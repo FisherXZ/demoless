@@ -140,6 +140,17 @@ and P1D can replace `getProductFacts()`.
 - LLM: streamed, sentence-chunked into TTS.
 - TTS: short per-sentence REST requests stream PCM straight to the client.
 - Voice: default `aura-2-thalia-en` (override with `DEEPGRAM_TTS_MODEL`).
+- Speaking rate: `TTS_SPEED` (1.0 normal; Deepgram ~0.5-2.0, ElevenLabs 0.7-1.2).
+- **Pipelined TTS** (`pipelineSpeak` in `server/session.ts`): each sentence is
+  synthesized into its own `ChunkChannel` (`server/util/chunkChannel.ts`) the
+  moment its text arrives, so the next sentence's TTS request is already in
+  flight while the current one streams. A single consumer drains the channels in
+  order, so audio reaches the browser sequentially with no gaps between
+  sentences.
+- **Playback jitter buffer** (`PcmPlayer`, `bufferAhead` ~120ms): when playback
+  (re)starts from idle or recovers from an underrun, a small cushion is
+  scheduled before audio plays so network/synthesis jitter doesn't cause
+  glitches. Continuous audio stays gapless (no added latency mid-stream).
 
 ## Barge-in (P2C)
 

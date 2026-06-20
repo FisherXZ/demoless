@@ -1,6 +1,6 @@
 import { DeepgramClient } from "@deepgram/sdk";
 import { AUDIO_SAMPLE_RATE, type Language, LANGUAGES } from "../../lib/voice/messages";
-import { readStream, type TtsProvider } from "./index";
+import { getTtsSpeed, readStream, type TtsProvider } from "./index";
 
 /**
  * Deepgram Aura-2 TTS via the REST streaming endpoint.
@@ -40,6 +40,8 @@ export class DeepgramTts implements TtsProvider {
         encoding: "linear16",
         sample_rate: AUDIO_SAMPLE_RATE,
         container: "none",
+        // Aura-2 speaking-rate multiplier; 1.0 normal, >1 faster.
+        speed: getTtsSpeed(),
       },
       { abortSignal: signal }
     );

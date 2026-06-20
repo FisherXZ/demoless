@@ -17,6 +17,16 @@ export interface TtsProvider {
   ): AsyncIterable<Buffer>;
 }
 
+/**
+ * Speech-rate multiplier from env (TTS_SPEED). 1.0 = normal, >1 = faster.
+ * `min`/`max` clamp to each provider's supported range.
+ */
+export function getTtsSpeed(min = 0.5, max = 2.0): number {
+  const raw = Number(process.env.TTS_SPEED);
+  if (!Number.isFinite(raw) || raw <= 0) return 1.0;
+  return Math.min(max, Math.max(min, raw));
+}
+
 /** Pick the TTS provider from env (default: Deepgram Aura-2). */
 export function createTts(): TtsProvider {
   const provider = (process.env.TTS_PROVIDER ?? "deepgram").toLowerCase();

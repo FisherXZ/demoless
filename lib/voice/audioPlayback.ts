@@ -10,9 +10,15 @@ export class PcmPlayer {
   private nextTime = 0;
   private sources = new Set<AudioBufferSourceNode>();
 
+  /**
+   * @param bufferAhead Seconds of cushion scheduled before playback (re)starts.
+   *  Absorbs network/synthesis jitter so chunks don't underrun into glitches.
+   *  Only adds latency when (re)starting from idle; continuous audio is gapless.
+   */
   constructor(
     private ctx: AudioContext,
-    private sampleRate = 24000
+    private sampleRate = 24000,
+    private bufferAhead = 0.12
   ) {
     this.gain = ctx.createGain();
     this.gain.connect(ctx.destination);
@@ -30,7 +36,12 @@ export class PcmPlayer {
     src.connect(this.gain);
 
     const now = this.ctx.currentTime;
-    const startAt = Math.max(now, this.nextTime);
+    // If the schedule has fallen behind (idle start or an underrun), rebuild a
+    // small cushion before resuming; otherwise schedule back-to-back, gapless.
+    if (this.nextTime < now) {
+      this.nextTime = now + this.bufferAhead;
+    }
+    const startAt = this.nextTime;
     src.start(startAt);
     this.nextTime = startAt + buffer.duration;
 

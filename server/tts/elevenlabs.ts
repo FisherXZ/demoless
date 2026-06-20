@@ -1,5 +1,5 @@
 import { AUDIO_SAMPLE_RATE, type Language } from "../../lib/voice/messages";
-import { readStream, type TtsProvider } from "./index";
+import { getTtsSpeed, readStream, type TtsProvider } from "./index";
 
 /**
  * Optional ElevenLabs TTS provider (set TTS_PROVIDER=elevenlabs).
@@ -37,7 +37,12 @@ export class ElevenLabsTts implements TtsProvider {
         "xi-api-key": this.apiKey,
         "content-type": "application/json",
       },
-      body: JSON.stringify({ text, model_id: this.modelId }),
+      // ElevenLabs caps speed at 0.7-1.2 (1.0 = normal).
+      body: JSON.stringify({
+        text,
+        model_id: this.modelId,
+        voice_settings: { speed: getTtsSpeed(0.7, 1.2) },
+      }),
       signal,
     });
 

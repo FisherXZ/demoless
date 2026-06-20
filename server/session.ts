@@ -1,5 +1,6 @@
 import type { WebSocket } from "ws";
 import {
+  AUDIO_SAMPLE_RATE,
   DEFAULT_LANGUAGE,
   type Language,
   type ServerEvent,
@@ -9,6 +10,7 @@ import { DeepgramStt } from "./deepgram/stt";
 import { createOrchestrator, type Orchestrator } from "./orchestrator";
 import type { ConversationTurn } from "./orchestrator/types";
 import { createTts, type TtsProvider } from "./tts";
+import { ChunkChannel } from "./util/chunkChannel";
 
 /**
  * One live voice conversation: bridges the browser <-> Deepgram STT <->
@@ -139,38 +141,13 @@ export class VoiceSession {
     this.history.push({ role: "user", text: userText });
     this.setState("thinking");
 
-    const agentChunks: string[] = [];
+    let spoken: string[] = [];
     try {
-      for await (const cmd of this.orchestrator.runTurn(
-        { text: userText, language: this.language },
-        { history: this.history.slice(0, -1), buyerNotes: this.buyerNotes },
+      spoken = await this.pipelineSpeak(
+        this.orchestratorSay(userText, abort.signal),
+        turn,
         abort.signal
-      )) {
-        if (abort.signal.aborted) break;
-        switch (cmd.type) {
-          case "say":
-            agentChunks.push(cmd.text);
-            await this.speakFragment(cmd.text, turn, abort.signal);
-            break;
-          // Tolerated team-contract commands (P3/P4) - forward for the UI.
-          case "screen_is_on":
-            this.send({ t: "screen_is_on", page: cmd.page });
-            break;
-          case "remember":
-            this.send({ t: "remember", note: cmd.note, noteType: cmd.noteType });
-            break;
-          case "buyer_loaded":
-            this.buyerNotes = cmd.notes ?? this.buyerNotes;
-            this.send({
-              t: "buyer_loaded",
-              buyerId: cmd.buyerId,
-              notes: cmd.notes,
-            });
-            break;
-          default:
-            break;
-        }
-      }
+      );
     } catch (err) {
       if (!abort.signal.aborted) {
         this.send({
@@ -181,14 +158,154 @@ export class VoiceSession {
     }
 
     if (!abort.signal.aborted) {
-      if (agentChunks.length > 0) {
-        this.history.push({ role: "agent", text: agentChunks.join(" ") });
+      if (spoken.length > 0) {
+        this.history.push({ role: "agent", text: spoken.join(" ") });
       }
       this.send({ t: "tts_end", turn });
       this.agentSpeaking = false;
       this.setState("listening");
       this.active = null;
     }
+  }
+
+  /**
+   * Drive the orchestrator and yield only the spoken (`say`) fragments. Other
+   * commands (P3/P4 team contract) are forwarded to the client as side effects.
+   */
+  private async *orchestratorSay(
+    userText: string,
+    signal: AbortSignal
+  ): AsyncIterable<string> {
+    for await (const cmd of this.orchestrator.runTurn(
+      { text: userText, language: this.language },
+      { history: this.history.slice(0, -1), buyerNotes: this.buyerNotes },
+      signal
+    )) {
+      if (signal.aborted) return;
+      switch (cmd.type) {
+        case "say":
+          yield cmd.text;
+          break;
+        case "screen_is_on":
+          this.send({ t: "screen_is_on", page: cmd.page });
+          break;
+        case "remember":
+          this.send({ t: "remember", note: cmd.note, noteType: cmd.noteType });
+          break;
+        case "buyer_loaded":
+          this.buyerNotes = cmd.notes ?? this.buyerNotes;
+          this.send({
+            t: "buyer_loaded",
+            buyerId: cmd.buyerId,
+            notes: cmd.notes,
+          });
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  /**
+   * Speak a stream of sentences with pipelined synthesis.
+   *
+   * Each sentence is synthesized into its own channel as soon as its text
+   * arrives, so the *next* sentence's TTS request is already in flight while the
+   * current one is still streaming to the client. A single consumer drains the
+   * channels in order, so audio reaches the browser sequentially with no gaps
+   * between sentences. Returns the sentences actually spoken (for history).
+   */
+  private async pipelineSpeak(
+    texts: AsyncIterable<string>,
+    turn: number,
+    signal: AbortSignal
+  ): Promise<string[]> {
+    const jobs: { text: string; channel: ChunkChannel }[] = [];
+    const spoken: string[] = [];
+    let producerDone = false;
+    let wake: (() => void) | null = null;
+    const wakeConsumer = () => {
+      if (wake) {
+        const w = wake;
+        wake = null;
+        w();
+      }
+    };
+
+    // Producer: pull sentences and kick off their synthesis immediately.
+    const producer = (async () => {
+      try {
+        for await (const text of texts) {
+          if (signal.aborted) break;
+          const channel = new ChunkChannel();
+          jobs.push({ text, channel });
+          wakeConsumer();
+          void (async () => {
+            try {
+              for await (const chunk of this.tts.synthesize(
+                text,
+                this.language,
+                signal
+              )) {
+                if (signal.aborted) break;
+                channel.push(chunk);
+              }
+            } catch (err) {
+              if (!signal.aborted) {
+                this.send({
+                  t: "error",
+                  message: `TTS: ${(err as Error).message}`,
+                });
+              }
+            } finally {
+              channel.close();
+            }
+          })();
+        }
+      } finally {
+        producerDone = true;
+        wakeConsumer();
+      }
+    })();
+
+    // Consumer: send each sentence's caption + audio chunks in order.
+    let i = 0;
+    let seq = 0;
+    while (!signal.aborted) {
+      if (i >= jobs.length) {
+        if (producerDone) break;
+        // Register the waiter, then re-check to avoid a missed wakeup.
+        const waited = new Promise<void>((res) => {
+          wake = res;
+        });
+        if (i < jobs.length || producerDone) {
+          wake = null;
+        } else {
+          await waited;
+        }
+        continue;
+      }
+
+      const job = jobs[i++];
+      this.send({ t: "say", text: job.text, turn });
+      this.agentSpeaking = true;
+      this.setState("speaking");
+      spoken.push(job.text);
+
+      for await (const chunk of job.channel) {
+        if (signal.aborted) break;
+        this.send({
+          t: "tts_chunk",
+          b64: chunk.toString("base64"),
+          sampleRate: AUDIO_SAMPLE_RATE,
+          turn,
+          seq: seq++,
+        });
+      }
+    }
+
+    await producer;
+    return spoken;
   }
 
   /** Speak a one-off line (greeting) that may or may not be recorded in history. */
@@ -224,7 +341,7 @@ export class VoiceSession {
         this.send({
           t: "tts_chunk",
           b64: chunk.toString("base64"),
-          sampleRate: 24000,
+          sampleRate: AUDIO_SAMPLE_RATE,
           turn,
           seq: seq++,
         });
