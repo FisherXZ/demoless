@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { enterDemo } from "./actions";
 import {
   SECTIONS,
   CAPTIONS,
@@ -28,6 +30,7 @@ interface DemoState {
   captionsOn: boolean;
   selectedId: string | null;
   elapsed: number;
+  recallLine?: string;
   form: FormState;
 }
 
@@ -41,8 +44,6 @@ const initialState: DemoState = {
   selectedId: null,
   elapsed: 0,
   form: {
-    name: "",
-    email: "",
     role: "VP of Sales",
     size: "51–200",
     useCase: "Outbound sales",
@@ -52,6 +53,8 @@ const initialState: DemoState = {
 
 export function useDemoState(): DemoVals {
   const [s, set] = useState<DemoState>(initialState);
+  const { data: session, status } = useSession();
+  const isAuthed = status === "authenticated";
 
   const patch = (p: Partial<DemoState>) => set((prev) => ({ ...prev, ...p }));
   const setF = (k: keyof FormState, v: string) =>
@@ -127,12 +130,33 @@ export function useDemoState(): DemoVals {
     goLanding: () => patch({ screen: "landing" }),
     goForm: () => patch({ screen: "form" }),
     goDashboard: () => patch({ screen: "dashboard", selectedId: null }),
-    startDemo: () =>
-      patch({ screen: "room", moment: 0, elapsed: 0, paused: false }),
+    startDemo: async () => {
+      if (!isAuthed) return;
+      // Persist the verified buyer into P4 Redis and pull recall before entering.
+      const { recallLine } = await enterDemo({
+        role: form.role,
+        size: form.size,
+        useCase: form.useCase,
+      });
+      patch({
+        screen: "room",
+        moment: 0,
+        elapsed: 0,
+        paused: false,
+        recallLine,
+      });
+    },
+
+    authStatus: status,
+    isAuthed,
+    authEmail: session?.user?.email ?? undefined,
+    authName: session?.user?.name ?? undefined,
+    signInGoogle: () => signIn("google"),
+    signOutGoogle: () => signOut(),
+    canStart: isAuthed,
+    recallLine: s.recallLine,
 
     form,
-    onName: (e) => setF("name", e.target.value),
-    onEmail: (e) => setF("email", e.target.value),
     onRole: (e) => setF("role", e.target.value),
     onSize: (e) => setF("size", e.target.value),
     onUseCase: (e) => setF("useCase", e.target.value),

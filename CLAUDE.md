@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Demoless is an AI agent platform that runs live product demos for companies 24/7 (see `BRAINSTORM.txt` for the product vision, which breaks the work into tracks P1–P5). The repo is mostly the **frontend prototype**: a Next.js 15 (App Router) + TypeScript + Tailwind single-page app with four state-driven screens and mock data. There is no app server yet — the only non-frontend code so far is the **P4 memory layer** (`lib/memory/`), a standalone Redis module meant to be imported by P1's future server.
+Demoless is an AI agent platform that runs live product demos for companies 24/7 (see `BRAINSTORM.txt` for the product vision, which breaks the work into tracks P1–P5). The repo is mostly the **frontend prototype**: a Next.js 15 (App Router) + TypeScript + Tailwind single-page app with four state-driven screens and mock data. The non-UI code is the **P4 memory layer** (`lib/memory/`), a standalone Redis module, plus **Google auth** (Auth.js) which is the one place the frontend is wired to a real backend: signing in persists the verified buyer into the memory layer via a server action.
 
 ## Commands
 
@@ -20,11 +20,13 @@ docker run -d -p 6379:6379 redis:7        # local Redis
 REDIS_URL=redis://localhost:6379 npm run memory:smoke   # end-to-end smoke test
 ```
 
+Google sign-in needs OAuth credentials in `.env.local` (gitignored; placeholders in `.env.example`): `AUTH_SECRET` (`npx auth secret`), `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` from a Google Cloud OAuth 2.0 Web client whose redirect URI is `http://localhost:3000/api/auth/callback/google`. Without these, the dev server runs but the sign-in flow fails.
+
 There is no unit-test runner. The only automated check is `scripts/memory-smoke.ts` (run via `npm run memory:smoke`), which exercises the memory layer against a live Redis.
 
 ## Architecture
 
-The whole app is a single client-rendered page with no routing. `app/page.tsx` calls `useDemoState()` once and switches between four screen components based on `vals.screen` (`landing` | `form` | `room` | `dashboard`). `PrototypeNav` (bottom-left) renders on every screen and lets you jump between them.
+The whole app is a single client-rendered page with no routing. `app/page.tsx` calls `useDemoState()` once and switches between four screen components based on `vals.screen` (`landing` | `form` | `room` | `dashboard`). `PrototypeNav` (bottom-left) renders on every screen and lets you jump between them. The only server-side surfaces are the Auth.js route (`app/api/auth/[...nextauth]/`) and the `enterDemo` server action (`lib/actions.ts`); `app/layout.tsx` wraps everything in `components/Providers.tsx` (`<SessionProvider>`).
 
 **Single source of truth: `lib/useDemoState.ts`.** This hook owns all UI state in one `useState` object and returns a single `DemoVals` object — not just raw state, but fully *derived* view values: hex colors, formatted clock/labels, percentage strings, callbacks, and per-item view models (`sectionItems`, `columns`, `sel`). Every screen component receives the entire `vals: DemoVals` object as its only prop and is essentially presentational. This deliberately mirrors the original design export's `renderVals()` pattern.
 
@@ -48,6 +50,14 @@ A self-contained Redis module — **not wired into the frontend**. It exists to 
 - **Live feed** (`pubsub.ts`): every `remember` also `PUBLISH`es a `note_added` event on the `demoless:notes` channel. `createNotesSubscriber` (uses a separate ioredis connection, since a subscribed client can't issue commands) is what P1's server bridges to a WebSocket for the P5 panel.
 - **Contracts** (`types.ts`): `RememberCommand` / `BuyerLoadedEvent` / `NoteAddedEvent` are the integration seam with other tracks and **must be reconciled with P1B.1's shared message types** once those land.
 
+### Google auth → memory (the one real backend path)
+
+Auth.js (NextAuth v5) provides Google sign-in and is the only flow that touches a real backend end-to-end. `auth.ts` (repo root) exports `handlers`/`signIn`/`signOut`/`auth`; the route handler re-exports `handlers`. Session is JWT — no DB adapter.
+
+- **Identity is verified, not typed.** The pre-call form no longer has name/email inputs; `FormState` holds only `role`/`size`/`useCase`/`pain`. `useDemoState` calls `useSession()` and exposes `isAuthed`, `authEmail`, `authName`, `signInGoogle`, `signOutGoogle`, `canStart`, and `recallLine` on `DemoVals`. The **Join AI Demo** button is gated on `canStart` (= signed in).
+- **`startDemo` is async.** When authed it `await`s `enterDemo({ role, size, useCase })` (the server action in `lib/actions.ts`) before switching to the room. `enterDemo` reads email/name from the **server-verified session** (never client input), calls the P4 layer's `upsertProfile` + `loadBuyer`, and returns `recallLine` for the returning-buyer chip in `DemoRoom`. A Redis outage is caught and swallowed so the demo still starts.
+- This is the first consumer of `lib/memory`; the gate lives only on the form's Join button — `PrototypeNav` still jumps straight to any screen (dev shortcut).
+
 ### Styling
 
 Tailwind with a custom palette defined as named tokens in `tailwind.config.ts` (`brand`, `ink`, `night`, `muted`, `paper`, etc.). However, **state-driven colors are applied as inline `style` hex strings computed in `useDemoState`** (e.g. `bg`, `dotBg`, `intentColor`), because they vary per item/state. Don't try to convert those to Tailwind classes — they're dynamic by design.
@@ -57,5 +67,5 @@ Path alias `@/*` maps to the repo root (`tsconfig.json`).
 ## Known placeholders
 
 - The AI rep avatar is a placeholder in `PreCallForm.tsx` and `DemoRoom.tsx` (the design export had no headshot).
-- The frontend still runs on mock data (`lib/data.ts`); it is **not** connected to the `lib/memory` layer or any API/auth.
-- `lib/memory` has no consumer yet — there's no server importing it, and the message contracts in `lib/memory/types.ts` are provisional pending P1B.1.
+- The dashboard/demo-room screens still render mock data (`lib/data.ts`); only the sign-in → buyer-profile path is wired to `lib/memory`. Notes (`remember`) and the live feed have no producer/consumer in the UI yet.
+- The message contracts in `lib/memory/types.ts` are still provisional pending P1B.1.

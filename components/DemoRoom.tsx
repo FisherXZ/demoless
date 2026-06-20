@@ -22,6 +22,14 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               Tailored for {vals.tailoredFor}
             </span>
           </div>
+          {vals.recallLine && (
+            <div className="inline-flex items-center gap-[7px] px-[11px] py-[5px] rounded-full bg-brandsoft2 border border-brand max-w-[420px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-live flex-none" />
+              <span className="text-xs text-[#c7d2fe] font-mono truncate">
+                {vals.recallLine}
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-4">
           <span className="text-[13px] text-faint2 font-mono inline-flex items-center gap-1.5">
