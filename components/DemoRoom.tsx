@@ -392,8 +392,9 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex-none flex items-center justify-center gap-3 px-5 pt-1 pb-[18px] relative">
+      {/* Controls — lifted above the fixed PROTOTYPE nav (bottom-left) so it
+          can't cover the mic / language buttons. */}
+      <div className="flex-none flex items-center justify-center gap-3 px-5 pt-1 pb-[18px] mb-14 relative">
         <button
           onClick={() => (voice.active ? voice.stop() : void voice.start())}
           title={voice.active ? `Stop talking to ${agentName}` : `Talk to ${agentName}`}
