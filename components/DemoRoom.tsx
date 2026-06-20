@@ -1,13 +1,35 @@
 "use client";
 
 import type { DemoVals } from "@/lib/types";
+import { useVoiceAgent } from "@/lib/voice/useVoiceAgent";
+import { LANGUAGES, type Language } from "@/lib/voice/messages";
+
+const STATUS_LABEL: Record<string, string> = {
+  idle: "Tap the mic to talk",
+  connecting: "Connecting...",
+  listening: "Listening",
+  thinking: "Thinking...",
+  speaking: "Maya is speaking",
+  error: "Voice unavailable",
+};
 
 export default function DemoRoom({ vals }: { vals: DemoVals }) {
+  const voice = useVoiceAgent();
+
+  // Maya is "live" whenever the voice loop is speaking; fall back to the mock
+  // presenting state so the prototype still animates without a voice server.
+  const mayaSpeaking = voice.active ? voice.agentSpeaking : !vals.paused;
+
+  // Captions: prefer real spoken text once the voice loop is running.
+  const mayaCaption = voice.active && voice.lastCaption ? voice.lastCaption : vals.caption;
+
+  const otherLang: Language = voice.language === "en" ? "es" : "en";
+
   return (
     <div className="h-screen bg-night flex flex-col overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 flex-none">
-        <div className="flex items-center gap-[14px]">
+              <div className="flex items-center gap-[14px]">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center">
               <div className="w-2.5 h-2.5 rounded-full bg-brand" />
@@ -16,6 +38,21 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               Demoless live demo
             </span>
           </div>
+          {voice.active && (
+            <div className="inline-flex items-center gap-[7px] px-[11px] py-[5px] rounded-full bg-night3 border border-coalline">
+              <span
+                className="w-1.5 h-1.5 rounded-full bg-live"
+                style={
+                  voice.status === "listening"
+                    ? { animation: "dlSpeak 1.3s infinite" }
+                    : undefined
+                }
+              />
+              <span className="text-xs text-stone350 font-mono">
+                {STATUS_LABEL[voice.status] ?? voice.status}
+              </span>
+            </div>
+          )}
           <div className="inline-flex items-center gap-[7px] px-[11px] py-[5px] rounded-full bg-night3 border border-coalline">
             <span className="w-1.5 h-1.5 rounded-full bg-brand" />
             <span className="text-xs text-stone350 font-mono">
@@ -480,10 +517,12 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               <div className="absolute left-2 bottom-[7px] flex items-center gap-1.5 pointer-events-none">
                 <span className="relative w-[9px] h-[9px]">
                   <span className="absolute inset-0 rounded-full bg-live" />
-                  <span
-                    className="absolute -inset-1 rounded-full bg-live"
-                    style={{ animation: "dlSpeak 1.3s infinite" }}
-                  />
+                  {mayaSpeaking && (
+                    <span
+                      className="absolute -inset-1 rounded-full bg-live"
+                      style={{ animation: "dlSpeak 1.3s infinite" }}
+                    />
+                  )}
                 </span>
                 <span className="text-[11px] text-white font-semibold">Maya</span>
                 <span className="text-[9px] text-stone350 bg-black/40 px-[5px] py-px rounded font-mono">
@@ -494,12 +533,20 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
 
             {/* Captions overlay */}
             {vals.captionsOn && (
-              <div className="absolute left-[14px] bottom-[14px] max-w-[58%]">
+              <div className="absolute left-[14px] bottom-[14px] max-w-[58%] flex flex-col gap-1.5">
+                {voice.active && voice.partialTranscript && (
+                  <div className="bg-brand/90 text-white px-[15px] py-[9px] rounded-[11px] text-sm leading-[1.4] self-start">
+                    <span className="text-[#dcd6ff] font-bold text-xs font-mono">
+                      YOU&nbsp;&nbsp;
+                    </span>
+                    {voice.partialTranscript}
+                  </div>
+                )}
                 <div className="bg-night/90 text-white px-[15px] py-[11px] rounded-[11px] text-sm leading-[1.4]">
                   <span className="text-[#a5b4fc] font-bold text-xs font-mono">
                     MAYA&nbsp;&nbsp;
                   </span>
-                  {vals.caption}
+                  {mayaCaption}
                 </div>
               </div>
             )}
@@ -552,11 +599,22 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
       {/* Bottom controls */}
       <div className="flex-none flex items-center justify-center gap-3 px-5 pt-1 pb-[18px] relative">
         <button
-          onClick={vals.toggleMute}
+          onClick={() => (voice.active ? voice.stop() : void voice.start())}
+          title={voice.active ? "Stop talking to Maya" : "Talk to Maya"}
           className="w-[50px] h-[50px] rounded-full border-none cursor-pointer text-[19px] flex items-center justify-center"
-          style={{ background: vals.micBg, color: vals.micColor }}
+          style={{
+            background: voice.active ? "#4f46e5" : "#dc2626",
+            color: "#fff",
+          }}
         >
-          {vals.micIcon}
+          {voice.active ? "\u{1F399}" : "\u{1F507}"}
+        </button>
+        <button
+          onClick={() => voice.setLanguage(otherLang)}
+          title={`Switch to ${LANGUAGES[otherLang].label}`}
+          className="h-[50px] px-4 rounded-[25px] border-none cursor-pointer bg-coal text-line text-[13px] font-bold flex items-center justify-center font-mono"
+        >
+          {voice.language.toUpperCase()}
         </button>
         <button
           onClick={vals.toggleCam}
@@ -584,8 +642,14 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
         >
           End call
         </button>
-        <div className="absolute right-5 text-xs text-dim font-mono">
-          Maya is presenting
+        <div className="absolute right-5 text-xs font-mono">
+          {voice.error ? (
+            <span className="text-danger">{voice.error}</span>
+          ) : (
+            <span className="text-dim">
+              {voice.active ? STATUS_LABEL[voice.status] : "Maya is presenting"}
+            </span>
+          )}
         </div>
       </div>
     </div>

@@ -1,0 +1,70 @@
+/**
+ * Schedules streamed linear16 PCM chunks for gapless playback via Web Audio.
+ *
+ * Each chunk becomes an AudioBufferSourceNode scheduled back-to-back through a
+ * gain node. Keeping references to live sources lets {@link stop} cut playback
+ * instantly mid-sentence, which is what makes barge-in feel immediate (P2C).
+ */
+export class PcmPlayer {
+  private gain: GainNode;
+  private nextTime = 0;
+  private sources = new Set<AudioBufferSourceNode>();
+
+  constructor(
+    private ctx: AudioContext,
+    private sampleRate = 24000
+  ) {
+    this.gain = ctx.createGain();
+    this.gain.connect(ctx.destination);
+  }
+
+  /** Queue a chunk of linear16 PCM (mono @ sampleRate). */
+  enqueue(pcm: Int16Array) {
+    if (pcm.length === 0) return;
+    const buffer = this.ctx.createBuffer(1, pcm.length, this.sampleRate);
+    const channel = buffer.getChannelData(0);
+    for (let i = 0; i < pcm.length; i++) channel[i] = pcm[i] / 0x8000;
+
+    const src = this.ctx.createBufferSource();
+    src.buffer = buffer;
+    src.connect(this.gain);
+
+    const now = this.ctx.currentTime;
+    const startAt = Math.max(now, this.nextTime);
+    src.start(startAt);
+    this.nextTime = startAt + buffer.duration;
+
+    this.sources.add(src);
+    src.onended = () => this.sources.delete(src);
+  }
+
+  /** Stop everything currently queued/playing immediately (barge-in). */
+  stop() {
+    for (const src of this.sources) {
+      try {
+        src.onended = null;
+        src.stop();
+        src.disconnect();
+      } catch {
+        /* already stopped */
+      }
+    }
+    this.sources.clear();
+    this.nextTime = 0;
+  }
+
+  get isPlaying() {
+    return this.sources.size > 0 || this.nextTime > this.ctx.currentTime;
+  }
+}
+
+/** Decode a base64 linear16 payload into an Int16Array. */
+export function base64ToInt16(b64: string): Int16Array {
+  const binary = atob(b64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+  // Ensure even length for 16-bit samples.
+  const usable = len - (len % 2);
+  return new Int16Array(bytes.buffer, 0, usable / 2);
+}
