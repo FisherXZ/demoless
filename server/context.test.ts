@@ -24,4 +24,13 @@ describe("assembleContext", () => {
     const { messages } = assembleContext(base, "human");
     expect(messages).toEqual([{ role: "user", content: "we waste hours prepping demos" }]);
   });
+
+  it("injects a kickoff user message on the greet turn (empty history) so messages is never empty", () => {
+    // The real API rejects `messages: []` with a 400; the greet turn fires
+    // before the visitor speaks, so context must supply a user turn.
+    const greetState: LoopState = { ...base, history: [] };
+    const { messages } = assembleContext(greetState, "greet");
+    expect(messages.length).toBeGreaterThan(0);
+    expect(messages[0].role).toBe("user"); // API requires the first message be a user turn
+  });
 });

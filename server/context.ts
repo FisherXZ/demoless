@@ -43,5 +43,15 @@ export function assembleContext(state: LoopState, turn: TurnType) {
   ].join("\n\n");
 
   const messages = state.history.map((h) => ({ role: h.role, content: h.text }));
+  // The API requires a non-empty user turn. The greet turn fires before the
+  // visitor has said anything (empty history), so inject a kickoff so the model
+  // has something to respond to instead of getting `messages: []` → 400.
+  if (messages.length === 0) {
+    messages.push({
+      role: "user",
+      content:
+        "[The visitor just opened the demo and hasn't spoken yet. Greet them: open with the HOOK, and if they are a returning buyer with notes, welcome them back by what they cared about last time.]",
+    });
+  }
   return { system, messages };
 }
