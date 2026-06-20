@@ -19,6 +19,8 @@ const useStub = () => process.env.USE_STUB === "1" || !process.env.ANTHROPIC_API
 let client: Anthropic | null = null;
 const getClient = () => (client ??= new Anthropic());
 
+const GRACEFUL: Reply = { commands: [{ kind: "say", text: "Sorry — give me one second." }] };
+
 /** Pure: the exact params we send. Extracted so it's testable without a network call. */
 export function buildParams(req: CompleteRequest) {
   return {
@@ -33,12 +35,14 @@ export function buildParams(req: CompleteRequest) {
 
 export async function complete(req: CompleteRequest): Promise<Reply> {
   if (useStub()) return Reply.parse(stub(req));
-  const res = await getClient().messages.parse(buildParams(req));
-  if (!res.parsed_output) {
-    // Refusal / max_tokens / parse miss — degrade gracefully, never crash the loop.
-    return { commands: [{ kind: "say", text: "Sorry — give me one second." }] };
+  try {
+    const res = await getClient().messages.parse(buildParams(req));
+    if (!res.parsed_output) return GRACEFUL;
+    return res.parsed_output;
+  } catch (err) {
+    console.error("[model] complete failed:", err);
+    return GRACEFUL;
   }
-  return res.parsed_output;
 }
 
 function stub(req: CompleteRequest): Reply {

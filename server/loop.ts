@@ -59,11 +59,6 @@ export class Loop {
     this.enqueue("greet");
   }
 
-  /** Reset between runs ("restock"). wipeBuyer is handled by the memory lane. */
-  reset() {
-    this.state = freshState(this.state.sessionId, this.state.buyerId);
-  }
-
   // ── the turn engine ────────────────────────────────────────────────────────
   private enqueue(turn: TurnType) {
     this.chain = this.chain.then(() => this.runTurn(turn)).catch((err) => {
@@ -89,6 +84,9 @@ export class Loop {
     if (reply.select) {
       const valid = new Set(CATALOG.map((s) => s.id));
       const picked = reply.select.filter((id) => valid.has(id));
+      if (picked.length < reply.select.length) {
+        console.warn(`[loop] select: ${reply.select.length - picked.length} unknown id(s) dropped`);
+      }
       this.state.selected = picked;
       this.state.tourIndex = 0;
     }
@@ -105,12 +103,12 @@ export class Loop {
     if (!t) return;
     const last = Math.max(0, this.state.selected.length - 1);
     if (t === "advance") this.state.tourIndex = Math.min(this.state.tourIndex + 1, last);
-    else if (typeof t === "object") this.state.tourIndex = t.jump;
+    else if (typeof t === "object") this.state.tourIndex = Math.max(0, Math.min(Math.trunc(t.jump), last));
     // "stay" (detour) and "resume" leave the bookmark; the LLM re-navigates on resume.
   }
 }
 
-function freshState(sessionId: string, buyerId: string): LoopState {
+export function freshState(sessionId: string, buyerId: string): LoopState {
   return {
     sessionId,
     buyerId,

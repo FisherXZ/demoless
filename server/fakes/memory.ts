@@ -13,11 +13,13 @@ export function loadBuyer(id: string, name?: string): Buyer {
     b = { id, name, notes: [] };
     store.set(id, b);
   }
-  return b;
+  return structuredClone(b); // copy-on-read: never alias the stored object
 }
 
 export function saveNote(id: string, note: NoteInput) {
-  const b = loadBuyer(id);
+  // Mutate the stored object directly (bypass the copy-on-read in loadBuyer).
+  let b = store.get(id);
+  if (!b) { b = { id, notes: [] }; store.set(id, b); }
   b.notes.push({ ...note, at: new Date().toISOString() }); // runtime stamps `at`
   b.lastSeen = new Date().toISOString();
 }

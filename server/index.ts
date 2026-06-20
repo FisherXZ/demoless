@@ -49,10 +49,15 @@ function attach(ws: WebSocket) {
     const msg = parsed as import("../shared/wire").ClientMsg;
 
     if (msg.t === "start") {
+      if (!msg.buyerId) {
+        emit({ t: "error", message: "buyerId required" });
+        return;
+      }
       buyerId = msg.buyerId;
       loop = new Loop(`sess-${Date.now()}`, buyerId);
       wire(loop);
-      loop.start(); // GREET turn
+      // greet AFTER wire(): buyer_loaded must land first
+      loop.start();
       return;
     }
     if (!loop) {
@@ -63,8 +68,10 @@ function attach(ws: WebSocket) {
       loop.send({ kind: "user_said", text: msg.text, final: true });
     } else if (msg.t === "reset") {
       if (msg.wipeBuyer) wipeBuyer(buyerId);
-      loop.reset();
-      registerMemoryFake(loop, buyerId); // re-fire buyer_loaded
+      // Recreate the Loop so handler arrays are fresh (no double-registration).
+      loop = new Loop(`sess-${Date.now()}`, buyerId);
+      wire(loop);
+      // greet AFTER wire(): buyer_loaded must land first
       loop.start();
     }
   });
