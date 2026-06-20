@@ -43,15 +43,24 @@ export function assembleContext(state: LoopState, turn: TurnType) {
   ].join("\n\n");
 
   const messages = state.history.map((h) => ({ role: h.role, content: h.text }));
-  // The API requires a non-empty user turn. The greet turn fires before the
-  // visitor has said anything (empty history), so inject a kickoff so the model
-  // has something to respond to instead of getting `messages: []` → 400.
-  if (messages.length === 0) {
+  // The Messages API needs the conversation to END with a user turn: an empty
+  // array 400s ("at least one message"), and a trailing assistant message reads
+  // as a prefill and 400s on Opus 4.8. Non-human turns (greet, screen) carry no
+  // user input, so inject a synthetic user "event" describing what just happened.
+  if (turn === "greet") {
     messages.push({
       role: "user",
       content:
         "[The visitor just opened the demo and hasn't spoken yet. Greet them: open with the HOOK, and if they are a returning buyer with notes, welcome them back by what they cared about last time.]",
     });
+  } else if (turn === "screen") {
+    messages.push({
+      role: "user",
+      content: `[The product screen just changed — now showing: ${state.screen?.summary ?? "a new page"}${state.screen?.url ? ` (${state.screen.url})` : ""}. In one or two sentences, describe what's on screen and tie it to what the prospect cares about. Do NOT navigate.]`,
+    });
+  } else if (messages.length === 0 || messages[messages.length - 1].role === "assistant") {
+    // safety net: never send an empty array or end on an assistant (prefill) turn
+    messages.push({ role: "user", content: "[Continue.]" });
   }
   return { system, messages };
 }

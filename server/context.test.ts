@@ -33,4 +33,20 @@ describe("assembleContext", () => {
     expect(messages.length).toBeGreaterThan(0);
     expect(messages[0].role).toBe("user"); // API requires the first message be a user turn
   });
+
+  it("ends with a user turn on a screen turn (history ending in assistant would 400 as a prefill)", () => {
+    // After a navigate, history ends with the agent's say; a screen/narrate turn
+    // must not send a trailing assistant message (prefill → 400 on Opus 4.8).
+    const screenState: LoopState = {
+      ...base,
+      history: [
+        { role: "user", text: "show me analytics" },
+        { role: "assistant", text: "Opening the dashboard." },
+      ],
+      screen: { url: "/analytics", summary: "the analytics view" },
+    };
+    const { messages } = assembleContext(screenState, "screen");
+    expect(messages[messages.length - 1].role).toBe("user");
+    expect(messages[messages.length - 1].content).toContain("analytics");
+  });
 });
