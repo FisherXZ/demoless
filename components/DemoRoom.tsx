@@ -2,6 +2,7 @@
 
 import type { DemoVals } from "@/lib/types";
 import { useVoiceAgent } from "@/lib/voice/useVoiceAgent";
+import { useAgentName } from "@/lib/voice/useAgentName";
 import { LANGUAGES, type Language } from "@/lib/voice/messages";
 
 function statusLabel(status: string, name: string): string {
@@ -25,17 +26,21 @@ function statusLabel(status: string, name: string): string {
 
 export default function DemoRoom({ vals }: { vals: DemoVals }) {
   const voice = useVoiceAgent();
+  const configuredName = useAgentName();
 
-  // Agent name follows the selected voice model; fall back to "Maya" for the
-  // mock prototype state (before a voice session reports its name).
-  const agentName = voice.active && voice.agentName ? voice.agentName : "Maya";
+  // Agent name follows the selected voice model. During a live session use the
+  // active voice's name; otherwise the server-configured name (mock prototype).
+  const agentName =
+    voice.active && voice.agentName ? voice.agentName : configuredName;
 
   // The rep is "live" whenever the voice loop is speaking; fall back to the mock
   // presenting state so the prototype still animates without a voice server.
   const mayaSpeaking = voice.active ? voice.agentSpeaking : !vals.paused;
 
-  // Captions: prefer real spoken text once the voice loop is running.
-  const mayaCaption = voice.active && voice.lastCaption ? voice.lastCaption : vals.caption;
+  // Captions: prefer real spoken text once the voice loop is running. Swap any
+  // "Maya" in the mock caption for the configured name so it stays consistent.
+  const rawCaption = voice.active && voice.lastCaption ? voice.lastCaption : vals.caption;
+  const mayaCaption = rawCaption.replace(/Maya/g, agentName);
 
   const otherLang: Language = voice.language === "en" ? "es" : "en";
 

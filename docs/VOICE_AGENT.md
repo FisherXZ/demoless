@@ -166,20 +166,42 @@ The agent's display name follows the selected voice instead of being hardcoded:
   model id (`aura-2-odysseus-en` -> "Odysseus", `aura-2-thalia-en` -> "Thalia");
   ElevenLabs uses `ELEVENLABS_VOICE_NAME` (voice ids aren't human names).
 - `AGENT_NAME` env overrides everything if you want a fixed name.
-- The session computes the name, uses it in the greeting + system prompt, and
-  sends it to the browser in the `ready` event. `useVoiceAgent` exposes
-  `agentName`, and `DemoRoom` uses it for the rep tile, captions, and status.
-  Switching the voice model (or language) updates the name everywhere.
+- During a live session the gateway computes the name, uses it in the greeting +
+  system prompt, and sends it to the browser in the `ready` event.
+  `useVoiceAgent` exposes `agentName`; `DemoRoom` uses it for the rep tile,
+  captions, and status. Switching the voice model (or language) updates it.
+- Pre-call screens (Landing, PreCallForm) and the DemoRoom fallback can't read
+  the server-only voice env, so they fetch the name from the `GET /api/agent-name`
+  route via the `useAgentName` hook. The route resolves the name the same way
+  (`createTts().voiceName(...)`), so there's a single source of truth.
 
-## Barge-in (P2C)
+## Barge-in: modes, noise filtering, sensitivity (P2C)
 
-Two triggers, both cut audio instantly via `PcmPlayer.stop()`:
-1. Server-side: Deepgram `SpeechStarted` (VAD) while Maya is speaking ->
-   `VoiceSession.bargeIn()` aborts the turn (stops LLM + TTS) and sends a
-   `barge_in` event.
-2. Client-side: receiving any `user_said` while audio is playing also stops
-   playback immediately, so the cut feels instant even before the server round
-   trip.
+On a speaker setup (no headphones) the mic hears the agent's own voice, and
+background noise can also trip naive barge-in - making the agent interrupt
+*itself* and cut off. Barge-in therefore has three modes via `BARGE_IN`
+(parsed in `server/bargeIn.ts`):
+
+- **`off`** (`false`): half-duplex. While the agent speaks, the session stops
+  forwarding mic audio to Deepgram and ignores stray transcripts
+  (`VoiceSession.listening`); a short post-speech guard (`POST_SPEECH_GUARD_MS`)
+  drops the echo tail. The agent always finishes. Most reliable on speakers.
+- **`speech`** (`true`, recommended for barge-in): the user can interrupt, but
+  only with *real speech*. A transcript heard mid-turn must clear a bar before it
+  counts (`VoiceSession.evaluateInterruption`):
+  - at least `BARGE_IN_MIN_WORDS` words (default 3), and
+  - at least `BARGE_IN_MIN_CONFIDENCE` STT confidence (default 0.6), and
+  - those words must be *novel* - the agent's own words it's currently speaking
+    are tracked (`recentAgentWords`) and discounted, so its echo doesn't count.
+  This is the noise filter: coughs, keyboard clatter, and the agent's own voice
+  don't reach the bar; a real sentence from the user does.
+- **`vad`**: interrupt on any Deepgram `SpeechStarted` (VAD) onset. Snappiest but
+  the most sensitive - only good with headphones.
+
+**Tuning sensitivity:** raise `BARGE_IN_MIN_WORDS` / `BARGE_IN_MIN_CONFIDENCE`
+to make the agent harder to interrupt (more noise-resistant); lower them to make
+it more responsive. When a barge-in fires, `VoiceSession.bargeIn()` aborts the
+turn (stops LLM + TTS) and emits `barge_in`; the client stops playback at once.
 
 ## Out of scope (owned by teammates)
 

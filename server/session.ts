@@ -6,7 +6,13 @@ import {
   type ServerEvent,
   parseClientMessage,
 } from "../lib/voice/messages";
-import { DeepgramStt } from "./deepgram/stt";
+import {
+  type BargeConfig,
+  novelWordCount,
+  readBargeConfig,
+  tokenize,
+} from "./bargeIn";
+import { DeepgramStt, type SttTranscript } from "./deepgram/stt";
 import { createOrchestrator, type Orchestrator } from "./orchestrator";
 import type { ConversationTurn } from "./orchestrator/types";
 import { createTts, type TtsProvider } from "./tts";
@@ -36,6 +42,62 @@ export class VoiceSession {
   /** How many recent turns to send to the orchestrator (bounds prompt size). */
   private static readonly MAX_HISTORY_TURNS = 12;
 
+  /** Drop stray echo for this long after the agent stops talking (ms). */
+  private static readonly POST_SPEECH_GUARD_MS = 600;
+
+  /**
+   * How (and how readily) the user can interrupt the agent. See {@link readBargeConfig}.
+   * "off" = half-duplex (ignore mic while the agent speaks; reliable on speakers);
+   * "vad" = interrupt on any sound; "speech" = interrupt only on real, confident
+   * speech (noise-filtered + sensitivity-tunable).
+   */
+  private barge: BargeConfig = readBargeConfig();
+
+  /** Lowercased words the agent is currently speaking, to discount mic echo. */
+  private recentAgentWords = new Set<string>();
+
+  /** Until this time we ignore mic input to avoid transcribing the agent's tail. */
+  private suppressInputUntil = 0;
+
+  /**
+   * Whether mic audio should reach Deepgram right now. In half-duplex mode we
+   * stop listening while the agent speaks (and briefly after) so its own voice
+   * can't trigger a false interruption. With barge-in on we always listen so we
+   * can detect a genuine interruption.
+   */
+  private get listening(): boolean {
+    if (this.barge.mode === "off") {
+      return !this.agentSpeaking && Date.now() >= this.suppressInputUntil;
+    }
+    return true;
+  }
+
+  /** Mark the agent as done speaking and arm the post-speech echo guard. */
+  private endSpeaking() {
+    this.agentSpeaking = false;
+    this.finals = [];
+    this.suppressInputUntil = Date.now() + VoiceSession.POST_SPEECH_GUARD_MS;
+  }
+
+  /** Remember the agent's words so mic echo of them won't count as interruption. */
+  private noteAgentWords(text: string) {
+    for (const word of tokenize(text)) this.recentAgentWords.add(word);
+  }
+
+  /**
+   * Decide whether a transcript heard while the agent is speaking is a real
+   * interruption. In "speech" mode it must clear the configured word + confidence
+   * bar (after discounting the agent's own echoed words); in "vad" mode the VAD
+   * onset already handled it; in "off" mode we never interrupt.
+   */
+  private evaluateInterruption(t: SttTranscript) {
+    if (this.barge.mode !== "speech") return;
+    if (t.confidence < this.barge.minConfidence) return;
+    if (novelWordCount(t.text, this.recentAgentWords) >= this.barge.minWords) {
+      this.bargeIn();
+    }
+  }
+
   /**
    * The agent's display name for the active voice. An explicit AGENT_NAME env
    * wins; otherwise it's derived from the selected voice model, so switching
@@ -55,8 +117,10 @@ export class VoiceSession {
 
     ws.on("message", (data, isBinary) => {
       if (isBinary) {
-        // Raw PCM from the mic -> Deepgram.
-        this.stt?.sendAudio(data as Buffer);
+        // Raw PCM from the mic -> Deepgram. In half-duplex mode we don't forward
+        // mic audio while the agent is speaking, so it can't hear itself and
+        // barge in on its own voice.
+        if (this.listening) this.stt?.sendAudio(data as Buffer);
       } else {
         this.onControl(data.toString());
       }
@@ -108,6 +172,15 @@ export class VoiceSession {
     const stt = new DeepgramStt(this.deepgramKey);
 
     stt.on("transcript", (t) => {
+      // While the agent is speaking, a transcript is a candidate interruption -
+      // judged by the barge-in policy (which filters noise + the agent's echo).
+      if (this.agentSpeaking) {
+        this.evaluateInterruption(t);
+        return;
+      }
+      // Post-speech guard: drop the agent's echo tail right after it stops.
+      if (Date.now() < this.suppressInputUntil) return;
+
       if (t.isFinal) {
         this.finals.push(t.text);
         const full = this.finals.join(" ").trim();
@@ -119,14 +192,21 @@ export class VoiceSession {
       }
     });
 
-    // VAD onset while Maya is talking => the prospect is interrupting (P2C).
+    // VAD onset while the agent is talking => barge-in, but only in "vad" mode.
+    // "speech" mode waits for transcribed words; "off" never interrupts.
     stt.on("speechStarted", () => {
-      if (this.agentSpeaking) this.bargeIn();
+      if (this.agentSpeaking && this.barge.mode === "vad") this.bargeIn();
     });
 
     // Backstop: if we got finals but no speech_final, end on utterance end.
     stt.on("utteranceEnd", () => {
-      if (this.finals.length > 0) this.endUtterance();
+      if (
+        !this.agentSpeaking &&
+        Date.now() >= this.suppressInputUntil &&
+        this.finals.length > 0
+      ) {
+        this.endUtterance();
+      }
     });
 
     stt.on("error", (err) =>
@@ -149,6 +229,7 @@ export class VoiceSession {
   private async runTurn(userText: string) {
     // A new utterance supersedes any in-progress response.
     this.cancelActive();
+    this.recentAgentWords.clear();
 
     const turn = ++this.turnCounter;
     const abort = new AbortController();
@@ -178,7 +259,7 @@ export class VoiceSession {
         this.history.push({ role: "agent", text: spoken.join(" ") });
       }
       this.send({ t: "tts_end", turn });
-      this.agentSpeaking = false;
+      this.endSpeaking();
       this.setState("listening");
       this.active = null;
     }
@@ -315,6 +396,7 @@ export class VoiceSession {
 
       const job = jobs[i++];
       this.send({ t: "say", text: job.text, turn });
+      this.noteAgentWords(job.text);
       this.agentSpeaking = true;
       this.setState("speaking");
       spoken.push(job.text);
@@ -338,6 +420,7 @@ export class VoiceSession {
   /** Speak a one-off line (greeting) that may or may not be recorded in history. */
   private async speakTurn(text: string, recordAsUser: string | null) {
     this.cancelActive();
+    this.recentAgentWords.clear();
     const turn = ++this.turnCounter;
     const abort = new AbortController();
     this.active = { turn, abort };
@@ -348,7 +431,7 @@ export class VoiceSession {
     if (!abort.signal.aborted) {
       this.history.push({ role: "agent", text });
       this.send({ t: "tts_end", turn });
-      this.agentSpeaking = false;
+      this.endSpeaking();
       this.setState("listening");
       this.active = null;
     }
@@ -358,6 +441,7 @@ export class VoiceSession {
   private async speakFragment(text: string, turn: number, signal: AbortSignal) {
     if (signal.aborted) return;
     this.send({ t: "say", text, turn });
+    this.noteAgentWords(text);
     this.agentSpeaking = true;
     this.setState("speaking");
 

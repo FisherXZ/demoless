@@ -1,8 +1,10 @@
 "use client";
 
 import type { DemoVals } from "@/lib/types";
+import { useAgentName } from "@/lib/voice/useAgentName";
 
 export default function Landing({ vals }: { vals: DemoVals }) {
+  const agentName = useAgentName();
   return (
     <div className="min-h-screen flex flex-col">
       <header className="flex items-center justify-between py-5 px-10 max-w-[1200px] mx-auto w-full">
@@ -101,7 +103,7 @@ export default function Landing({ vals }: { vals: DemoVals }) {
               <div className="absolute bottom-3 right-3 w-[72px] h-[52px] rounded-[9px] bg-coal border-2 border-brand overflow-hidden">
                 <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,#3a3a37,#3a3a37_4px,#33332f_4px,#33332f_8px)]" />
                 <span className="absolute bottom-[3px] left-1 text-[8px] text-stone350 font-mono">
-                  Maya · AI
+                  {agentName} · AI
                 </span>
               </div>
             </div>
