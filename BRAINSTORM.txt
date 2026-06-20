@@ -1,0 +1,258 @@
+﻿Demoless: AI agent platform for creating live demos
+
+
+
+
+
+
+
+
+
+
+Demoless sits on a company's website or in outbound campaigns and demos their product for them, 24/7. 
+
+
+It learns from sales decks, product docs, past sales transcripts, live walkthroughs, internal wikis, and more. 
+
+
+It runs real conversations with prospects, handles objections, qualifies leads, and books meetings. Sales teams wake up to warm pipeline with full conversation context instead of cold form fills. 
+
+
+Every conversation makes Demoless  smarter. It learns new objection patterns, adapts to different buyer personas, and builds a deeper understanding of the product with each interaction.
+
+
+Potential tech-stack:
+* Simular’s computer use agent Sai
+* Browserbase: Browsers, Search, Fetch, Stagehand, Browserbase CLI
+* Redis: Caching, Redis Iris for agent memory, vector search, context retrieval
+* Deepgram: STT, TTS, etc. 
+* Sentry: Observability and/or error monitoring
+
+
+
+
+
+
+
+
+Execution Roadmap:
+
+Milestones:
+MVP draft by midnight → full product by 8–9am → 9–11am rehearse + backup + submit
+
+
+Sponsors we’ll involve:
+Deepgram/Elevenlab — voice
+Browserbase + Stagehand — drive the real product
+Redis — memory
+Claude — brain
+Simular Sai — research/follow-up, off the live path
+Sentry — observability
+
+
+
+
+  
+
+
+
+Demoless — P1–P5 Tasks + Acceptance Criteria
+________________
+
+
+P1 — Orchestrator + Memory Context Layer
+P1A — pick a target, get Keys
+Acceptance Criteria
+* One demo-target product chosen and written at the top of this doc(a sponsor we’ll target and test against ideally with comprehensive docs )
+* Deepgram / Browserbase / Redis / Sentry/Sai keys set up, confirm we have access 
+* npm run dev runs the web app + server locally for all four people
+Subtasks
+* P1A.1 Pick the demo-target product
+* P1A.2 Grab all keys + create .env.example
+* P1A.3 Create repo skeleton: web app + server, runs locally
+________________
+
+
+P1C — LLM Loop
+Acceptance Criteria
+* GREET → ASK ONE QUESTION → DEMO → WRAP → DONE
+Subtasks
+* P1B.1 Define shared message types
+* P1B.2 Build agent Loop 
+* P1C.1 Assemble conversation + product facts + buyer memory into the prompt
+* P1C.2 Add LLM call + parse reply into Command[]
+* P1C.3 Add phase flag driving the conversation arc
+________________
+
+
+P1D — Product Facts / KB
+Acceptance Criteria
+* LLM can answer a basic product question from the product facts blob
+* Product facts blob is loaded into the memory context layer each turn
+Subtasks
+* P1D.1 Scrape or collect the demo-target product docs into md text
+* P1D.2 Load the blob into the memory context layer
+* Use redis here(dedicated memory session in p4)
+________________
+
+
+P1F — Agent memory i/o
+Acceptance Criteria
+* A mentioned user preference → agent calls remember and add to memory layer
+* Signal spotting runs without slowing the main reply
+Subtasks
+* P1F.1 Add extraction pass over transcript
+* P1F.2 Fire remember with the right note type
+________________
+
+
+P2 — Voice Agent
+P2A — Voice In / Out Loop
+Acceptance Criteria
+* Speaking a sentence logs a user_said message
+* final=true is set when the user stops speaking
+* A say command is spoken aloud with low latency
+Subtasks
+* P2A.1 Add mic capture + Deepgram STT
+* P2A.2 Send user_said on transcript
+* P2A.3 Add text-to-speech on say
+________________
+
+
+P2B — One Real Answer End-to-End
+Acceptance Criteria
+* Ask a product question by voice → hear a correct spoken answer
+Subtasks
+* P2B.1 Run one product question through the real loop and tune it
+________________
+
+
+P2C — Barge-In + Voice Polish
+Acceptance Criteria
+* Prospect can interrupt mid-sentence
+* Agent stops speaking when interrupted
+* Latency is tuned
+* A good voice is selected
+Subtasks
+* P2C.1 Add barge-in / interruption handling
+* P2C.2 Tune latency + select voice
+________________
+
+
+P2D — Second-Language Toggle(optional )
+Acceptance Criteria
+* One extra language can be toggled for the voice loop
+Subtasks
+* P2D.1 Add one extra language toggle
+________________
+
+
+P3 — Live Product Demo Stream Room
+P3A — Cloud Browser + Login
+Acceptance Criteria
+* A streamed Browserbase browser opens
+* Browser logs into the demo-target product successfully
+Subtasks
+* P3A.1 Open a Browserbase session
+* P3A.2 Navigate + log into the product
+________________
+
+
+P3B — Command Handlers
+Acceptance Criteria
+* navigate moves the real product to the target page
+* click_or_type moves the real product through the main flow
+* After each move, screen_is_on is sent with the current page
+Subtasks
+* P3B.1 Add navigate handler
+* P3B.2 Add click_or_type via Stagehand
+* P3B.3 Emit screen_is_on after each move
+________________
+
+
+P3D — Off-Script Move
+Acceptance Criteria
+* Agent handles one question that requires navigating somewhere not in the script
+Subtasks
+* P3D.1 Let click_or_type go off-script for one flow
+________________
+
+
+P3E — Fallback Screen / Mock
+Acceptance Criteria
+* Pre-recorded screen or clickable mock exists
+* Agent can narrate over fallback if live browser is flaky on stage
+Subtasks
+* P3E.1 Record or build fallback
+* P3E.2 Add switch to fallback mode
+________________
+
+
+P4 — Memory
+P4A — Store + Load Buyer
+Acceptance Criteria
+* A remember command writes a note to the buyer in Redis
+* On demo start, buyer is looked up
+* On demo start, buyer_loaded is sent so the LM can personalize
+Subtasks
+* P4A.1 Add Redis 
+* P4A.2 Write to Redis on remember
+* P4A.3 Look up buyer on demo start
+* P4A.4 Send buyer_loaded on demo start
+________________
+
+
+P4B — Read Memory Mid-Demo
+Acceptance Criteria
+* Stored notes are fed back into the memory context layer during the demo
+Subtasks
+* P4B.1 Wire buyer notes into the loop context
+________________
+
+
+P4C — Remember Across Visits
+Acceptance Criteria
+* A second session opens with: “Welcome back, last time you cared about X”
+Subtasks
+* P4C.1 Persist buyer across sessions
+* P4C.2 Store and read lastSeen
+* P4C.3 Compose welcome-back recall into the greeting
+________________
+
+
+P4D — Live Notes Feed to Panel
+Acceptance Criteria
+* Notes are pushed to P5 as they are saved
+Subtasks
+* P4D.1 Push notes to P5 as they are saved
+________________
+
+
+P5 — Frontend
+P5A — Main Demo Page
+Acceptance Criteria
+* Start screen exists
+* “Start a demo” button exists
+* Live product is embedded using P3’s live-view URL
+* Speaking indicator exists
+Subtasks
+* P5A.1 Build start screen + launch flow
+* P5A.2 Embed live product
+* P5A.3 Add speaking indicator
+________________
+
+
+P5B — Buyer Panel
+Acceptance Criteria
+* Panel sits beside the product view
+* Panel fills in as notes arrive
+* Audience can visibly see the product remembering
+Subtasks
+* P5B.1 Render buyer panel from notes stream
+P5D — Recap Screen
+Acceptance Criteria
+* End-of-demo recap shows what the prospect cared about
+* End-of-demo recap shows objections raised
+* End-of-demo recap shows suggested next step
+Subtasks
+* P5D.1 Build recap layout from buyer notes
