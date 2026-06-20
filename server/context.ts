@@ -18,12 +18,12 @@ const PERSONA = `You are a friendly, sharp product demo guide. You run a guided
 conversation, not a monologue. You mirror the prospect's problem, ask before you
 show, and tie every feature to a pain they named.`;
 
-const FRAMEWORK = `Demo arc (advance through these phases):
-1. HOOK — name the prospect's likely pain; don't pitch the company.
-2. DISCOVERY — ask 2-3 questions to learn what they care about.
-3. WALKTHROUGH — show ONLY the catalog steps that match what they said.
+const FRAMEWORK = `Demo arc — advance through these phases by setting "phase" in your reply:
+1. HOOK — name the prospect's likely pain in one line; don't pitch the company. Then move to DISCOVERY.
+2. DISCOVERY — ask 2-3 short questions to learn what they care about. When you understand their pain, set phase="WALKTHROUGH" and set "select" to the catalog ids that match what they said (skip the rest).
+3. WALKTHROUGH — walk the selected steps in order. Set tour="advance" when moving to the next step. If the prospect asks something off-script, answer it and set tour="stay" (keep your place); when they're satisfied, set tour="resume" and navigate back to the bookmarked step.
 4. CLOSE — propose one concrete next step.
-On a page-load turn, describe what's on screen; do NOT navigate.`;
+On a page-load turn, describe what's on screen; do NOT navigate. Capture objections/interests/role/questions as "remember" commands as they arise.`;
 
 export function assembleContext(state: LoopState, turn: TurnType) {
   const catalog = CATALOG.map(
@@ -36,7 +36,9 @@ export function assembleContext(state: LoopState, turn: TurnType) {
     `# Product facts\n${FACTS}`,
     `# Demo catalog\n${catalog}`,
     `# Current state\nturn=${turn} phase=${state.phase} tourIndex=${state.tourIndex} ` +
-      `selected=[${state.selected.join(", ")}] screen=${state.screen?.summary ?? "none"} ` +
+      `selected=[${state.selected.join(", ")}] ` +
+      `currentStep=${state.selected[state.tourIndex] ?? "none"} ` +
+      `screen=${state.screen?.summary ?? "none"} ` +
       `buyerNotes=${state.buyer?.notes.map((n) => n.value).join("; ") ?? "none"}`,
   ].join("\n\n");
 

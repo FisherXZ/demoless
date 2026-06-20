@@ -53,6 +53,8 @@ export const Reply = z.object({
       z.object({ jump: z.number() }),
     ])
     .optional(),
+  phase: z.enum(["HOOK", "DISCOVERY", "WALKTHROUGH", "CLOSE", "DONE"]).optional(), // next phase
+  select: z.array(z.string()).optional(), // catalog ids chosen from discovery
 });
 
 export type NoteType = z.infer<typeof NoteType>;

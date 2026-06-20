@@ -6,6 +6,7 @@ import type { Incoming, Command, TourDirective } from "../shared/contract";
 import type { CommandHandler, LoopState, TurnType } from "./state";
 import { assembleContext } from "./context";
 import { complete } from "./model";
+import { CATALOG } from "../product/catalog";
 
 export class Loop {
   private state: LoopState;
@@ -83,6 +84,14 @@ export class Loop {
     }
 
     this.applyTour(reply.tour);
+
+    if (reply.phase) this.state.phase = reply.phase;
+    if (reply.select) {
+      const valid = new Set(CATALOG.map((s) => s.id));
+      const picked = reply.select.filter((id) => valid.has(id));
+      this.state.selected = picked;
+      this.state.tourIndex = 0;
+    }
 
     for (const c of commands) {
       if (c.kind === "say") this.state.history.push({ role: "assistant", text: c.text });
