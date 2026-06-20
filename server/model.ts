@@ -1,11 +1,9 @@
-// LAYER 2 — Model Layer. A pure function: prompt in, validated Reply out. It
-// knows nothing about sessions, ws, or state — which is why it's a clean swap
-// point (model/effort/caching live here).
-//
-// THIS IS A STUB. Step 1 of the implementation plan replaces the body with
-// `client.messages.parse({ model: "claude-opus-4-8", output_config: { format:
-// zodOutputFormat(Reply) }, ... })`. The signature stays the same.
+// LAYER 2 — Model Layer. Pure function: prompt in, validated Reply out.
+// Real call uses claude-opus-4-8 structured outputs; falls back to the stub
+// when USE_STUB=1 or no API key (so the frontend works offline).
 
+import Anthropic from "@anthropic-ai/sdk";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { Reply } from "../shared/contract";
 import type { LoopState, TurnType } from "./state";
 
@@ -16,16 +14,35 @@ export interface CompleteRequest {
   state: LoopState;
 }
 
+const useStub = () => process.env.USE_STUB === "1" || !process.env.ANTHROPIC_API_KEY;
+
+let client: Anthropic | null = null;
+const getClient = () => (client ??= new Anthropic());
+
+/** Pure: the exact params we send. Extracted so it's testable without a network call. */
+export function buildParams(req: CompleteRequest) {
+  return {
+    model: "claude-opus-4-8" as const,
+    max_tokens: 1024,
+    thinking: { type: "adaptive" as const },
+    output_config: { effort: "low" as const, format: zodOutputFormat(Reply) },
+    system: [{ type: "text" as const, text: req.system, cache_control: { type: "ephemeral" as const } }],
+    messages: req.messages,
+  };
+}
+
 export async function complete(req: CompleteRequest): Promise<Reply> {
-  const canned = stub(req);
-  // Validate the stub against the same schema the real model output will use,
-  // so the Layer 1↔2 contract is exercised from day one.
-  return Reply.parse(canned);
+  if (useStub()) return Reply.parse(stub(req));
+  const res = await getClient().messages.parse(buildParams(req));
+  if (!res.parsed_output) {
+    // Refusal / max_tokens / parse miss — degrade gracefully, never crash the loop.
+    return { commands: [{ kind: "say", text: "Sorry — give me one second." }] };
+  }
+  return res.parsed_output;
 }
 
 function stub(req: CompleteRequest): Reply {
   const lastUser = [...req.messages].reverse().find((m) => m.role === "user")?.content ?? "";
-
   if (req.turn === "greet") {
     const b = req.state.buyer;
     const text =
@@ -34,16 +51,9 @@ function stub(req: CompleteRequest): Reply {
         : `Hi — I'm your demo guide. Before I show you anything: what brought you here today?`;
     return { commands: [{ kind: "say", text }] };
   }
-
   if (req.turn === "screen") {
-    return {
-      commands: [
-        { kind: "say", text: `(stub) Here's ${req.state.screen?.summary ?? "the page"}.` },
-      ],
-    };
+    return { commands: [{ kind: "say", text: `(stub) Here's ${req.state.screen?.summary ?? "the page"}.` }] };
   }
-
-  // human turn — exercise say + navigate + remember + a tour directive
   return {
     commands: [
       { kind: "say", text: `(stub) You said: "${lastUser}". Let me pull that up.` },
