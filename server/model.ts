@@ -25,8 +25,10 @@ const GRACEFUL: Reply = { commands: [{ kind: "say", text: "Sorry — give me one
 export function buildParams(req: CompleteRequest) {
   return {
     model: "claude-opus-4-8" as const,
-    max_tokens: 1024,
-    thinking: { type: "adaptive" as const },
+    // Thinking is OFF for this loop: a live demo agent needs snappy turns, and
+    // adaptive thinking competed for the token budget and truncated the JSON
+    // mid-string. 2048 leaves ample room for the commands + a long `say`.
+    max_tokens: 2048,
     output_config: { effort: "low" as const, format: zodOutputFormat(Reply) },
     system: [{ type: "text" as const, text: req.system, cache_control: { type: "ephemeral" as const } }],
     messages: req.messages,
