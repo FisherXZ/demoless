@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import type { DemoVals } from "@/lib/types";
 import { useVoiceAgent } from "@/lib/voice/useVoiceAgent";
+import { useAgentName } from "@/lib/voice/useAgentName";
 import { LANGUAGES, type Language } from "@/lib/voice/messages";
 
 const TARGET = "https://worldcuparena.live/";
@@ -68,6 +69,7 @@ interface ChatMsg {
 
 export default function DemoRoom({ vals }: { vals: DemoVals }) {
   const voice = useVoiceAgent();
+  const configuredName = useAgentName();
 
   // Browser-share session state (Maya drives a real cloud browser).
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -88,8 +90,10 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
   // The rep tile pulses while Maya speaks (voice) or is navigating (text chat).
   const mayaSpeaking = voice.active ? voice.agentSpeaking : sending;
 
-  // Captions: prefer the live voice transcript, else the latest chat reply.
-  const mayaCaption = voice.active && voice.lastCaption ? voice.lastCaption : caption;
+  // Captions: prefer real spoken text once the voice loop is running. Swap any
+  // "Maya" in the mock caption for the configured name so it stays consistent.
+  const rawCaption = voice.active && voice.lastCaption ? voice.lastCaption : vals.caption;
+  const mayaCaption = rawCaption.replace(/Maya/g, agentName);
 
   const otherLang: Language = voice.language === "en" ? "es" : "en";
 

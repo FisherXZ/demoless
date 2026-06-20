@@ -21,6 +21,8 @@ export interface SttTranscript {
   text: string;
   isFinal: boolean;
   speechFinal: boolean;
+  /** Deepgram's confidence for this result (0-1); 1 if unavailable. */
+  confidence: number;
 }
 
 export interface SttEvents {
@@ -95,6 +97,8 @@ export class DeepgramStt extends EventEmitter {
           text,
           isFinal: Boolean(msg.is_final),
           speechFinal: Boolean(msg.speech_final),
+          confidence:
+            typeof alt?.confidence === "number" ? alt.confidence : 1,
         });
       } else if (msg.type === "SpeechStarted") {
         this.emit("speechStarted");
