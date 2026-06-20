@@ -35,12 +35,51 @@ export function buildParams(req: CompleteRequest) {
   };
 }
 
+const VALID_KIND = new Set(["say", "navigate", "click_or_type", "remember"]);
+const VALID_NOTE = new Set(["objection", "interest", "role", "question"]);
+const VALID_PHASE = new Set(["HOOK", "DISCOVERY", "WALKTHROUGH", "CLOSE", "DONE"]);
+const VALID_TOUR = new Set(["advance", "stay", "resume"]);
+
+/**
+ * Coerce the model's JSON into a valid Reply instead of rejecting the whole turn.
+ * Structured outputs GUIDES generation but doesn't hard-enforce our enums, so the
+ * model occasionally emits e.g. note.type:"pain". Rather than 400 the turn, we
+ * keep the valid commands and snap stray enums to safe defaults.
+ */
+export function coerceReply(raw: unknown): Reply {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  const out: Reply = { commands: [] };
+  for (const c of Array.isArray(r.commands) ? (r.commands as Record<string, unknown>[]) : []) {
+    if (!c || !VALID_KIND.has(c.kind as string)) continue;
+    if (c.kind === "say" && typeof c.text === "string") out.commands.push({ kind: "say", text: c.text });
+    else if (c.kind === "navigate" && typeof c.target === "string") out.commands.push({ kind: "navigate", target: c.target });
+    else if (c.kind === "click_or_type" && typeof c.instruction === "string") out.commands.push({ kind: "click_or_type", instruction: c.instruction });
+    else if (c.kind === "remember") {
+      const note = c.note as Record<string, unknown> | undefined;
+      if (note && typeof note.value === "string") {
+        const type = VALID_NOTE.has(note.type as string) ? (note.type as "objection" | "interest" | "role" | "question") : "interest";
+        out.commands.push({ kind: "remember", note: { type, value: note.value } });
+      }
+    }
+  }
+  if (typeof r.phase === "string" && VALID_PHASE.has(r.phase)) out.phase = r.phase as Reply["phase"];
+  if (typeof r.tour === "string" && VALID_TOUR.has(r.tour)) out.tour = r.tour as Reply["tour"];
+  else if (r.tour && typeof r.tour === "object" && typeof (r.tour as Record<string, unknown>).jump === "number") {
+    out.tour = { jump: (r.tour as { jump: number }).jump };
+  }
+  if (Array.isArray(r.select)) out.select = (r.select as unknown[]).filter((s): s is string => typeof s === "string");
+  return out;
+}
+
 export async function complete(req: CompleteRequest): Promise<Reply> {
   if (useStub()) return Reply.parse(stub(req));
   try {
-    const res = await getClient().messages.parse(buildParams(req));
-    if (!res.parsed_output) return GRACEFUL;
-    return res.parsed_output;
+    // messages.create (not .parse): structured output still guides generation,
+    // but we parse leniently + coerce so a single stray enum doesn't kill the turn.
+    const res = await getClient().messages.create(buildParams(req));
+    const text = res.content.find((b): b is Anthropic.TextBlock => b.type === "text")?.text ?? "";
+    const reply = coerceReply(JSON.parse(text));
+    return reply.commands.length > 0 ? reply : GRACEFUL;
   } catch (err) {
     console.error("[model] complete failed:", err);
     return GRACEFUL;

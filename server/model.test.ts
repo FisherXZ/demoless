@@ -1,6 +1,6 @@
 // server/model.test.ts
 import { describe, it, expect } from "vitest";
-import { buildParams, complete } from "./model";
+import { buildParams, complete, coerceReply } from "./model";
 import type { LoopState } from "./state";
 
 const state: LoopState = {
@@ -17,6 +17,36 @@ describe("buildParams", () => {
     expect(Array.isArray(p.system)).toBe(true);
     expect(p.system[0].cache_control).toEqual({ type: "ephemeral" });
     expect(p.messages).toEqual([{ role: "user", content: "hi" }]);
+  });
+});
+
+describe("coerceReply", () => {
+  it("snaps a stray note.type to interest instead of dropping the turn", () => {
+    const r = coerceReply({ commands: [{ kind: "remember", note: { type: "pain", value: "x" } }] });
+    expect(r.commands).toEqual([{ kind: "remember", note: { type: "interest", value: "x" } }]);
+  });
+
+  it("keeps valid commands and drops unknown command kinds", () => {
+    const r = coerceReply({
+      commands: [
+        { kind: "say", text: "hi" },
+        { kind: "bogus", text: "nope" },
+        { kind: "navigate", target: "dashboard" },
+      ],
+      phase: "WALKTHROUGH",
+      tour: "advance",
+      select: ["automation", 7],
+    });
+    expect(r.commands.map((c) => c.kind)).toEqual(["say", "navigate"]);
+    expect(r.phase).toBe("WALKTHROUGH");
+    expect(r.tour).toBe("advance");
+    expect(r.select).toEqual(["automation"]); // non-strings filtered
+  });
+
+  it("drops an out-of-enum phase/tour rather than erroring", () => {
+    const r = coerceReply({ commands: [{ kind: "say", text: "hi" }], phase: "CHITCHAT", tour: "next" });
+    expect(r.phase).toBeUndefined();
+    expect(r.tour).toBeUndefined();
   });
 });
 
