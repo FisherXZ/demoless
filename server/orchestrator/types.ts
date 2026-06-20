@@ -22,6 +22,8 @@ export interface TurnContext {
   history: ConversationTurn[];
   /** Buyer notes from P4 memory (empty until P4 lands). */
   buyerNotes: string[];
+  /** The agent's display name, derived from the selected voice model. */
+  agentName: string;
 }
 
 export interface ConversationTurn {
@@ -42,5 +44,5 @@ export interface Orchestrator {
   ): AsyncIterable<Command>;
 
   /** Optional opening line when a session starts (GREET phase). */
-  greeting?(language: Language): Promise<string> | string;
+  greeting?(language: Language, agentName: string): Promise<string> | string;
 }

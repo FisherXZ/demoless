@@ -4,19 +4,33 @@ import type { DemoVals } from "@/lib/types";
 import { useVoiceAgent } from "@/lib/voice/useVoiceAgent";
 import { LANGUAGES, type Language } from "@/lib/voice/messages";
 
-const STATUS_LABEL: Record<string, string> = {
-  idle: "Tap the mic to talk",
-  connecting: "Connecting...",
-  listening: "Listening",
-  thinking: "Thinking...",
-  speaking: "Maya is speaking",
-  error: "Voice unavailable",
-};
+function statusLabel(status: string, name: string): string {
+  switch (status) {
+    case "idle":
+      return "Tap the mic to talk";
+    case "connecting":
+      return "Connecting...";
+    case "listening":
+      return "Listening";
+    case "thinking":
+      return "Thinking...";
+    case "speaking":
+      return `${name} is speaking`;
+    case "error":
+      return "Voice unavailable";
+    default:
+      return status;
+  }
+}
 
 export default function DemoRoom({ vals }: { vals: DemoVals }) {
   const voice = useVoiceAgent();
 
-  // Maya is "live" whenever the voice loop is speaking; fall back to the mock
+  // Agent name follows the selected voice model; fall back to "Maya" for the
+  // mock prototype state (before a voice session reports its name).
+  const agentName = voice.active && voice.agentName ? voice.agentName : "Maya";
+
+  // The rep is "live" whenever the voice loop is speaking; fall back to the mock
   // presenting state so the prototype still animates without a voice server.
   const mayaSpeaking = voice.active ? voice.agentSpeaking : !vals.paused;
 
@@ -49,7 +63,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                 }
               />
               <span className="text-xs text-stone350 font-mono">
-                {STATUS_LABEL[voice.status] ?? voice.status}
+                {statusLabel(voice.status, agentName)}
               </span>
             </div>
           )}
@@ -468,7 +482,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                       That’s the tour, where to next?
                     </div>
                     <div className="text-sm text-muted2 text-center mt-1.5 mb-6">
-                      Maya can hand you off in one click.
+                      {agentName} can hand you off in one click.
                     </div>
                     <div className="flex flex-col gap-3">
                       <button
@@ -524,7 +538,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                     />
                   )}
                 </span>
-                <span className="text-[11px] text-white font-semibold">Maya</span>
+                <span className="text-[11px] text-white font-semibold">{agentName}</span>
                 <span className="text-[9px] text-stone350 bg-black/40 px-[5px] py-px rounded font-mono">
                   AI
                 </span>
@@ -544,7 +558,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                 )}
                 <div className="bg-night/90 text-white px-[15px] py-[11px] rounded-[11px] text-sm leading-[1.4]">
                   <span className="text-[#a5b4fc] font-bold text-xs font-mono">
-                    MAYA&nbsp;&nbsp;
+                    {agentName.toUpperCase()}&nbsp;&nbsp;
                   </span>
                   {mayaCaption}
                 </div>
@@ -600,7 +614,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
       <div className="flex-none flex items-center justify-center gap-3 px-5 pt-1 pb-[18px] relative">
         <button
           onClick={() => (voice.active ? voice.stop() : void voice.start())}
-          title={voice.active ? "Stop talking to Maya" : "Talk to Maya"}
+          title={voice.active ? `Stop talking to ${agentName}` : `Talk to ${agentName}`}
           className="w-[50px] h-[50px] rounded-full border-none cursor-pointer text-[19px] flex items-center justify-center"
           style={{
             background: voice.active ? "#4f46e5" : "#dc2626",
@@ -647,7 +661,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
             <span className="text-danger">{voice.error}</span>
           ) : (
             <span className="text-dim">
-              {voice.active ? STATUS_LABEL[voice.status] : "Maya is presenting"}
+              {voice.active ? statusLabel(voice.status, agentName) : `${agentName} is presenting`}
             </span>
           )}
         </div>

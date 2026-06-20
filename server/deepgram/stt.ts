@@ -2,6 +2,12 @@ import { EventEmitter } from "node:events";
 import { DeepgramClient } from "@deepgram/sdk";
 import { AUDIO_SAMPLE_RATE, type Language, LANGUAGES } from "../../lib/voice/messages";
 
+/** Silence (ms) before a turn ends. Lower = snappier; default 250. */
+function endpointingMs(): number {
+  const raw = Number(process.env.STT_ENDPOINTING_MS);
+  return Number.isFinite(raw) && raw > 0 ? raw : 250;
+}
+
 /**
  * Streaming speech-to-text over Deepgram Listen v1 (nova-3).
  *
@@ -57,8 +63,10 @@ export class DeepgramStt extends EventEmitter {
       interim_results: "true",
       smart_format: "true",
       punctuate: "true",
-      // Endpointing tuned low for snappy turn-taking (P2C latency).
-      endpointing: 300,
+      // Endpointing = silence (ms) before the user's turn is considered done.
+      // Lower = snappier replies, but too low can cut people off mid-pause.
+      // Tune with STT_ENDPOINTING_MS.
+      endpointing: endpointingMs(),
       utterance_end_ms: 1000,
       vad_events: "true",
       Authorization: `Token ${this.apiKey}`,

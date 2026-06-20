@@ -118,6 +118,8 @@ export type ClientMessage =
 export interface ReadyEvent {
   t: "ready";
   language: Language;
+  /** Display name of the agent, derived from the selected voice model. */
+  agentName: string;
 }
 
 /** A transcript of what the prospect said (P2A.2). `final` flips true on endpoint. */

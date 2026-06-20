@@ -9,8 +9,8 @@ import type {
 
 /**
  * Swappable stand-in for P1's LLM loop: a thin streaming Claude call grounded
- * in the product-facts blob. It plays "Maya", Demoless's AI sales rep, and
- * streams short spoken sentences so TTS can begin almost immediately.
+ * in the product-facts blob. It plays Demoless's AI sales rep (named after the
+ * selected voice) and streams short spoken sentences so TTS starts immediately.
  *
  * Replace with P1's real orchestrator by implementing {@link Orchestrator}.
  */
@@ -25,11 +25,11 @@ export class StubOrchestrator implements Orchestrator {
     this.model = process.env.ANTHROPIC_MODEL ?? "claude-3-5-haiku-latest";
   }
 
-  greeting(language: Language): string {
+  greeting(language: Language, agentName: string): string {
     if (language === "es") {
-      return "Hola, soy Maya, la representante de Demoless. Encantada de mostrarte el producto. Que te gustaria ver primero?";
+      return `Hola, soy ${agentName}, la representante de Demoless. Encantada de mostrarte el producto. Que te gustaria ver primero?`;
     }
-    return "Hi, I'm Maya, your Demoless product specialist. Happy to walk you through it. What would you like to see first?";
+    return `Hi, I'm ${agentName}, your Demoless product specialist. Happy to walk you through it. What would you like to see first?`;
   }
 
   async *runTurn(
@@ -101,7 +101,7 @@ function buildSystemPrompt(
         )}`
       : "";
 
-  return `You are Maya, a friendly, sharp AI sales specialist running a live voice demo of ${product}.
+  return `You are ${context.agentName}, a friendly, sharp AI sales specialist running a live voice demo of ${product}.
 
 You are speaking out loud, so your replies must sound like natural speech:
 - Keep answers short: 1-3 sentences. This is a conversation, not a monologue.
@@ -116,31 +116,71 @@ ${blob}${memory}`;
 }
 
 /**
- * Buffers streamed text and emits complete sentences. Lets us send each
- * sentence to TTS the moment it's done instead of waiting for the full reply.
+ * Buffers streamed text and emits speakable fragments as soon as they're ready,
+ * so TTS can start before the full reply is generated.
+ *
+ * - Always flushes on sentence-ending punctuation.
+ * - For the very first fragment, also flushes on an early clause boundary
+ *   (comma/colon/semicolon) so the user hears audio sooner (lower latency).
+ * - Safety-flushes very long run-ons at a word boundary.
  */
 class SentenceChunker {
   private buffer = "";
+  private emitted = 0;
+
+  private static readonly FIRST_CLAUSE_MIN = 18;
+  private static readonly MAX_LEN = 140;
+  private static readonly SENTENCE_RE = /([.!?]+["')\]]?\s+|[\u3002\uFF01\uFF1F]\s*)/;
+  private static readonly CLAUSE_RE = /([,;:]\s+)/;
 
   push(text: string): string[] {
     this.buffer += text;
     const out: string[] = [];
-    // Emit on sentence-ending punctuation followed by whitespace, or on a
-    // comfortably long clause so very long sentences still flush early.
-    const re = /([.!?]+["')\]]?\s+|[\u3002\uFF01\uFF1F]\s*)/;
-    let match: RegExpMatchArray | null;
-    while ((match = this.buffer.match(re)) && match.index !== undefined) {
-      const end = match.index + match[0].length;
-      const sentence = this.buffer.slice(0, end).trim();
-      if (sentence) out.push(sentence);
-      this.buffer = this.buffer.slice(end);
+
+    for (;;) {
+      const sentence = this.buffer.match(SentenceChunker.SENTENCE_RE);
+      if (sentence && sentence.index !== undefined) {
+        this.take(out, sentence.index + sentence[0].length);
+        continue;
+      }
+
+      // First-audio: flush the opening clause early so a reply starts sooner.
+      if (this.emitted === 0) {
+        const clause = this.buffer.match(SentenceChunker.CLAUSE_RE);
+        if (
+          clause &&
+          clause.index !== undefined &&
+          clause.index >= SentenceChunker.FIRST_CLAUSE_MIN
+        ) {
+          this.take(out, clause.index + clause[0].length);
+          continue;
+        }
+      }
+
+      if (this.buffer.length > SentenceChunker.MAX_LEN) {
+        const space = this.buffer.lastIndexOf(" ", SentenceChunker.MAX_LEN);
+        this.take(out, space > 0 ? space + 1 : SentenceChunker.MAX_LEN);
+        continue;
+      }
+
+      break;
     }
     return out;
+  }
+
+  private take(out: string[], end: number) {
+    const fragment = this.buffer.slice(0, end).trim();
+    if (fragment) {
+      out.push(fragment);
+      this.emitted++;
+    }
+    this.buffer = this.buffer.slice(end);
   }
 
   flush(): string {
     const rest = this.buffer.trim();
     this.buffer = "";
+    if (rest) this.emitted++;
     return rest;
   }
 }

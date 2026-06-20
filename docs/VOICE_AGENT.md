@@ -135,9 +135,15 @@ and P1D can replace `getProductFacts()`.
 
 ## Latency + voice tuning (P2C)
 
-- STT: `interim_results`, `endpointing: 300ms`, `utterance_end_ms: 1000` for
-  snappy turn-taking; keep-alive pings hold the socket warm during silence.
-- LLM: streamed, sentence-chunked into TTS.
+- STT: `interim_results`, env-tunable `endpointing` (`STT_ENDPOINTING_MS`,
+  default 250ms), `utterance_end_ms: 1000` for snappy turn-taking; keep-alive
+  pings hold the socket warm during silence. Lower endpointing = less pause
+  before the agent replies, but too low can cut the user off mid-sentence.
+- LLM: streamed, sentence-chunked into TTS. History sent to the orchestrator is
+  capped (`MAX_HISTORY_TURNS`) so time-to-first-token stays low as the demo runs.
+- First-audio: the `SentenceChunker` flushes the **first** fragment on an early
+  clause boundary (comma/colon), so the user hears a reply sooner instead of
+  waiting for the model to finish a long opening sentence.
 - TTS: short per-sentence REST requests stream PCM straight to the client.
 - Voice: default `aura-2-thalia-en` (override with `DEEPGRAM_TTS_MODEL`).
 - Speaking rate: `TTS_SPEED` (1.0 normal; Deepgram ~0.5-2.0, ElevenLabs 0.7-1.2).
@@ -151,6 +157,19 @@ and P1D can replace `getProductFacts()`.
   (re)starts from idle or recovers from an underrun, a small cushion is
   scheduled before audio plays so network/synthesis jitter doesn't cause
   glitches. Continuous audio stays gapless (no added latency mid-stream).
+
+## Agent name (dynamic)
+
+The agent's display name follows the selected voice instead of being hardcoded:
+
+- `TtsProvider.voiceName(language)` derives the name. Deepgram parses its Aura
+  model id (`aura-2-odysseus-en` -> "Odysseus", `aura-2-thalia-en` -> "Thalia");
+  ElevenLabs uses `ELEVENLABS_VOICE_NAME` (voice ids aren't human names).
+- `AGENT_NAME` env overrides everything if you want a fixed name.
+- The session computes the name, uses it in the greeting + system prompt, and
+  sends it to the browser in the `ready` event. `useVoiceAgent` exposes
+  `agentName`, and `DemoRoom` uses it for the rep tile, captions, and status.
+  Switching the voice model (or language) updates the name everywhere.
 
 ## Barge-in (P2C)
 

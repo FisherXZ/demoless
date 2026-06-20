@@ -25,6 +25,8 @@ export interface VoiceAgent {
   partialTranscript: string;
   /** The agent's most recent spoken line (for captions). */
   lastCaption: string;
+  /** The agent's display name, derived from the active voice model. */
+  agentName: string;
   language: Language;
   error: string | null;
   start: () => Promise<void>;
@@ -40,6 +42,7 @@ export function useVoiceAgent(): VoiceAgent {
   const [agentSpeaking, setAgentSpeaking] = useState(false);
   const [partialTranscript, setPartialTranscript] = useState("");
   const [lastCaption, setLastCaption] = useState("");
+  const [agentName, setAgentName] = useState("");
   const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,6 +90,7 @@ export function useVoiceAgent(): VoiceAgent {
     switch (ev.t) {
       case "ready":
         setStatus("listening");
+        setAgentName(ev.agentName);
         break;
       case "user_said":
         setPartialTranscript(ev.text);
@@ -207,6 +211,7 @@ export function useVoiceAgent(): VoiceAgent {
     agentSpeaking,
     partialTranscript,
     lastCaption,
+    agentName,
     language,
     error,
     start,

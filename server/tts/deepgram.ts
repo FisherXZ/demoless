@@ -1,6 +1,11 @@
 import { DeepgramClient } from "@deepgram/sdk";
 import { AUDIO_SAMPLE_RATE, type Language, LANGUAGES } from "../../lib/voice/messages";
-import { getTtsSpeed, readStream, type TtsProvider } from "./index";
+import {
+  getTtsSpeed,
+  nameFromAuraModel,
+  readStream,
+  type TtsProvider,
+} from "./provider";
 
 /**
  * Deepgram Aura-2 TTS via the REST streaming endpoint.
@@ -24,6 +29,10 @@ export class DeepgramTts implements TtsProvider {
       return process.env.DEEPGRAM_TTS_MODEL ?? LANGUAGES.en.ttsModel;
     }
     return LANGUAGES[language]?.ttsModel ?? LANGUAGES.en.ttsModel;
+  }
+
+  voiceName(language: Language): string {
+    return nameFromAuraModel(this.modelFor(language));
   }
 
   async *synthesize(

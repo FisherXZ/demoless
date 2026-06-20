@@ -1,5 +1,5 @@
 import { AUDIO_SAMPLE_RATE, type Language } from "../../lib/voice/messages";
-import { getTtsSpeed, readStream, type TtsProvider } from "./index";
+import { getTtsSpeed, readStream, type TtsProvider } from "./provider";
 
 /**
  * Optional ElevenLabs TTS provider (set TTS_PROVIDER=elevenlabs).
@@ -13,11 +13,19 @@ export class ElevenLabsTts implements TtsProvider {
   private voiceId: string;
   private modelId: string;
 
+  private voiceLabel: string;
+
   constructor() {
     this.apiKey = process.env.ELEVENLABS_API_KEY ?? "";
     // Default to "Rachel"; override with ELEVENLABS_VOICE_ID.
     this.voiceId = process.env.ELEVENLABS_VOICE_ID ?? "21m00Tcm4TlvDq8ikWAM";
     this.modelId = process.env.ELEVENLABS_MODEL_ID ?? "eleven_turbo_v2_5";
+    // ElevenLabs voice ids are opaque, so the name comes from env (or default).
+    this.voiceLabel = process.env.ELEVENLABS_VOICE_NAME ?? "Aria";
+  }
+
+  voiceName(): string {
+    return this.voiceLabel;
   }
 
   async *synthesize(

@@ -33,6 +33,19 @@ export class VoiceSession {
   private active: { turn: number; abort: AbortController } | null = null;
   private agentSpeaking = false;
 
+  /** How many recent turns to send to the orchestrator (bounds prompt size). */
+  private static readonly MAX_HISTORY_TURNS = 12;
+
+  /**
+   * The agent's display name for the active voice. An explicit AGENT_NAME env
+   * wins; otherwise it's derived from the selected voice model, so switching
+   * models switches the name (e.g. aura-2-orion-en -> "Orion").
+   */
+  private get agentName(): string {
+    const override = process.env.AGENT_NAME?.trim();
+    return override || this.tts.voiceName(this.language);
+  }
+
   constructor(
     private ws: WebSocket,
     private deepgramKey: string
@@ -78,10 +91,13 @@ export class VoiceSession {
   private async startListening(language: Language) {
     this.language = language ?? DEFAULT_LANGUAGE;
     await this.openStt();
-    this.send({ t: "ready", language: this.language });
+    this.send({ t: "ready", language: this.language, agentName: this.agentName });
     this.setState("listening");
-    // GREET: Maya opens the conversation so the user hears the loop working.
-    const greeting = await this.orchestrator.greeting?.(this.language);
+    // GREET: the agent opens the conversation so the user hears the loop working.
+    const greeting = await this.orchestrator.greeting?.(
+      this.language,
+      this.agentName
+    );
     if (greeting) {
       await this.speakTurn(greeting, /* recordAsUser */ null);
     }
@@ -176,9 +192,20 @@ export class VoiceSession {
     userText: string,
     signal: AbortSignal
   ): AsyncIterable<string> {
+    // Send only the most recent turns (excluding the just-pushed user turn) to
+    // keep the prompt small so time-to-first-token stays low as the demo runs.
+    const priorHistory = this.history.slice(0, -1);
+    const recentHistory = priorHistory.slice(
+      -VoiceSession.MAX_HISTORY_TURNS
+    );
+
     for await (const cmd of this.orchestrator.runTurn(
       { text: userText, language: this.language },
-      { history: this.history.slice(0, -1), buyerNotes: this.buyerNotes },
+      {
+        history: recentHistory,
+        buyerNotes: this.buyerNotes,
+        agentName: this.agentName,
+      },
       signal
     )) {
       if (signal.aborted) return;
@@ -376,7 +403,7 @@ export class VoiceSession {
     this.finals = [];
     this.cancelActive();
     if (this.stt) await this.openStt();
-    this.send({ t: "ready", language: this.language });
+    this.send({ t: "ready", language: this.language, agentName: this.agentName });
   }
 
   private async stopListening() {
