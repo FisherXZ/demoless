@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "memory:smoke": "tsx scripts/memory-smoke.ts"
+    "memory:smoke": "tsx scripts/memory-smoke.ts",
+    "knowledge:seed": "tsx scripts/knowledge-seed.ts",
+    "knowledge:smoke": "tsx scripts/knowledge-smoke.ts"
   },
   "dependencies": {
     "ioredis": "^5.4.1",

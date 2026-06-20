@@ -15,14 +15,19 @@ npm run build    # production build
 npm run start    # serve the production build
 npm run lint     # next lint
 
-# P4 memory layer — needs a Redis instance (REDIS_URL, see .env.example)
-docker run -d -p 6379:6379 redis:7        # local Redis
-REDIS_URL=redis://localhost:6379 npm run memory:smoke   # end-to-end smoke test
+# Redis-backed layers — need a Redis instance (REDIS_URL, see .env.example).
+# Vector search (lib/knowledge) needs Redis Stack; it's a superset, so use it for both.
+docker run -d -p 6379:6379 redis/redis-stack:latest        # local Redis + Search
+REDIS_URL=redis://localhost:6379 npm run memory:smoke      # P4 memory smoke test
+
+# Product-knowledge RAG (lib/knowledge) — also needs OPENAI_API_KEY for embeddings
+npm run knowledge:seed     # index the sample product corpus
+npm run knowledge:smoke    # end-to-end semantic-retrieval smoke test
 ```
 
 Google sign-in needs OAuth credentials in `.env.local` (gitignored; placeholders in `.env.example`): `AUTH_SECRET` (`npx auth secret`), `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` from a Google Cloud OAuth 2.0 Web client whose redirect URI is `http://localhost:3000/api/auth/callback/google`. Without these, the dev server runs but the sign-in flow fails.
 
-There is no unit-test runner. The only automated check is `scripts/memory-smoke.ts` (run via `npm run memory:smoke`), which exercises the memory layer against a live Redis.
+There is no unit-test runner. The automated checks are standalone smoke scripts run against a live Redis: `scripts/memory-smoke.ts` (`npm run memory:smoke`) for the P4 memory layer, and `scripts/knowledge-smoke.ts` (`npm run knowledge:smoke`) for the product-knowledge RAG layer (the latter also needs `OPENAI_API_KEY` and Redis Stack).
 
 ## Architecture
 
@@ -50,6 +55,25 @@ A self-contained Redis module — **not wired into the frontend**. It exists to 
 - **Live feed** (`pubsub.ts`): every `remember` also `PUBLISH`es a `note_added` event on the `demoless:notes` channel. `createNotesSubscriber` (uses a separate ioredis connection, since a subscribed client can't issue commands) is what P1's server bridges to a WebSocket for the P5 panel.
 - **Contracts** (`types.ts`): `RememberCommand` / `BuyerLoadedEvent` / `NoteAddedEvent` are the integration seam with other tracks and **must be reconciled with P1B.1's shared message types** once those land.
 
+### Product knowledge / RAG (`lib/knowledge/`)
+
+A second, **separate** Redis-backed module for answering buyers' questions *about the product being demoed* (retrieval-augmented generation). It is deliberately distinct from `lib/memory` — different question, data, retrieval, and key:
+
+| | P4 buyer memory (`lib/memory/`) | Product knowledge (`lib/knowledge/`) |
+|---|---|---|
+| Answers | *Who* is this buyer? | *What* does the product do? |
+| Data | per-buyer notes (small) | company docs (large corpus) |
+| Retrieval | importance + recency ranking | **vector / semantic KNN** |
+| Key | normalized email | company slug |
+
+This is why only the knowledge layer uses a vector DB: semantic search earns its keep over a large doc corpus, whereas a buyer's handful of notes rank fine without it. Public surface is `lib/knowledge/index.ts`.
+
+- **Storage**: each document is chunked (`chunk.ts`), embedded (`embed.ts`), and stored as a Redis **hash** `demoless:kb:{company}:{chunkId}` with the embedding in a `vector` FLOAT32 field. A single RediSearch index `demoless:kb-idx` (HNSW, cosine) spans all companies; a `company` TAG field pre-filters queries — so this **requires Redis Stack** (RediSearch), not plain `redis:7`.
+- **Embeddings** (`embed.ts`): OpenAI `text-embedding-3-small` (1536-dim) via raw `fetch`, no SDK. `EMBED_DIM` must match both the model and the index schema.
+- **Ingest/search** (`store.ts`): `indexDocuments(company, docs)` builds the index (seeded by `scripts/knowledge-seed.ts`); `searchKnowledge(company, query, k)` runs the KNN query; `ensureIndex()` is idempotent and throws a clear "needs Redis Stack" error if FT.* is missing.
+- **Prompt block** (`answer.ts`): `buildAnswerContext(hits)` is the RAG counterpart to `buildMemoryContext` — P1C injects both into Claude's prompt (one grounds *who*, the other grounds *what*).
+- **Ownership**: retrieval arguably belongs to the "brain" (P1C) rather than P4 — coordinate before wiring so it isn't built twice.
+
 ### Google auth → memory (the one real backend path)
 
 Auth.js (NextAuth v5) provides Google sign-in and is the only flow that touches a real backend end-to-end. `auth.ts` (repo root) exports `handlers`/`signIn`/`signOut`/`auth`; the route handler re-exports `handlers`. Session is JWT — no DB adapter.
@@ -68,4 +92,5 @@ Path alias `@/*` maps to the repo root (`tsconfig.json`).
 
 - The AI rep avatar is a placeholder in `PreCallForm.tsx` and `DemoRoom.tsx` (the design export had no headshot).
 - The dashboard/demo-room screens still render mock data (`lib/data.ts`); only the sign-in → buyer-profile path is wired to `lib/memory`. Notes (`remember`) and the live feed have no producer/consumer in the UI yet.
+- `lib/knowledge` has no consumer yet either — it's verified by `knowledge:smoke` and pre-loaded by `knowledge:seed` (a sample Demoless corpus). Real content ingestion (file upload / P3 crawl) and the P1C question-answering wiring are still to come.
 - The message contracts in `lib/memory/types.ts` are still provisional pending P1B.1.
