@@ -1,6 +1,6 @@
-// The tagged demo-step catalog (Q7). Each step is tagged with the pains it
-// addresses; DISCOVERY filters this into the walkthrough subset. Placeholder
-// product = Demoless demoing itself. Swap for the real target's steps later.
+// Tagged Browserbase demo-step catalog. DISCOVERY filters this into the
+// walkthrough subset, then the browser lane maps each semantic target to the
+// real Browserbase dashboard or docs location it can reliably drive.
 
 export interface DemoStep {
   id: string;
@@ -11,27 +11,68 @@ export interface DemoStep {
 
 export const CATALOG: DemoStep[] = [
   {
-    id: "automation",
-    addresses: ["manual prep", "wasting time", "hours preparing"],
-    navigate: "campaigns/new",
-    say: "Here's how a demo gets built automatically — no manual prep.",
+    id: "sessions",
+    addresses: [
+      "browser infrastructure",
+      "self-hosted chromium",
+      "scaling browsers",
+      "automation reliability",
+      "agent browsing",
+    ],
+    navigate: "browserbase sessions",
+    say:
+      "Browserbase gives your agent a managed cloud browser session instead of forcing you to operate Chromium yourself.",
   },
   {
-    id: "personalization",
-    addresses: ["generic demos", "one-size-fits-all", "same thing to everyone"],
-    navigate: "dashboard",
-    say: "Watch how the walkthrough adapts to each prospect's profile.",
+    id: "live-view",
+    addresses: [
+      "debugging",
+      "watch the agent",
+      "observability",
+      "what happened",
+      "customer trust",
+    ],
+    navigate: "browserbase session live view",
+    say:
+      "Live View lets you watch and control the browser in real time, which is exactly what we embed for the prospect.",
   },
   {
-    id: "analytics",
-    addresses: ["no visibility", "can't measure", "no insight"],
-    navigate: "analytics",
-    say: "This is where every conversation's signals show up.",
+    id: "contexts",
+    addresses: [
+      "login",
+      "authentication",
+      "cookies",
+      "persistent sessions",
+      "repeat workflows",
+    ],
+    navigate: "browserbase contexts",
+    say:
+      "Contexts persist cookies, auth tokens, and browser storage so the agent can stay logged in across sessions.",
   },
   {
-    id: "memory",
-    addresses: ["repeat visitors", "context loss", "starting over"],
-    navigate: "buyers",
-    say: "And it remembers each buyer across visits — here's the buyer view.",
+    id: "stagehand",
+    addresses: [
+      "natural language actions",
+      "selector brittleness",
+      "page changes",
+      "ai browser control",
+      "data extraction",
+    ],
+    navigate: "browserbase stagehand",
+    say:
+      "Stagehand mixes Playwright-style control with AI actions and extraction, so the agent can handle pages that shift under it.",
+  },
+  {
+    id: "security",
+    addresses: [
+      "security",
+      "compliance",
+      "sensitive data",
+      "recording controls",
+      "regulated workloads",
+    ],
+    navigate: "browserbase security",
+    say:
+      "For sensitive workflows, Browserbase supports controls like disabled logs and recordings, ZDR, BYOS, regions, and enterprise compliance.",
   },
 ];

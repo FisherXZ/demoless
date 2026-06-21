@@ -10,3 +10,9 @@ next-env.d.ts
 .vercel
 *.tsbuildinfo
 .env
+.gstack/
+
+.claude/
+.codex/
+.cursor/
+.agents/

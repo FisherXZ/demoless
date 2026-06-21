@@ -12,12 +12,12 @@ const config: Config = {
         ink2: "#44403c", // form label text
         paper: "#fafaf9", // app background
 
-        brand: "#4f46e5", // indigo primary
-        branddeep: "#4338ca", // indigo deep (numbers, links)
-        brandsoft: "#eef0ff", // indigo wash
-        brandsoft2: "#f6f5ff", // indigo wash 2
-        brandborder: "#dcdcfa", // indigo soft border
-        indigotext: "#312e81", // indigo-950 text
+        brand: "#3138cc", // indigo primary — pulled bluer, used sparingly (DESIGN.md)
+        branddeep: "#262aa6", // indigo deep (numbers, links)
+        brandsoft: "#eaecfb", // indigo wash
+        brandsoft2: "#f4f5fc", // indigo wash 2
+        brandborder: "#d2d4f2", // indigo soft border
+        indigotext: "#232a78", // deep indigo text
 
         night: "#161615", // dark hero / sidebar bg
         night2: "#1f1f1e",
@@ -25,6 +25,27 @@ const config: Config = {
         coal: "#2a2a28",
         coal2: "#4b4b48",
         coalline: "#34332f",
+
+        // ── Dark instrument layer (the dashboard "command center") ──────────
+        // Layered warm-black surfaces. Use as: obsidian = app base,
+        // slate = raised panel/card, slate2 = nested/hover, with edge hairlines.
+        obsidian: "#0c0c0b", // app base (deepest)
+        slate: "#161614", // raised panel / card
+        slate2: "#1d1d1a", // nested fill / row hover
+        slate3: "#242420", // input / control fill
+        edge: "#2b2a27", // dark hairline border
+        edge2: "#201f1d", // subtler divider
+        // Text ramp on dark (warm, never pure white)
+        chalk: "#f3f1ec", // primary text on dark
+        ash: "#aba79e", // secondary text on dark
+        ember: "#75716a", // tertiary / mono labels on dark
+        // Accents retuned to glow on near-black (the light brand is invisible here)
+        brandlit: "#7c82ff", // indigo accent on dark — actions, active, AI presence
+        brandlit2: "#9aa0ff", // hover / brighter
+        goodlit: "#34d399", // qualified / positive on dark
+        warnlit: "#fbbf24", // objection / caution on dark
+        dangerlit: "#f87171", // needs-a-human on dark
+        livelit: "#34d399", // active / streaming / speaking-now on dark
 
         muted: "#57534e",
         muted2: "#78716c",

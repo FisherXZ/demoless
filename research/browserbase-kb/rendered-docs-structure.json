@@ -1,0 +1,923 @@
+{
+  "startUrl": "https://docs.browserbase.com/welcome/introduction#the-browserbase-platform",
+  "finalUrl": "https://docs.browserbase.com/welcome/introduction#the-browserbase-platform",
+  "title": "Introducing Browserbase - Browserbase Documentation",
+  "extractedAt": "2026-06-20T22:40:58.440Z",
+  "screenshotPath": "research/browserbase-kb/rendered-docs-structure.png",
+  "pageSections": [
+    {
+      "level": "h1",
+      "text": "Introducing Browserbase"
+    },
+    {
+      "level": "h2",
+      "text": "Quickstart"
+    },
+    {
+      "level": "h2",
+      "text": "Skills and prompts"
+    },
+    {
+      "level": "h2",
+      "text": "Templates"
+    },
+    {
+      "level": "h2",
+      "text": "SDKs reference"
+    },
+    {
+      "level": "h2",
+      "text": "​ The Browserbase Platform"
+    },
+    {
+      "level": "h2",
+      "text": "Browser API"
+    },
+    {
+      "level": "h2",
+      "text": "Search API"
+    },
+    {
+      "level": "h2",
+      "text": "Fetch API"
+    },
+    {
+      "level": "h2",
+      "text": "Functions"
+    },
+    {
+      "level": "h2",
+      "text": "Model Gateway"
+    },
+    {
+      "level": "h2",
+      "text": "​ Explore use cases"
+    },
+    {
+      "level": "h2",
+      "text": "Agents"
+    },
+    {
+      "level": "h2",
+      "text": "Web data retrieval"
+    },
+    {
+      "level": "h2",
+      "text": "Browser automation"
+    },
+    {
+      "level": "h2",
+      "text": "Automated testing"
+    },
+    {
+      "level": "h2",
+      "text": "​ Start building"
+    },
+    {
+      "level": "h2",
+      "text": "Playwright"
+    },
+    {
+      "level": "h2",
+      "text": "Puppeteer"
+    },
+    {
+      "level": "h2",
+      "text": "Selenium"
+    },
+    {
+      "level": "h2",
+      "text": "Stagehand"
+    },
+    {
+      "level": "h2",
+      "text": "Mastra"
+    },
+    {
+      "level": "h2",
+      "text": "LangChain"
+    },
+    {
+      "level": "h2",
+      "text": "CrewAI"
+    }
+  ],
+  "navigation": [
+    {
+      "label": "Pages",
+      "links": [
+        {
+          "text": "Home",
+          "href": "https://docs.browserbase.com/welcome/introduction"
+        },
+        {
+          "text": "Overview",
+          "href": "https://docs.browserbase.com/welcome/getting-started"
+        },
+        {
+          "text": "Skills",
+          "href": "https://docs.browserbase.com/welcome/quickstarts/skills"
+        },
+        {
+          "text": "Stagehand",
+          "href": "https://docs.browserbase.com/welcome/quickstarts/stagehand"
+        },
+        {
+          "text": "Playwright",
+          "href": "https://docs.browserbase.com/welcome/quickstarts/playwright"
+        },
+        {
+          "text": "Puppeteer",
+          "href": "https://docs.browserbase.com/welcome/quickstarts/puppeteer"
+        },
+        {
+          "text": "Selenium",
+          "href": "https://docs.browserbase.com/welcome/quickstarts/selenium"
+        },
+        {
+          "text": "What is Browserbase?",
+          "href": "https://docs.browserbase.com/welcome/what-is-browserbase"
+        },
+        {
+          "text": "Browse CLI",
+          "href": "https://docs.browserbase.com/integrations/skills/browse-cli"
+        },
+        {
+          "text": "Create a browser session",
+          "href": "https://docs.browserbase.com/platform/browser/getting-started/create-browser-session"
+        },
+        {
+          "text": "Using a browser session",
+          "href": "https://docs.browserbase.com/platform/browser/getting-started/using-browser-session"
+        },
+        {
+          "text": "Manage a browser session",
+          "href": "https://docs.browserbase.com/platform/browser/getting-started/manage-browser-session"
+        },
+        {
+          "text": "Deploying a browser session",
+          "href": "https://docs.browserbase.com/platform/browser/getting-started/deploying-browser-session"
+        },
+        {
+          "text": "What is a headless browser?",
+          "href": "https://docs.browserbase.com/platform/browser/getting-started/what-is-headless-browser"
+        },
+        {
+          "text": "Managed vs self-hosted",
+          "href": "https://docs.browserbase.com/platform/browser/getting-started/remote-browser-versus-local-browser"
+        },
+        {
+          "text": "Overview",
+          "href": "https://docs.browserbase.com/platform/browser/core-features/overview"
+        },
+        {
+          "text": "Contexts",
+          "href": "https://docs.browserbase.com/platform/browser/core-features/contexts"
+        },
+        {
+          "text": "Viewports",
+          "href": "https://docs.browserbase.com/platform/browser/core-features/viewports"
+        },
+        {
+          "text": "Metadata",
+          "href": "https://docs.browserbase.com/platform/browser/core-features/session-metadata"
+        },
+        {
+          "text": "Browser extensions",
+          "href": "https://docs.browserbase.com/platform/browser/core-features/browser-extensions"
+        },
+        {
+          "text": "Overview",
+          "href": "https://docs.browserbase.com/platform/browser/observability/observability"
+        },
+        {
+          "text": "Session live view",
+          "href": "https://docs.browserbase.com/platform/browser/observability/session-live-view"
+        },
+        {
+          "text": "Session recording (rrweb)",
+          "href": "https://docs.browserbase.com/platform/browser/observability/session-recording"
+        },
+        {
+          "text": "Session replay",
+          "href": "https://docs.browserbase.com/platform/browser/observability/session-replay"
+        },
+        {
+          "text": "Overview",
+          "href": "https://docs.browserbase.com/platform/browser/files/overview"
+        },
+        {
+          "text": "Downloads",
+          "href": "https://docs.browserbase.com/platform/browser/files/downloads"
+        },
+        {
+          "text": "Uploads",
+          "href": "https://docs.browserbase.com/platform/browser/files/uploads"
+        },
+        {
+          "text": "Screenshots",
+          "href": "https://docs.browserbase.com/platform/browser/files/screenshots"
+        },
+        {
+          "text": "PDFs",
+          "href": "https://docs.browserbase.com/platform/browser/files/pdfs"
+        },
+        {
+          "text": "Overview",
+          "href": "https://docs.browserbase.com/platform/browser/long-sessions/overview"
+        },
+        {
+          "text": "Keep alive",
+          "href": "https://docs.browserbase.com/platform/browser/long-sessions/keep-alive"
+        },
+        {
+          "text": "Timeout",
+          "href": "https://docs.browserbase.com/platform/browser/long-sessions/timeouts"
+        },
+        {
+          "text": "Dialogs",
+          "href": "https://docs.browserbase.com/platform/browser/techniques/dialogues"
+        },
+        {
+          "text": "Overview",
+          "href": "https://docs.browserbase.com/platform/runtime/overview"
+        },
+        {
+          "text": "Deploy from playground",
+          "href": "https://docs.browserbase.com/platform/runtime/deploy-from-playground"
+        },
+        {
+          "text": "Functions reference",
+          "href": "https://docs.browserbase.com/platform/runtime/reference"
+        },
+        {
+          "text": "Fetch",
+          "href": "https://docs.browserbase.com/platform/fetch/overview"
+        },
+        {
+          "text": "Search",
+          "href": "https://docs.browserbase.com/platform/search/overview"
+        },
+        {
+          "text": "Overview",
+          "href": "https://docs.browserbase.com/platform/identity/overview"
+        },
+        {
+          "text": "Verified",
+          "href": "https://docs.browserbase.com/platform/identity/verified-customization"
+        },
+        {
+          "text": "Proxies",
+          "href": "https://docs.browserbase.com/platform/identity/proxies"
+        },
+        {
+          "text": "Authentication",
+          "href": "https://docs.browserbase.com/platform/identity/authentication"
+        },
+        {
+          "text": "Allowed Domains",
+          "href": "https://docs.browserbase.com/platform/identity/allowed-domains"
+        },
+        {
+          "text": "IP allowlisting",
+          "href": "https://docs.browserbase.com/platform/identity/vpn"
+        },
+        {
+          "text": "Model Gateway",
+          "href": "https://docs.browserbase.com/platform/model-gateway/overview"
+        },
+        {
+          "text": "Browser agents",
+          "href": "https://docs.browserbase.com/use-cases/agents"
+        },
+        {
+          "text": "Browser automation",
+          "href": "https://docs.browserbase.com/use-cases/automating-form-submissions"
+        },
+        {
+          "text": "Data retrieval",
+          "href": "https://docs.browserbase.com/use-cases/web-data-retrieval"
+        },
+        {
+          "text": "Automated testing",
+          "href": "https://docs.browserbase.com/use-cases/building-automated-tests"
+        },
+        {
+          "text": "Performance optimization",
+          "href": "https://docs.browserbase.com/optimizations/latency/speed-optimization"
+        },
+        {
+          "text": "Browser regions",
+          "href": "https://docs.browserbase.com/optimizations/latency/multi-region"
+        },
+        {
+          "text": "Cost optimization",
+          "href": "https://docs.browserbase.com/optimizations/cost/cost-optimization"
+        },
+        {
+          "text": "Usage tracking",
+          "href": "https://docs.browserbase.com/optimizations/cost/measuring-usage"
+        },
+        {
+          "text": "Concurrency",
+          "href": "https://docs.browserbase.com/optimizations/concurrency/overview"
+        },
+        {
+          "text": "Enterprise security",
+          "href": "https://docs.browserbase.com/account/enterprise/security"
+        },
+        {
+          "text": "Zero data retention",
+          "href": "https://docs.browserbase.com/account/enterprise/zero-data-retention"
+        },
+        {
+          "text": "Bring your own storage",
+          "href": "https://docs.browserbase.com/account/enterprise/byos-setup-guide"
+        },
+        {
+          "text": "Pricing",
+          "href": "https://docs.browserbase.com/account/billing/plans"
+        },
+        {
+          "text": "Plan management",
+          "href": "https://docs.browserbase.com/account/billing/plan-management"
+        },
+        {
+          "text": "Roles",
+          "href": "https://docs.browserbase.com/account/team/roles"
+        },
+        {
+          "text": "SSO (single sign-on)",
+          "href": "https://docs.browserbase.com/account/team/sso"
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "text": "Docs",
+      "href": "https://docs.browserbase.com/welcome/introduction"
+    },
+    {
+      "text": "Integrations",
+      "href": "https://docs.browserbase.com/integrations/get-started"
+    },
+    {
+      "text": "APIs & SDKs",
+      "href": "https://docs.browserbase.com/reference/introduction"
+    },
+    {
+      "text": "Templates ↗",
+      "href": "https://www.browserbase.com/templates"
+    },
+    {
+      "text": "Stagehand ↗",
+      "href": "https://docs.stagehand.dev/"
+    },
+    {
+      "text": "Changelog ↗",
+      "href": "https://www.browserbase.com/changelog"
+    },
+    {
+      "text": "Dashboard ↗",
+      "href": "https://www.browserbase.com/overview"
+    },
+    {
+      "text": "Sign up ↗",
+      "href": "https://www.browserbase.com/sign-up?redirect=%2Fget-started&utm_source=docs&utm_medium=nav&utm_campaign=docs_signup_cta"
+    },
+    {
+      "text": "Quickstart Tutorials and guides to get you up to speed with Browserbase.",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/playwright"
+    },
+    {
+      "text": "Skills and prompts You’re an agent? Start here!",
+      "href": "https://docs.browserbase.com/integrations/skills/introduction"
+    },
+    {
+      "text": "Templates Start building right away with 30+ ready-made templates.",
+      "href": "https://browserbase.com/templates"
+    },
+    {
+      "text": "SDKs reference Stagehand and Browserbase SDKs, plus a full REST API reference.",
+      "href": "https://docs.browserbase.com/reference/introduction"
+    },
+    {
+      "text": "​",
+      "href": "https://docs.browserbase.com/welcome/introduction#the-browserbase-platform"
+    },
+    {
+      "text": "Browser API Create, control, and observe browser sessions programmatically.",
+      "href": "https://docs.browserbase.com/welcome/getting-started"
+    },
+    {
+      "text": "Search API Fast, token-efficient web search results for your agents.",
+      "href": "https://docs.browserbase.com/platform/search/overview"
+    },
+    {
+      "text": "Fetch API Retrieve page content as clean markdown through a proxy network.",
+      "href": "https://docs.browserbase.com/platform/fetch/overview"
+    },
+    {
+      "text": "Functions Deploy and run browser agents on Browserbase, on a schedule or on demand.",
+      "href": "https://docs.browserbase.com/platform/runtime/overview"
+    },
+    {
+      "text": "Model Gateway Route requests across 100+ LLM providers with a single endpoint.",
+      "href": "https://docs.browserbase.com/platform/model-gateway/overview"
+    },
+    {
+      "text": "​",
+      "href": "https://docs.browserbase.com/welcome/introduction#explore-use-cases"
+    },
+    {
+      "text": "Agents Power AI agents with real browser interactions and tool use.",
+      "href": "https://docs.browserbase.com/use-cases/agents"
+    },
+    {
+      "text": "Web data retrieval Extract structured data from any website at scale.",
+      "href": "https://docs.browserbase.com/use-cases/web-data-retrieval"
+    },
+    {
+      "text": "Browser automation Automate logins, registrations, and multi-step form flows.",
+      "href": "https://docs.browserbase.com/use-cases/automating-form-submissions"
+    },
+    {
+      "text": "Automated testing Run reliable end-to-end tests in isolated browser environments.",
+      "href": "https://docs.browserbase.com/use-cases/building-automated-tests"
+    },
+    {
+      "text": "​",
+      "href": "https://docs.browserbase.com/welcome/introduction#start-building"
+    },
+    {
+      "text": "Playwright Full browser control with auto-waits, network interception, and multi-tab support.",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/playwright"
+    },
+    {
+      "text": "Puppeteer Direct Chrome DevTools Protocol access for fine-grained browser control.",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/puppeteer"
+    },
+    {
+      "text": "Selenium Battle-tested cross-browser automation via the WebDriver standard.",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/selenium"
+    },
+    {
+      "text": "Stagehand The SDK for browser agents. Natural language selectors, self-healing actions, and caching at scale. 22k GitHub stars, 700k+ weekly downloads. Built by Browserbase.",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/stagehand"
+    },
+    {
+      "text": "Mastra TypeScript-first agent framework with built-in Browserbase support.",
+      "href": "https://docs.browserbase.com/integrations/mastra/introduction"
+    },
+    {
+      "text": "LangChain Composable LLM chains and agents with browser tools.",
+      "href": "https://docs.browserbase.com/integrations/langchain/introduction"
+    },
+    {
+      "text": "CrewAI Multi-agent orchestration with collaborative browser tasks.",
+      "href": "https://docs.browserbase.com/integrations/crew-ai/introduction"
+    },
+    {
+      "text": "Overview Next",
+      "href": "https://docs.browserbase.com/welcome/getting-started"
+    },
+    {
+      "text": "website",
+      "href": "https://www.browserbase.com/"
+    },
+    {
+      "text": "x",
+      "href": "https://x.com/browserbase"
+    },
+    {
+      "text": "github",
+      "href": "https://github.com/browserbase"
+    },
+    {
+      "text": "linkedin",
+      "href": "https://www.linkedin.com/company/browserbasehq"
+    },
+    {
+      "text": "Powered by This documentation is built and hosted on Mintlify, a developer documentation platform",
+      "href": "https://www.mintlify.com/?utm_campaign=poweredBy&utm_medium=referral&utm_source=browserbase"
+    }
+  ],
+  "allDocsLinks": [
+    {
+      "text": "Plan management",
+      "href": "https://docs.browserbase.com/account/billing/plan-management",
+      "path": "account/billing/plan-management",
+      "group": "account / billing"
+    },
+    {
+      "text": "Pricing",
+      "href": "https://docs.browserbase.com/account/billing/plans",
+      "path": "account/billing/plans",
+      "group": "account / billing"
+    },
+    {
+      "text": "Bring your own storage",
+      "href": "https://docs.browserbase.com/account/enterprise/byos-setup-guide",
+      "path": "account/enterprise/byos-setup-guide",
+      "group": "account / enterprise"
+    },
+    {
+      "text": "Enterprise security",
+      "href": "https://docs.browserbase.com/account/enterprise/security",
+      "path": "account/enterprise/security",
+      "group": "account / enterprise"
+    },
+    {
+      "text": "Zero data retention",
+      "href": "https://docs.browserbase.com/account/enterprise/zero-data-retention",
+      "path": "account/enterprise/zero-data-retention",
+      "group": "account / enterprise"
+    },
+    {
+      "text": "Roles",
+      "href": "https://docs.browserbase.com/account/team/roles",
+      "path": "account/team/roles",
+      "group": "account / team"
+    },
+    {
+      "text": "SSO (single sign-on)",
+      "href": "https://docs.browserbase.com/account/team/sso",
+      "path": "account/team/sso",
+      "group": "account / team"
+    },
+    {
+      "text": "CrewAI Multi-agent orchestration with collaborative browser tasks.",
+      "href": "https://docs.browserbase.com/integrations/crew-ai/introduction",
+      "path": "integrations/crew-ai/introduction",
+      "group": "integrations / crew-ai"
+    },
+    {
+      "text": "Integrations",
+      "href": "https://docs.browserbase.com/integrations/get-started",
+      "path": "integrations/get-started",
+      "group": "integrations"
+    },
+    {
+      "text": "LangChain Composable LLM chains and agents with browser tools.",
+      "href": "https://docs.browserbase.com/integrations/langchain/introduction",
+      "path": "integrations/langchain/introduction",
+      "group": "integrations / langchain"
+    },
+    {
+      "text": "Mastra TypeScript-first agent framework with built-in Browserbase support.",
+      "href": "https://docs.browserbase.com/integrations/mastra/introduction",
+      "path": "integrations/mastra/introduction",
+      "group": "integrations / mastra"
+    },
+    {
+      "text": "Browse CLI",
+      "href": "https://docs.browserbase.com/integrations/skills/browse-cli",
+      "path": "integrations/skills/browse-cli",
+      "group": "integrations / skills"
+    },
+    {
+      "text": "Skills and prompts You’re an agent? Start here!",
+      "href": "https://docs.browserbase.com/integrations/skills/introduction",
+      "path": "integrations/skills/introduction",
+      "group": "integrations / skills"
+    },
+    {
+      "text": "/llms.txt",
+      "href": "https://docs.browserbase.com/llms.txt",
+      "path": "llms.txt",
+      "group": "llms.txt"
+    },
+    {
+      "text": "Concurrency",
+      "href": "https://docs.browserbase.com/optimizations/concurrency/overview",
+      "path": "optimizations/concurrency/overview",
+      "group": "optimizations / concurrency"
+    },
+    {
+      "text": "Cost optimization",
+      "href": "https://docs.browserbase.com/optimizations/cost/cost-optimization",
+      "path": "optimizations/cost/cost-optimization",
+      "group": "optimizations / cost"
+    },
+    {
+      "text": "Usage tracking",
+      "href": "https://docs.browserbase.com/optimizations/cost/measuring-usage",
+      "path": "optimizations/cost/measuring-usage",
+      "group": "optimizations / cost"
+    },
+    {
+      "text": "Browser regions",
+      "href": "https://docs.browserbase.com/optimizations/latency/multi-region",
+      "path": "optimizations/latency/multi-region",
+      "group": "optimizations / latency"
+    },
+    {
+      "text": "Performance optimization",
+      "href": "https://docs.browserbase.com/optimizations/latency/speed-optimization",
+      "path": "optimizations/latency/speed-optimization",
+      "group": "optimizations / latency"
+    },
+    {
+      "text": "Browser extensions",
+      "href": "https://docs.browserbase.com/platform/browser/core-features/browser-extensions",
+      "path": "platform/browser/core-features/browser-extensions",
+      "group": "platform / browser / core-features"
+    },
+    {
+      "text": "Contexts",
+      "href": "https://docs.browserbase.com/platform/browser/core-features/contexts",
+      "path": "platform/browser/core-features/contexts",
+      "group": "platform / browser / core-features"
+    },
+    {
+      "text": "Overview",
+      "href": "https://docs.browserbase.com/platform/browser/core-features/overview",
+      "path": "platform/browser/core-features/overview",
+      "group": "platform / browser / core-features"
+    },
+    {
+      "text": "Metadata",
+      "href": "https://docs.browserbase.com/platform/browser/core-features/session-metadata",
+      "path": "platform/browser/core-features/session-metadata",
+      "group": "platform / browser / core-features"
+    },
+    {
+      "text": "Viewports",
+      "href": "https://docs.browserbase.com/platform/browser/core-features/viewports",
+      "path": "platform/browser/core-features/viewports",
+      "group": "platform / browser / core-features"
+    },
+    {
+      "text": "Downloads",
+      "href": "https://docs.browserbase.com/platform/browser/files/downloads",
+      "path": "platform/browser/files/downloads",
+      "group": "platform / browser / files"
+    },
+    {
+      "text": "Overview",
+      "href": "https://docs.browserbase.com/platform/browser/files/overview",
+      "path": "platform/browser/files/overview",
+      "group": "platform / browser / files"
+    },
+    {
+      "text": "PDFs",
+      "href": "https://docs.browserbase.com/platform/browser/files/pdfs",
+      "path": "platform/browser/files/pdfs",
+      "group": "platform / browser / files"
+    },
+    {
+      "text": "Screenshots",
+      "href": "https://docs.browserbase.com/platform/browser/files/screenshots",
+      "path": "platform/browser/files/screenshots",
+      "group": "platform / browser / files"
+    },
+    {
+      "text": "Uploads",
+      "href": "https://docs.browserbase.com/platform/browser/files/uploads",
+      "path": "platform/browser/files/uploads",
+      "group": "platform / browser / files"
+    },
+    {
+      "text": "Create a browser session",
+      "href": "https://docs.browserbase.com/platform/browser/getting-started/create-browser-session",
+      "path": "platform/browser/getting-started/create-browser-session",
+      "group": "platform / browser / getting-started"
+    },
+    {
+      "text": "Deploying a browser session",
+      "href": "https://docs.browserbase.com/platform/browser/getting-started/deploying-browser-session",
+      "path": "platform/browser/getting-started/deploying-browser-session",
+      "group": "platform / browser / getting-started"
+    },
+    {
+      "text": "Manage a browser session",
+      "href": "https://docs.browserbase.com/platform/browser/getting-started/manage-browser-session",
+      "path": "platform/browser/getting-started/manage-browser-session",
+      "group": "platform / browser / getting-started"
+    },
+    {
+      "text": "Managed vs self-hosted",
+      "href": "https://docs.browserbase.com/platform/browser/getting-started/remote-browser-versus-local-browser",
+      "path": "platform/browser/getting-started/remote-browser-versus-local-browser",
+      "group": "platform / browser / getting-started"
+    },
+    {
+      "text": "Using a browser session",
+      "href": "https://docs.browserbase.com/platform/browser/getting-started/using-browser-session",
+      "path": "platform/browser/getting-started/using-browser-session",
+      "group": "platform / browser / getting-started"
+    },
+    {
+      "text": "What is a headless browser?",
+      "href": "https://docs.browserbase.com/platform/browser/getting-started/what-is-headless-browser",
+      "path": "platform/browser/getting-started/what-is-headless-browser",
+      "group": "platform / browser / getting-started"
+    },
+    {
+      "text": "Keep alive",
+      "href": "https://docs.browserbase.com/platform/browser/long-sessions/keep-alive",
+      "path": "platform/browser/long-sessions/keep-alive",
+      "group": "platform / browser / long-sessions"
+    },
+    {
+      "text": "Overview",
+      "href": "https://docs.browserbase.com/platform/browser/long-sessions/overview",
+      "path": "platform/browser/long-sessions/overview",
+      "group": "platform / browser / long-sessions"
+    },
+    {
+      "text": "Timeout",
+      "href": "https://docs.browserbase.com/platform/browser/long-sessions/timeouts",
+      "path": "platform/browser/long-sessions/timeouts",
+      "group": "platform / browser / long-sessions"
+    },
+    {
+      "text": "Overview",
+      "href": "https://docs.browserbase.com/platform/browser/observability/observability",
+      "path": "platform/browser/observability/observability",
+      "group": "platform / browser / observability"
+    },
+    {
+      "text": "Session live view",
+      "href": "https://docs.browserbase.com/platform/browser/observability/session-live-view",
+      "path": "platform/browser/observability/session-live-view",
+      "group": "platform / browser / observability"
+    },
+    {
+      "text": "Session recording (rrweb)",
+      "href": "https://docs.browserbase.com/platform/browser/observability/session-recording",
+      "path": "platform/browser/observability/session-recording",
+      "group": "platform / browser / observability"
+    },
+    {
+      "text": "Session replay",
+      "href": "https://docs.browserbase.com/platform/browser/observability/session-replay",
+      "path": "platform/browser/observability/session-replay",
+      "group": "platform / browser / observability"
+    },
+    {
+      "text": "Dialogs",
+      "href": "https://docs.browserbase.com/platform/browser/techniques/dialogues",
+      "path": "platform/browser/techniques/dialogues",
+      "group": "platform / browser / techniques"
+    },
+    {
+      "text": "Fetch",
+      "href": "https://docs.browserbase.com/platform/fetch/overview",
+      "path": "platform/fetch/overview",
+      "group": "platform / fetch"
+    },
+    {
+      "text": "Allowed Domains",
+      "href": "https://docs.browserbase.com/platform/identity/allowed-domains",
+      "path": "platform/identity/allowed-domains",
+      "group": "platform / identity"
+    },
+    {
+      "text": "Authentication",
+      "href": "https://docs.browserbase.com/platform/identity/authentication",
+      "path": "platform/identity/authentication",
+      "group": "platform / identity"
+    },
+    {
+      "text": "Overview",
+      "href": "https://docs.browserbase.com/platform/identity/overview",
+      "path": "platform/identity/overview",
+      "group": "platform / identity"
+    },
+    {
+      "text": "Proxies",
+      "href": "https://docs.browserbase.com/platform/identity/proxies",
+      "path": "platform/identity/proxies",
+      "group": "platform / identity"
+    },
+    {
+      "text": "Verified",
+      "href": "https://docs.browserbase.com/platform/identity/verified-customization",
+      "path": "platform/identity/verified-customization",
+      "group": "platform / identity"
+    },
+    {
+      "text": "IP allowlisting",
+      "href": "https://docs.browserbase.com/platform/identity/vpn",
+      "path": "platform/identity/vpn",
+      "group": "platform / identity"
+    },
+    {
+      "text": "Model Gateway",
+      "href": "https://docs.browserbase.com/platform/model-gateway/overview",
+      "path": "platform/model-gateway/overview",
+      "group": "platform / model-gateway"
+    },
+    {
+      "text": "Deploy from playground",
+      "href": "https://docs.browserbase.com/platform/runtime/deploy-from-playground",
+      "path": "platform/runtime/deploy-from-playground",
+      "group": "platform / runtime"
+    },
+    {
+      "text": "Overview",
+      "href": "https://docs.browserbase.com/platform/runtime/overview",
+      "path": "platform/runtime/overview",
+      "group": "platform / runtime"
+    },
+    {
+      "text": "Functions reference",
+      "href": "https://docs.browserbase.com/platform/runtime/reference",
+      "path": "platform/runtime/reference",
+      "group": "platform / runtime"
+    },
+    {
+      "text": "Search",
+      "href": "https://docs.browserbase.com/platform/search/overview",
+      "path": "platform/search/overview",
+      "group": "platform / search"
+    },
+    {
+      "text": "APIs & SDKs",
+      "href": "https://docs.browserbase.com/reference/introduction",
+      "path": "reference/introduction",
+      "group": "reference"
+    },
+    {
+      "text": "Browser agents",
+      "href": "https://docs.browserbase.com/use-cases/agents",
+      "path": "use-cases/agents",
+      "group": "use-cases"
+    },
+    {
+      "text": "Browser automation",
+      "href": "https://docs.browserbase.com/use-cases/automating-form-submissions",
+      "path": "use-cases/automating-form-submissions",
+      "group": "use-cases"
+    },
+    {
+      "text": "Automated testing",
+      "href": "https://docs.browserbase.com/use-cases/building-automated-tests",
+      "path": "use-cases/building-automated-tests",
+      "group": "use-cases"
+    },
+    {
+      "text": "Data retrieval",
+      "href": "https://docs.browserbase.com/use-cases/web-data-retrieval",
+      "path": "use-cases/web-data-retrieval",
+      "group": "use-cases"
+    },
+    {
+      "text": "Overview",
+      "href": "https://docs.browserbase.com/welcome/getting-started",
+      "path": "welcome/getting-started",
+      "group": "welcome"
+    },
+    {
+      "text": "Skip to main content",
+      "href": "https://docs.browserbase.com/welcome/introduction",
+      "path": "welcome/introduction",
+      "group": "welcome"
+    },
+    {
+      "text": "Playwright",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/playwright",
+      "path": "welcome/quickstarts/playwright",
+      "group": "welcome / quickstarts"
+    },
+    {
+      "text": "Puppeteer",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/puppeteer",
+      "path": "welcome/quickstarts/puppeteer",
+      "group": "welcome / quickstarts"
+    },
+    {
+      "text": "Selenium",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/selenium",
+      "path": "welcome/quickstarts/selenium",
+      "group": "welcome / quickstarts"
+    },
+    {
+      "text": "Skills",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/skills",
+      "path": "welcome/quickstarts/skills",
+      "group": "welcome / quickstarts"
+    },
+    {
+      "text": "Stagehand",
+      "href": "https://docs.browserbase.com/welcome/quickstarts/stagehand",
+      "path": "welcome/quickstarts/stagehand",
+      "group": "welcome / quickstarts"
+    },
+    {
+      "text": "What is Browserbase?",
+      "href": "https://docs.browserbase.com/welcome/what-is-browserbase",
+      "path": "welcome/what-is-browserbase",
+      "group": "welcome"
+    }
+  ],
+  "counts": {
+    "navigationContainers": 1,
+    "navigationLinks": 61,
+    "uniqueDocsLinks": 68,
+    "pageSections": 24,
+    "cards": 37
+  }
+}

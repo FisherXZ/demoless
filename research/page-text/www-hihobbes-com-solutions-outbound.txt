@@ -1,0 +1,46 @@
+# Hobbes - Self-Improving Agents for Demos
+
+- Requested: https://www.hihobbes.com/solutions/outbound
+- Final: https://www.hihobbes.com/solutions/outbound
+- Status: 200
+- Source: seed
+
+## Headings
+
+
+## CTAs And Links
+
+- Product
+- Solutions
+- Company
+- Hobbes -> https://www.hihobbes.com/#hero
+- Login -> https://app.hihobbes.com/
+- Start Demo -> https://demo.hihobbes.com/hobbes
+- Start Demo -> https://demo.hihobbes.com/hobbes
+- Talk to Sales -> https://cal.com/team/hobbes/hobbes-intro
+- Inbound
+
+Turn visitors into qualified pipeline -> https://www.hihobbes.com/solutions/inbound
+- What does training a Hobbes agent look like?
+- What's the risk of competitors going through a demo?
+- Where can we deploy Hobbes?
+- How long does it take to go live?
+- How does Hobbes get better after every conversation?
+- Start Demo -> https://demo.hihobbes.com/hobbes
+- Talk to Sales -> https://cal.com/team/hobbes/hobbes-intro
+- Features -> https://www.hihobbes.com/#features
+- Outcomes -> https://www.hihobbes.com/#outcomes
+- How it works -> https://www.hihobbes.com/#how-it-works
+- Use Cases -> https://www.hihobbes.com/#use-cases
+- Careers -> https://www.hihobbes.com/careers
+- Blog -> https://www.hihobbes.com/blogs
+- Terms -> https://www.hihobbes.com/terms-of-use
+- Privacy Policy -> https://www.hihobbes.com/privacy-policy
+- Trust Center -> http://trust.hihobbes.com/
+- LinkedIn -> https://www.linkedin.com/company/hihobbes/
+- X.com -> https://x.com/hobbes_ai
+- Bricx -> https://bricxlabs.com/
+
+## Text Stats
+
+- Extracted body characters: 2904

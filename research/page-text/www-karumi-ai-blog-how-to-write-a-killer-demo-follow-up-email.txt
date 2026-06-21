@@ -1,0 +1,53 @@
+# How to write a killer demo follow-up email (with examples)
+
+- Requested: https://www.karumi.ai/blog/how-to-write-a-killer-demo-follow-up-email
+- Final: https://www.karumi.ai/blog/how-to-write-a-killer-demo-follow-up-email
+- Status: 200
+- Source: seed
+
+## Headings
+
+- h1: How to write a killer demo follow-up email (with examples)
+- h2: Why is the followup email so important?
+- h2: When should you send the followup email?
+- h2: Key elements of a followup email
+- h2: Mistakes to avoid in your followup emails
+- h2: Examples of post demo followup emails
+- h3: After a demo with strong fit
+- h3: When questions were left unanswered
+- h3: When multiple stakeholders are involved
+- h2: When the prospect goes silent
+- h2: How agentic demos can boost your followup strategy
+- h1: Accelerate your growth with
+- h1: AI-led demos.
+- h1: Launch your demo in 5 minutes!
+- h1: Launch your demo in 5 minutes!
+
+## CTAs And Links
+
+- Customers -> https://www.karumi.ai/customers
+- Blog -> https://www.karumi.ai/blog
+- Research -> https://www.karumi.ai/research
+- Talk To Sales -> https://www.karumi.ai/contact-demo
+- Blog -> https://www.karumi.ai/blog
+- Product demo -> https://www.karumi.ai/blog/category/product-demo
+- product demo -> https://www.karumi.ai/blog/what-is-a-product-demo
+- agentic demo -> https://www.karumi.ai/blog/agentic-demos
+- Watch Now
+- About -> https://www.ycombinator.com/companies/karumi
+- Careers -> https://www.ycombinator.com/companies/karumi/jobs
+- Customers -> https://www.karumi.ai/customers
+- Blog -> https://www.karumi.ai/blog
+- Research -> https://www.karumi.ai/research
+- Privacy Policy -> https://www.karumi.ai/privacy
+- Terms of Service -> https://www.karumi.ai/terms
+- DPA -> https://www.karumi.ai/dpa
+- Security Portal -> https://trust.delve.co/karumi
+- Cookie Trigger
+- Talk To Sales -> https://www.karumi.ai/contact-demo
+- Launch Demo Now -> https://app.karumi.ai/meet/start/d461afa6-f0d8-4bbe-83ac-ee88a7dbc303
+- Cookie Policy -> https://www.karumi.ai/privacy
+
+## Text Stats
+
+- Extracted body characters: 13139

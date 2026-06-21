@@ -35,12 +35,12 @@ describe("coerceReply", () => {
       ],
       phase: "WALKTHROUGH",
       tour: "advance",
-      select: ["automation", 7],
+      select: ["sessions", 7],
     });
     expect(r.commands.map((c) => c.kind)).toEqual(["say", "navigate"]);
     expect(r.phase).toBe("WALKTHROUGH");
     expect(r.tour).toBe("advance");
-    expect(r.select).toEqual(["automation"]); // non-strings filtered
+    expect(r.select).toEqual(["sessions"]); // non-strings filtered
   });
 
   it("drops an out-of-enum phase/tour rather than erroring", () => {

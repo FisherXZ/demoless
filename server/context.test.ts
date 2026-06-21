@@ -15,8 +15,8 @@ describe("assembleContext", () => {
   it("includes the demo arc, product facts, the catalog, and current state", () => {
     const { system } = assembleContext(base, "human");
     expect(system).toContain("HOOK");
-    expect(system).toContain("Demoless"); // from facts.md
-    expect(system).toContain("automation"); // a catalog id
+    expect(system).toContain("Browserbase"); // from facts.md
+    expect(system).toContain("sessions"); // a catalog id
     expect(system).toContain("phase=DISCOVERY");
   });
 

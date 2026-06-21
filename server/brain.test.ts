@@ -20,20 +20,24 @@ describe("brain: phase + selection", () => {
     mockComplete.mockResolvedValue({
       commands: [{ kind: "say", text: "let me show you" }],
       phase: "WALKTHROUGH",
-      select: ["automation", "analytics"],
+      select: ["sessions", "live-view"],
     });
     const loop = new Loop("s", "u");
-    loop.send({ kind: "user_said", text: "we waste time and can't measure", final: true });
+    loop.send({
+      kind: "user_said",
+      text: "we waste time running browsers and need to debug them",
+      final: true,
+    });
     await flush();
-    expect(loop.getState().selected).toEqual(["automation", "analytics"]);
+    expect(loop.getState().selected).toEqual(["sessions", "live-view"]);
     expect(loop.getState().tourIndex).toBe(0);
   });
 
   it("ignores select ids not in the catalog", async () => {
-    mockComplete.mockResolvedValue({ commands: [], select: ["automation", "bogus"] });
+    mockComplete.mockResolvedValue({ commands: [], select: ["sessions", "bogus"] });
     const loop = new Loop("s", "u");
     loop.send({ kind: "user_said", text: "x", final: true });
     await flush();
-    expect(loop.getState().selected).toEqual(["automation"]); // bogus dropped
+    expect(loop.getState().selected).toEqual(["sessions"]); // bogus dropped
   });
 });
