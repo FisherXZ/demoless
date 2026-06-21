@@ -39,7 +39,7 @@ const config: Config = {
         // Text ramp on light (cool near-black, never pure #000)
         chalk: "#0E1116", // primary text — ink
         ash: "#525B68", // secondary text
-        ember: "#8A94A2", // tertiary / mono labels
+        ember: "#657080", // tertiary / mono labels, AA on light surfaces
         // Cobalt accent
         brandlit: "#3A41D6", // accent — actions, active, AI presence, one series
         brandlit2: "#2A2FA8", // accent-deep — hover / links on light
@@ -54,7 +54,7 @@ const config: Config = {
 
         muted: "#57534e",
         muted2: "#78716c",
-        faint: "#a8a29e",
+        faint: "#6B7280",
         faint2: "#8a8782",
         dim: "#6b6b66",
 

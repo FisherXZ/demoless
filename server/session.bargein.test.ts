@@ -38,6 +38,11 @@ vi.mock("../lib/memory/store", () => ({
 vi.mock("../lib/memory/pubsub", () => ({
   publishPhase: vi.fn().mockResolvedValue(undefined),
 }));
+vi.mock("../lib/learnings", () => ({
+  getLearnings: vi.fn().mockResolvedValue([]),
+  buildLearningsContext: vi.fn().mockReturnValue(""),
+  reflectAndStore: vi.fn().mockResolvedValue(undefined),
+}));
 
 import { VoiceSession } from "./session";
 
@@ -52,31 +57,107 @@ function makeWs() {
   };
 }
 
-/**
- * Build a fake orchestrator that streams `sentences` one by one, but after
- * the first sentence is yielded it waits `holdMs` so the test can barge-in
- * before the rest are yielded.
- */
-function makeSlowOrchestrator(sentences: string[], holdMs = 50) {
+function deferred() {
+  let resolve!: () => void;
+  const promise = new Promise<void>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
+function parseSent(ws: ReturnType<typeof makeWs>) {
+  return ws.sent.map((s) => JSON.parse(s) as { t: string; text?: string });
+}
+
+function makeGatedOrchestrator(sentences: string[]) {
+  const afterFirstSentence = deferred();
+  const continueAfterFirstSentence = deferred();
+  const finished = deferred();
+
   return {
-    greeting: vi.fn().mockReturnValue(null),
-    runTurn: vi.fn(async function* (_input: unknown, _ctx: unknown, signal: AbortSignal) {
-      for (const s of sentences) {
-        if (signal.aborted) return;
-        yield { type: "say", text: s };
-        // Pause between sentences so caller can abort
-        await new Promise<void>((res) => setTimeout(res, holdMs));
-        if (signal.aborted) return;
-      }
-    }),
+    orchestrator: {
+      greeting: vi.fn().mockReturnValue(null),
+      runTurn: vi.fn(async function* (
+        _input: unknown,
+        _ctx: unknown,
+        signal: AbortSignal
+      ) {
+        try {
+          for (const [index, s] of sentences.entries()) {
+            if (signal.aborted) return;
+            yield { type: "say", text: s };
+            if (index === 0) {
+              afterFirstSentence.resolve();
+              await continueAfterFirstSentence.promise;
+            }
+          }
+        } finally {
+          finished.resolve();
+        }
+      }),
+    },
+    afterFirstSentence: afterFirstSentence.promise,
+    continueAfterFirstSentence: continueAfterFirstSentence.resolve,
+    finished: finished.promise,
   };
+}
+
+function makeBlockedBeforeFirstSentenceOrchestrator(sentences: string[]) {
+  const allowFirstSentence = deferred();
+  const finished = deferred();
+
+  return {
+    orchestrator: {
+      greeting: vi.fn().mockReturnValue(null),
+      runTurn: vi.fn(async function* (
+        _input: unknown,
+        _ctx: unknown,
+        signal: AbortSignal
+      ) {
+        try {
+          await allowFirstSentence.promise;
+          if (signal.aborted) return;
+          for (const s of sentences) {
+            if (signal.aborted) return;
+            yield { type: "say", text: s };
+          }
+        } finally {
+          finished.resolve();
+        }
+      }),
+    },
+    allowFirstSentence: allowFirstSentence.resolve,
+    finished: finished.promise,
+  };
+}
+
+async function waitForReady(ws: ReturnType<typeof makeWs>) {
+  await vi.waitFor(() => {
+    expect(parseSent(ws).some((e) => e.t === "ready")).toBe(true);
+  });
+}
+
+async function waitForSay(ws: ReturnType<typeof makeWs>, text: string) {
+  await vi.waitFor(() => {
+    expect(
+      parseSent(ws)
+        .filter((e) => e.t === "say")
+        .map((e) => e.text)
+    ).toContain(text);
+  });
+}
+
+function historyFor(session: VoiceSession) {
+  return (session as unknown as { history: Array<{ role: string; text: string }> })
+    .history;
 }
 
 describe("VoiceSession — barge-in history recording", () => {
   it("records only spoken sentences when turn is aborted mid-stream", async () => {
     const ws = makeWs();
     const sentences = ["Sentence one.", "Sentence two.", "Sentence three."];
-    const fakeOrchestrator = makeSlowOrchestrator(sentences, 80);
+    const gated = makeGatedOrchestrator(sentences);
+    const fakeOrchestrator = gated.orchestrator;
 
     const session = new VoiceSession(
       ws as unknown as import("ws").WebSocket,
@@ -108,7 +189,7 @@ describe("VoiceSession — barge-in history recording", () => {
       }),
       false
     );
-    await new Promise((r) => setTimeout(r, 10)); // let startSession resolve
+    await waitForReady(ws);
 
     // Send text input — starts a turn
     await msgHandler(
@@ -116,16 +197,18 @@ describe("VoiceSession — barge-in history recording", () => {
       false
     );
 
-    // Wait for first sentence to be spoken (it takes ~80ms hold time), then barge-in
-    // before the second sentence is yielded.
-    await new Promise((r) => setTimeout(r, 40));
+    await gated.afterFirstSentence;
+    await waitForSay(ws, "Sentence one.");
     await msgHandler(JSON.stringify({ t: "barge_in" }), false);
-
-    // Wait for the turn to fully settle
-    await new Promise((r) => setTimeout(r, 200));
+    gated.continueAfterFirstSentence();
+    await gated.finished;
+    await vi.waitFor(() => {
+      const agentTurns = historyFor(session).filter((h) => h.role === "agent");
+      expect(agentTurns.map((h) => h.text)).toEqual(["Sentence one."]);
+    });
 
     // Check the agent_state events and the say events sent — at least one "say"
-    const events = ws.sent.map((s) => JSON.parse(s) as { t: string; text?: string });
+    const events = parseSent(ws);
     const saySentences = events.filter((e) => e.t === "say").map((e) => e.text);
 
     // We expect exactly 1 "say" sentence was emitted before the barge-in
@@ -138,7 +221,9 @@ describe("VoiceSession — barge-in history recording", () => {
       JSON.stringify({ t: "text_input", text: "what about integrations?" }),
       false
     );
-    await new Promise((r) => setTimeout(r, 200));
+    await vi.waitFor(() => {
+      expect(fakeOrchestrator.runTurn).toHaveBeenCalledTimes(2);
+    });
 
     const lastCall = (fakeOrchestrator.runTurn as Mock).mock.calls.at(-1);
     const history = lastCall?.[1]?.history as Array<{ role: string; text: string }>;
@@ -152,10 +237,10 @@ describe("VoiceSession — barge-in history recording", () => {
 
   it("records nothing when no sentences were spoken before barge-in", async () => {
     const ws = makeWs();
-    // Orchestrator holds immediately (never yields before abort)
-    const fakeOrchestrator = makeSlowOrchestrator(["Only sentence."], 500);
+    const blocked = makeBlockedBeforeFirstSentenceOrchestrator(["Only sentence."]);
+    const fakeOrchestrator = blocked.orchestrator;
 
-    new VoiceSession(
+    const session = new VoiceSession(
       ws as unknown as import("ws").WebSocket,
       "dg-key",
       {
@@ -184,23 +269,29 @@ describe("VoiceSession — barge-in history recording", () => {
       }),
       false
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await waitForReady(ws);
 
     await msgHandler(
       JSON.stringify({ t: "text_input", text: "tell me about pricing" }),
       false
     );
+    await vi.waitFor(() => {
+      expect(fakeOrchestrator.runTurn).toHaveBeenCalledTimes(1);
+    });
 
-    // Barge-in immediately before TTS for first sentence could play
     await msgHandler(JSON.stringify({ t: "barge_in" }), false);
-    await new Promise((r) => setTimeout(r, 600));
+    blocked.allowFirstSentence();
+    await blocked.finished;
+    expect(historyFor(session).filter((h) => h.role === "agent")).toHaveLength(0);
 
     // Follow-up turn — history should have NO agent turn (nothing was spoken)
     await msgHandler(
       JSON.stringify({ t: "text_input", text: "integrations?" }),
       false
     );
-    await new Promise((r) => setTimeout(r, 600));
+    await vi.waitFor(() => {
+      expect(fakeOrchestrator.runTurn).toHaveBeenCalledTimes(2);
+    });
 
     const lastCall = (fakeOrchestrator.runTurn as Mock).mock.calls.at(-1);
     const history = lastCall?.[1]?.history as Array<{ role: string; text: string }>;

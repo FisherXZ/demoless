@@ -20,19 +20,12 @@ import {
 } from "./orchestrator";
 import type { ConversationTurn } from "./orchestrator/types";
 import { createTts, type TtsProvider } from "./tts";
-import { ChunkChannel } from "./util/chunkChannel";
-import { getDemoConfig } from "./config/demoConfig";
 import {
   startSession as defaultStartSession,
   stopSession as defaultStopSession,
 } from "../lib/browser/session";
-import { loadBuyer } from "../lib/memory/store";
 import { publishPhase } from "../lib/memory/pubsub";
-import {
-  getLearnings,
-  buildLearningsContext,
-  reflectAndStore as defaultReflectAndStore,
-} from "../lib/learnings";
+import { reflectAndStore as defaultReflectAndStore } from "../lib/learnings";
 import { detectLanguage } from "./util/detectLanguage";
 import {
   SessionRecorder,
@@ -43,15 +36,27 @@ import {
   type SessionRecord,
   type SessionStatus,
 } from "../lib/sessions";
+import {
+  createDemoSessionStartup,
+  defaultDemoSessionStartup,
+  type CreateOrchestrator,
+  type DemoSessionStartup,
+  type StartBrowserSession,
+} from "./demoSession/startup";
+import {
+  createDemoSessionFinalizer,
+  defaultDemoSessionFinalizer,
+  type DemoSessionFinalizer,
+} from "./demoSession/finalize";
+import { streamSpeechTurn } from "./demoSession/speech";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
-  startSession: (
-    url: string,
-    onLiveView?: (liveViewUrl: string, sessionId: string) => void
-  ) => Promise<{ liveViewUrl: string; sessionId: string; url: string; title: string }>;
+  startup: DemoSessionStartup;
+  finalizer: DemoSessionFinalizer;
+  startSession: StartBrowserSession;
   stopSession: (sessionId: string) => Promise<void>;
-  createOrchestrator: (args: { sessionId: string; buyerId: string; company: string }) => Orchestrator;
+  createOrchestrator: CreateOrchestrator;
   reflectAndStore: (args: {
     company: string;
     turns: { role: "user" | "agent"; text: string }[];
@@ -62,23 +67,12 @@ export interface VoiceSessionDeps {
   analyzeAndStore: (record: SessionRecord) => Promise<void>;
 }
 
-/**
- * A browser pre-created by a `prewarm` message, kept briefly so the next real
- * session can adopt it (skipping the ~6s create+connect). Held at MODULE scope —
- * not on a VoiceSession — so the short-lived prewarm connection closing doesn't
- * release it. Opt-in: only populated when a client sends `prewarm`.
- */
-let warmSession: { sessionId: string; liveViewUrl: string; at: number } | null = null;
-const WARM_TTL_MS = 120_000;
-
-function takeWarmSession(): { sessionId: string; liveViewUrl: string } | null {
-  if (warmSession && Date.now() - warmSession.at < WARM_TTL_MS) {
-    const { sessionId, liveViewUrl } = warmSession;
-    warmSession = null;
-    return { sessionId, liveViewUrl };
-  }
-  warmSession = null; // expired
-  return null;
+interface VoiceSessionRuntimeDeps {
+  startup: DemoSessionStartup;
+  finalizer: DemoSessionFinalizer;
+  stopSession: (sessionId: string) => Promise<void>;
+  saveSession: (record: SessionRecord) => Promise<void>;
+  loadSession: (id: string) => Promise<SessionRecord | null>;
 }
 
 /**
@@ -204,7 +198,7 @@ export class VoiceSession {
   /** Memoized one-time startup (browser + orchestrator), shared by the
    *  audio_start (mic) and text_input (typed) entry points so it runs once. */
   private startPromise: Promise<void> | null = null;
-  private readonly deps: VoiceSessionDeps;
+  private readonly deps: VoiceSessionRuntimeDeps;
 
   constructor(
     private ws: WebSocket,
@@ -216,14 +210,30 @@ export class VoiceSession {
     // Set a placeholder so the field is never uninitialized.
     this.orchestrator = null as unknown as Orchestrator;
 
+    const startSession = deps?.startSession ?? defaultStartSession;
+    const createOrchestrator =
+      deps?.createOrchestrator ?? defaultCreateOrchestrator;
+    const startup =
+      deps?.startup ??
+      (deps?.startSession || deps?.createOrchestrator
+        ? createDemoSessionStartup({ startSession, createOrchestrator })
+        : defaultDemoSessionStartup);
+    const finalizer =
+      deps?.finalizer ??
+      (deps?.reflectAndStore || deps?.saveSession || deps?.analyzeAndStore
+        ? createDemoSessionFinalizer({
+            reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
+            saveSession: deps?.saveSession ?? defaultSaveSession,
+            analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
+          })
+        : defaultDemoSessionFinalizer);
+
     this.deps = {
-      startSession: deps?.startSession ?? defaultStartSession,
+      startup,
+      finalizer,
       stopSession: deps?.stopSession ?? defaultStopSession,
-      createOrchestrator: deps?.createOrchestrator ?? defaultCreateOrchestrator,
-      reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
       saveSession: deps?.saveSession ?? defaultSaveSession,
       loadSession: deps?.loadSession ?? defaultLoadSession,
-      analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
     };
 
     ws.on("message", (data, isBinary) => {
@@ -350,18 +360,8 @@ export class VoiceSession {
     return this.startPromise;
   }
 
-  /** Pre-create the cloud browser so the next real session adopts it. Does NOT
-   *  set this.browserSessionId, so this (short-lived) connection closing won't
-   *  release the warmed browser. Best-effort. */
   private async prewarm() {
-    if (warmSession && Date.now() - warmSession.at < WARM_TTL_MS) return;
-    try {
-      const cfg = getDemoConfig();
-      const r = await this.deps.startSession(cfg.browseTargetUrl);
-      warmSession = { sessionId: r.sessionId, liveViewUrl: r.liveViewUrl, at: Date.now() };
-    } catch {
-      /* best-effort — warm-up never blocks anything */
-    }
+    await this.deps.startup.prewarm();
   }
 
   private async startListening(language: Language) {
@@ -371,9 +371,6 @@ export class VoiceSession {
     }
     this.language = language ?? DEFAULT_LANGUAGE;
 
-    // Start the cloud browser and wire the orchestrator to its session.
-    const cfg = getDemoConfig();
-    this.company = cfg.company;
     // Recover createdAt from the up-front record so live snapshots don't clobber
     // it; if the record is missing (Redis was down at enterDemo) we leave it 0.
     try {
@@ -382,63 +379,24 @@ export class VoiceSession {
     } catch {
       this.sessionCreatedAt = 0;
     }
-    let sessionId: string;
-    let liveViewUrl: string;
-    const warm = takeWarmSession();
-    if (warm) {
-      // Adopt a pre-warmed browser — instant, no create+connect+load wait.
-      sessionId = warm.sessionId;
-      liveViewUrl = warm.liveViewUrl;
-    } else {
-      // Show the live browser as soon as it's connectable (before the page
-      // finishes loading) so the visitor watches it navigate instead of waiting.
-      const started = await this.deps.startSession(
-        cfg.browseTargetUrl,
-        (url, sid) => {
-          this.browserSessionId = sid;
-          this.send({ t: "live_view", url });
-        }
-      );
-      sessionId = started.sessionId;
-      liveViewUrl = started.liveViewUrl;
-    }
-    this.browserSessionId = sessionId;
-    this.liveViewUrl = liveViewUrl;
-    this.send({ t: "live_view", url: liveViewUrl });
+
+    const prepared = await this.deps.startup.prepare({
+      buyerId: this.buyerEmail,
+      onLiveView: (url, sessionId) => {
+        this.browserSessionId = sessionId;
+        this.send({ t: "live_view", url });
+      },
+    });
+    this.browserSessionId = prepared.sessionId;
+    this.liveViewUrl = prepared.liveViewUrl;
+    this.send({ t: "live_view", url: prepared.liveViewUrl });
+    this.orchestrator = prepared.orchestrator;
+    this.buyerNotes = prepared.buyerNotes;
+    this.learningsContext = prepared.learningsContext;
+    this.company = prepared.company;
     // The session is now live with a real cloud browser — mark it so the
     // dashboard Live mode can show it in progress (with replay pending).
     void this.snapshot("live");
-
-    this.orchestrator = this.deps.createOrchestrator({
-      sessionId,
-      buyerId: this.buyerEmail,
-      company: cfg.company,
-    });
-
-    // Load buyer memory; populate buyerNotes for turn context; ignore errors
-    // so a Redis outage never blocks the session from starting.
-    let buyer;
-    try {
-      buyer = await loadBuyer(this.buyerEmail);
-      this.buyerNotes = buyer.notes.map((n) => n.text);
-    } catch {
-      // Degrade gracefully: no notes injected.
-    }
-
-    // Load cross-session demo learnings into the per-session prompt context.
-    // Same degrade-on-failure contract as buyer memory above.
-    try {
-      const learnings = await getLearnings(cfg.company);
-      this.learningsContext = buildLearningsContext(learnings);
-      if (this.learningsContext) {
-        const n = this.learningsContext.split("\n").length - 1;
-        console.log(
-          `[learnings] loaded ${n} past-demo learning(s) for ${cfg.company} into this session's prompt`
-        );
-      }
-    } catch {
-      // Degrade gracefully: no learnings injected.
-    }
 
     await this.openStt();
     this.send({ t: "ready", language: this.language, agentName: this.agentName });
@@ -447,7 +405,7 @@ export class VoiceSession {
     const greeting = await this.orchestrator.greeting?.(
       this.language,
       this.agentName,
-      buyer
+      prepared.buyer
     );
     if (greeting) {
       await this.speakTurn(greeting, /* recordAsUser */ null);
@@ -679,93 +637,35 @@ export class VoiceSession {
     turn: number,
     signal: AbortSignal
   ): Promise<string[]> {
-    const jobs: { text: string; filler: boolean; channel: ChunkChannel }[] = [];
     const spoken: string[] = [];
-    let producerDone = false;
-    let wake: (() => void) | null = null;
-    const wakeConsumer = () => {
-      if (wake) {
-        const w = wake;
-        wake = null;
-        w();
-      }
-    };
-
-    // Producer: pull sentences and kick off their synthesis immediately.
-    const producer = (async () => {
-      try {
-        for await (const { text, filler } of texts) {
-          if (signal.aborted) break;
-          const channel = new ChunkChannel();
-          jobs.push({ text, filler, channel });
-          wakeConsumer();
-          void (async () => {
-            try {
-              for await (const chunk of this.tts.synthesize(
-                text,
-                this.language,
-                signal
-              )) {
-                if (signal.aborted) break;
-                channel.push(chunk);
-              }
-            } catch (err) {
-              if (!signal.aborted) {
-                this.send({
-                  t: "error",
-                  message: `TTS: ${(err as Error).message}`,
-                });
-              }
-            } finally {
-              channel.close();
-            }
-          })();
-        }
-      } finally {
-        producerDone = true;
-        wakeConsumer();
-      }
-    })();
-
-    // Consumer: send each sentence's caption + audio chunks in order.
-    let i = 0;
-    let seq = 0;
-    while (!signal.aborted) {
-      if (i >= jobs.length) {
-        if (producerDone) break;
-        // Register the waiter, then re-check to avoid a missed wakeup.
-        const waited = new Promise<void>((res) => {
-          wake = res;
-        });
-        if (i < jobs.length || producerDone) {
-          wake = null;
-        } else {
-          await waited;
-        }
+    for await (const event of streamSpeechTurn({
+      texts,
+      tts: this.tts,
+      language: this.language,
+      turn,
+      signal,
+    })) {
+      if (event.type === "say") {
+        this.send({ t: "say", text: event.text, turn: event.turn });
+        this.noteAgentWords(event.text);
+        this.agentSpeaking = true;
+        this.setState("speaking");
+        if (!event.filler) spoken.push(event.text);
         continue;
       }
-
-      const job = jobs[i++];
-      this.send({ t: "say", text: job.text, turn });
-      this.noteAgentWords(job.text);
-      this.agentSpeaking = true;
-      this.setState("speaking");
-      // Filler lines are spoken aloud but excluded from history.
-      if (!job.filler) spoken.push(job.text);
-
-      for await (const chunk of job.channel) {
-        if (signal.aborted) break;
+      if (event.type === "audio") {
         this.send({
           t: "tts_chunk",
-          b64: chunk.toString("base64"),
+          b64: event.chunk.toString("base64"),
           sampleRate: AUDIO_SAMPLE_RATE,
-          turn,
-          seq: seq++,
+          turn: event.turn,
+          seq: event.seq,
         });
+        continue;
       }
+      this.send({ t: "error", message: event.message });
     }
 
-    await producer;
     return spoken;
   }
 
@@ -778,41 +678,20 @@ export class VoiceSession {
     this.active = { turn, abort };
     if (recordAsUser) this.history.push({ role: "user", text: recordAsUser });
 
-    await this.speakFragment(text, turn, abort.signal);
+    const spoken = await this.pipelineSpeak(
+      (async function* () {
+        yield { text, filler: false };
+      })(),
+      turn,
+      abort.signal
+    );
 
-    if (!abort.signal.aborted) {
-      this.history.push({ role: "agent", text });
+    if (!abort.signal.aborted && spoken.length > 0) {
+      this.history.push({ role: "agent", text: spoken.join(" ") });
       this.send({ t: "tts_end", turn });
       this.endSpeaking();
       this.setState("listening");
       this.active = null;
-    }
-  }
-
-  /** Send caption + synthesize one spoken fragment, streaming PCM to the client. */
-  private async speakFragment(text: string, turn: number, signal: AbortSignal) {
-    if (signal.aborted) return;
-    this.send({ t: "say", text, turn });
-    this.noteAgentWords(text);
-    this.agentSpeaking = true;
-    this.setState("speaking");
-
-    let seq = 0;
-    try {
-      for await (const chunk of this.tts.synthesize(text, this.language, signal)) {
-        if (signal.aborted) return;
-        this.send({
-          t: "tts_chunk",
-          b64: chunk.toString("base64"),
-          sampleRate: AUDIO_SAMPLE_RATE,
-          turn,
-          seq: seq++,
-        });
-      }
-    } catch (err) {
-      if (!signal.aborted) {
-        this.send({ t: "error", message: `TTS: ${(err as Error).message}` });
-      }
     }
   }
 
@@ -870,24 +749,15 @@ export class VoiceSession {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
-    // Fire-and-forget: distill this demo into cross-session learnings. Must not
-    // block teardown; reflectAndStore never throws and no-ops on empty history.
-    void this.deps.reflectAndStore({
-      company: this.company,
-      turns: this.history,
-      phaseReached: this.lastPhase,
-    });
-    // Persist the final session (status ended) + kick off the evidence-backed
-    // recap analysis. Keyed by the app-owned demo id; the Browserbase id is an
-    // attached field. Fire-and-forget; impls swallow errors and never block.
-    if (this.demoSessionId) {
+    try {
       const bb = this.browserSessionId ?? undefined;
       const endedAt = Date.now();
       const durationSec = this.sessionCreatedAt
         ? Math.max(0, Math.round((endedAt - this.sessionCreatedAt) / 1000))
         : undefined;
-      const record = this.recorder.build({
+      this.deps.finalizer.finalize({
         id: this.demoSessionId,
+        browserSessionId: this.browserSessionId,
         company: this.company,
         status: "ended",
         buyerEmail: this.buyerEmail || undefined,
@@ -896,14 +766,14 @@ export class VoiceSession {
         endedAt,
         durationSec,
         phaseReached: this.lastPhase,
-        browserbaseSessionId: bb,
         liveViewUrl: this.liveViewUrl,
         language: this.language,
         replayStatus: bb ? "pending" : "unavailable",
-        replayUrl: bb ? replayUrl(bb) : undefined,
+        recorder: this.recorder,
+        turns: this.history,
       });
-      void this.deps.saveSession(record).catch(() => {});
-      void this.deps.analyzeAndStore(record).catch(() => {});
+    } catch {
+      // Teardown must never throw out through ws close/error handlers.
     }
     this.cancelActive();
     void this.stopStt();

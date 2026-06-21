@@ -5,6 +5,8 @@ import type { SessionRecord } from "./types";
 const record: SessionRecord = {
   id: "s1",
   company: "Acme",
+  status: "ended",
+  createdAt: 0,
   startedAt: 0,
   endedAt: 10,
   events: [

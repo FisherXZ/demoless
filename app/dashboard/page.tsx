@@ -539,8 +539,7 @@ async function DemoOverviewPage() {
       {/* KPI row — featured Qualified card + secondary metrics */}
       <div className="my-5 grid grid-cols-1 gap-[12px] md:grid-cols-2 lg:grid-cols-4">
         {/* hero metric */}
-        <div className="relative overflow-hidden rounded-[14px] border border-brandlit/40 bg-gradient-to-b from-[#E7E8FB] to-slate p-[18px] lg:row-span-1">
-          <div className="absolute right-0 top-0 h-[60px] w-[60px] rounded-bl-[40px] bg-brandlit/10 blur-2xl" />
+        <div className="rounded-[14px] border border-brandlit/40 bg-accentsoft p-[18px] lg:row-span-1">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-brandlit2">
               Qualified rate
@@ -551,9 +550,9 @@ async function DemoOverviewPage() {
             {k.qualifiedPct}
             <span className="text-[20px] text-ash">%</span>
           </div>
-          <div className="mt-[14px] h-[5px] w-full overflow-hidden rounded-full bg-obsidian">
+          <div className="mt-[14px] h-[5px] w-full overflow-hidden rounded-full bg-slate">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-brandlit to-brandlit2"
+              className="h-full rounded-full bg-brandlit"
               style={{ width: `${k.qualifiedPct}%` }}
             />
           </div>
