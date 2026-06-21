@@ -21,13 +21,34 @@ export default function Landing({ vals }: { vals: DemoVals }) {
           <span className="text-[15px] text-muted font-medium">Docs</span>
         </nav>
         <div className="flex items-center gap-4">
-          <span className="text-[15px] text-ink font-semibold">Sign in</span>
-          <button
-            onClick={vals.goForm}
-            className="bg-brand text-white border-none py-[10px] px-[18px] rounded-[9px] text-[15px] font-semibold cursor-pointer shadow-[0_1px_2px_rgba(79,70,229,0.4)]"
-          >
-            Start AI Demo
-          </button>
+          {vals.isAuthed ? (
+            <>
+              <span className="text-[14px] text-muted font-medium">
+                {vals.authName ?? vals.authEmail}
+              </span>
+              <button
+                onClick={vals.goForm}
+                className="bg-brand text-white border-none py-[10px] px-[18px] rounded-[9px] text-[15px] font-semibold cursor-pointer shadow-[0_1px_2px_rgba(79,70,229,0.4)]"
+              >
+                Go to demo →
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={vals.signInGoogle}
+                className="bg-none border-none text-[15px] text-ink font-semibold cursor-pointer p-0"
+              >
+                Sign in
+              </button>
+              <button
+                onClick={vals.goForm}
+                className="bg-brand text-white border-none py-[10px] px-[18px] rounded-[9px] text-[15px] font-semibold cursor-pointer shadow-[0_1px_2px_rgba(79,70,229,0.4)]"
+              >
+                Start AI Demo
+              </button>
+            </>
+          )}
         </div>
       </header>
 

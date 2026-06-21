@@ -84,29 +84,59 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
           Step into the call, {agentName} is ready when you are.
         </p>
 
+        {/* Identity — verified via Google, not typed. */}
+        {vals.isAuthed ? (
+          <div className="flex items-center justify-between gap-3 border border-line3 rounded-[10px] px-[14px] py-3 bg-white mb-5">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-coal to-brand flex items-center justify-center text-white text-[15px] font-bold">
+                {(vals.authName || vals.authEmail || "?").charAt(0).toUpperCase()}
+              </span>
+              <div className="min-w-0">
+                <div className="text-[14px] font-semibold text-ink2 truncate">
+                  {vals.authName || "Signed in"}{" "}
+                  <span className="text-live">✓</span>
+                </div>
+                <div className="text-[13px] text-muted2 truncate">
+                  {vals.authEmail}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={vals.signOutGoogle}
+              className="shrink-0 bg-none border-none text-muted2 text-[13px] font-semibold cursor-pointer p-0"
+            >
+              Switch account
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={vals.signInGoogle}
+            disabled={vals.authStatus === "loading"}
+            className="flex items-center justify-center gap-3 border border-line3 rounded-[10px] px-[14px] py-3 bg-white text-[15px] font-semibold text-ink2 cursor-pointer transition-colors hover:border-brand mb-5 disabled:opacity-60"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+              <path
+                fill="#4285F4"
+                d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.62Z"
+              />
+              <path
+                fill="#34A853"
+                d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.8.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.71H.96v2.33A9 9 0 0 0 9 18Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M3.96 10.71a5.41 5.41 0 0 1 0-3.42V4.96H.96a9 9 0 0 0 0 8.08l3-2.33Z"
+              />
+              <path
+                fill="#EA4335"
+                d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.96l3 2.33C4.67 5.16 6.66 3.58 9 3.58Z"
+              />
+            </svg>
+            Continue with Google
+          </button>
+        )}
+
         <div className="grid grid-cols-2 gap-y-4 gap-x-[18px]">
-          <label className="col-span-1 flex flex-col gap-[7px]">
-            <span className="text-[13px] font-semibold text-ink2">
-              Full name
-            </span>
-            <input
-              value={vals.form.name}
-              onChange={vals.onName}
-              placeholder="Jordan Lee"
-              className={fieldClass}
-            />
-          </label>
-          <label className="col-span-1 flex flex-col gap-[7px]">
-            <span className="text-[13px] font-semibold text-ink2">
-              Work email
-            </span>
-            <input
-              value={vals.form.email}
-              onChange={vals.onEmail}
-              placeholder="jordan@company.com"
-              className={fieldClass}
-            />
-          </label>
           <label className="col-span-1 flex flex-col gap-[7px]">
             <span className="text-[13px] font-semibold text-ink2">
               Your role
@@ -174,7 +204,8 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
 
         <button
           onClick={vals.startDemo}
-          className="mt-[26px] bg-brand text-white border-none p-4 rounded-xl text-[17px] font-bold cursor-pointer shadow-[0_4px_16px_rgba(79,70,229,.3)] flex items-center justify-center gap-2.5"
+          disabled={!vals.canStart}
+          className="mt-[26px] bg-brand text-white border-none p-4 rounded-xl text-[17px] font-bold cursor-pointer shadow-[0_4px_16px_rgba(79,70,229,.3)] flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
         >
           <span
             className="w-[9px] h-[9px] rounded-full bg-white"
@@ -183,7 +214,9 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
           Join AI Demo
         </button>
         <p className="text-center text-[13px] text-faint mt-3.5 mb-0">
-          By joining you agree to be recorded for quality. No spam, ever.
+          {vals.canStart
+            ? "By joining you agree to be recorded for quality. No spam, ever."
+            : "Sign in with Google to join your demo."}
         </p>
       </div>
     </div>

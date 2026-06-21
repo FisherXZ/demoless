@@ -228,6 +228,26 @@ Subtasks
 ________________
 
 
+P4E — Product-Knowledge RAG (vector search)
+Note: this is a SEPARATE memory from P4A–D. Buyer memory (above) is "who is this
+buyer" — a few per-buyer notes, ranked by importance/recency, keyed by email. This
+is "what does the demoed product do" — a large per-company doc corpus the AI rep
+answers buyer questions from, so it uses a vector DB (semantic search), keyed by
+company. Built as lib/knowledge/ (Redis Stack / RediSearch + OpenAI embeddings),
+distinct from lib/memory/. Both feed P1C's prompt: buildMemoryContext (who) +
+buildAnswerContext (what). Retrieval arguably belongs to the brain (P1C) — confirm
+ownership before wiring.
+Acceptance Criteria
+* A buyer question retrieves the most relevant product docs (not keyword match)
+* Retrieved context is injected into the prompt so answers are grounded, not guessed
+Subtasks
+* P4E.1 Chunk + embed + index a company's docs (indexDocuments)
+* P4E.2 Semantic search per question (searchKnowledge) + buildAnswerContext
+* P4E.3 Real content ingestion (upload / P3 crawl) beyond the seed corpus
+* P4E.4 Wire into P1C alongside buyer memory
+________________
+
+
 P5 — Frontend
 P5A — Main Demo Page
 Acceptance Criteria
