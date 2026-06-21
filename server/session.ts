@@ -62,6 +62,12 @@ export interface VoiceSessionDeps {
   analyzeAndStore: (record: SessionRecord) => Promise<void>;
 }
 
+interface VoiceSessionRuntimeDeps {
+  startup: DemoSessionStartup;
+  finalizer: DemoSessionFinalizer;
+  stopSession: (sessionId: string) => Promise<void>;
+}
+
 /**
  * One live voice conversation: bridges the browser <-> Deepgram STT <->
  * orchestrator <-> TTS, and owns turn-taking + barge-in.
@@ -182,7 +188,7 @@ export class VoiceSession {
   /** Memoized one-time startup (browser + orchestrator), shared by the
    *  audio_start (mic) and text_input (typed) entry points so it runs once. */
   private startPromise: Promise<void> | null = null;
-  private readonly deps: VoiceSessionDeps;
+  private readonly deps: VoiceSessionRuntimeDeps;
 
   constructor(
     private ws: WebSocket,
@@ -202,24 +208,20 @@ export class VoiceSession {
       (deps?.startSession || deps?.createOrchestrator
         ? createDemoSessionStartup({ startSession, createOrchestrator })
         : defaultDemoSessionStartup);
+    const finalizer =
+      deps?.finalizer ??
+      (deps?.reflectAndStore || deps?.saveSession || deps?.analyzeAndStore
+        ? createDemoSessionFinalizer({
+            reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
+            saveSession: deps?.saveSession ?? defaultSaveSession,
+            analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
+          })
+        : defaultDemoSessionFinalizer);
 
     this.deps = {
       startup,
-      finalizer:
-        deps?.finalizer ??
-        (deps?.reflectAndStore || deps?.saveSession || deps?.analyzeAndStore
-          ? createDemoSessionFinalizer({
-              reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
-              saveSession: deps?.saveSession ?? defaultSaveSession,
-              analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
-            })
-          : defaultDemoSessionFinalizer),
-      startSession,
+      finalizer,
       stopSession: deps?.stopSession ?? defaultStopSession,
-      createOrchestrator,
-      reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
-      saveSession: deps?.saveSession ?? defaultSaveSession,
-      analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
     };
 
     ws.on("message", (data, isBinary) => {
