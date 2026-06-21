@@ -6,12 +6,12 @@ import { useVoiceAgent } from "@/lib/voice/useVoiceAgent";
 import { useAgentName } from "@/lib/voice/useAgentName";
 import { LANGUAGES, type Language } from "@/lib/voice/messages";
 
-const TARGET = "https://worldcuparena.live/";
+const TARGET = process.env.NEXT_PUBLIC_DEMO_TARGET_URL || "https://worldcuparena.live/";
 
 const SUGGESTIONS = [
-  "Show me the leaderboard",
-  "Open the blog",
-  "What is this benchmark?",
+  "Show me my sessions",
+  "Open the playground",
+  "What is Browserbase?",
 ];
 
 

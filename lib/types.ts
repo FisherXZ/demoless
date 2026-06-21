@@ -89,6 +89,12 @@ export interface SelectedLead extends Lead {
 export interface DemoVals {
   screen: Screen;
 
+  /** Auth state (NextAuth v5 Google sign-in). */
+  isAuthed: boolean;
+  authName?: string | null;
+  authEmail?: string | null;
+  signInGoogle: () => void;
+
   goLanding: () => void;
   goForm: () => void;
   goDashboard: () => void;

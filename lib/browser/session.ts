@@ -5,6 +5,11 @@ import { chromium, type Browser, type Page } from "playwright-core";
 
 const API_KEY = process.env.BROWSERBASE_API_KEY;
 const PROJECT_ID = process.env.BROWSERBASE_PROJECT_ID;
+// When set, every demo session reuses a pre-authenticated Browserbase Context
+// (seed it once with scripts/seed-context.mjs). The product being demoed then
+// loads already logged-in. persist:false so prospects' clicks don't overwrite
+// the saved login. Unset => plain sessions (current public-site behavior).
+const CONTEXT_ID = process.env.BROWSERBASE_CONTEXT_ID;
 
 /** What the room shows the audience after each move ("screen_is_on"). */
 export interface ScreenState {
@@ -65,7 +70,10 @@ export async function startSession(
     // worldcuparena.live (Fly.io) drops Browserbase's datacenter IPs, so the
     // cloud browser hangs on page.goto. Route through residential proxies.
     proxies: true,
-    browserSettings: { viewport: { width: 1280, height: 720 } },
+    browserSettings: {
+      viewport: { width: 1280, height: 720 },
+      ...(CONTEXT_ID ? { context: { id: CONTEXT_ID, persist: false } } : {}),
+    },
   });
   const debug = await bb.sessions.debug(session.id);
   // navbar=false strips Browserbase's devtools chrome from the embedded view.

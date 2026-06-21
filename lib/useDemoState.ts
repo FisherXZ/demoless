@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession, signIn } from "next-auth/react";
 import { enterDemo } from "./actions";
 import {
   SECTIONS,
@@ -54,6 +55,7 @@ const initialState: DemoState = {
 
 export function useDemoState(): DemoVals {
   const [s, set] = useState<DemoState>(initialState);
+  const { data: session } = useSession();
 
   const patch = (p: Partial<DemoState>) => set((prev) => ({ ...prev, ...p }));
   const setF = (k: keyof FormState, v: string) =>
@@ -125,6 +127,11 @@ export function useDemoState(): DemoVals {
 
   return {
     screen: s.screen,
+
+    isAuthed: !!session?.user,
+    authName: session?.user?.name,
+    authEmail: session?.user?.email,
+    signInGoogle: () => void signIn("google"),
 
     goLanding: () => patch({ screen: "landing" }),
     goForm: () => patch({ screen: "form" }),

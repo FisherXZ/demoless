@@ -20,15 +20,34 @@ export default function Landing({ vals }: { vals: DemoVals }) {
           <span className="font-mono text-[12px] uppercase tracking-[0.08em] text-ember">Docs</span>
         </nav>
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-[14px] font-semibold text-chalk">
-            Dashboard
-          </Link>
-          <button
-            onClick={vals.goForm}
-            className="cursor-pointer rounded-[9px] border-none bg-brandlit px-[18px] py-[10px] text-[14px] font-semibold text-white transition-colors hover:bg-brandlit2"
-          >
-            Start a demo
-          </button>
+          {vals.isAuthed ? (
+            <>
+              <span className="text-[14px] font-medium text-ash">
+                {vals.authName ?? vals.authEmail}
+              </span>
+              <button
+                onClick={vals.goForm}
+                className="cursor-pointer rounded-[9px] border-none bg-brandlit px-[18px] py-[10px] text-[14px] font-semibold text-white transition-colors hover:bg-brandlit2"
+              >
+                Go to demo →
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={vals.signInGoogle}
+                className="cursor-pointer border-none bg-transparent text-[14px] font-semibold text-chalk p-0"
+              >
+                Sign in
+              </button>
+              <button
+                onClick={vals.goForm}
+                className="cursor-pointer rounded-[9px] border-none bg-brandlit px-[18px] py-[10px] text-[14px] font-semibold text-white transition-colors hover:bg-brandlit2"
+              >
+                Start a demo
+              </button>
+            </>
+          )}
         </div>
       </header>
 

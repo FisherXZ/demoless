@@ -12,13 +12,13 @@ export const SECTIONS = [
 ];
 
 export const CAPTIONS = [
-  "Hey! I'm Maya. I'll walk you through Demoless in about three minutes, tailored to your team. Let's start with the big picture.",
-  "This is where every AI-led demo lands. Each call is scored and summarized automatically, no rep required.",
-  "Pricing scales with demos, not seats. Most teams your size land on Growth.",
-  "Demoless drops into your stack, Salesforce, HubSpot, Slack, so leads sync the moment a call ends.",
-  "Security matters for a buyer-facing tool: SOC 2 Type II, SSO, and data residency are all covered.",
-  "Here's the ROI. Teams reclaim around twelve rep-hours a week and convert more of the demos they do take.",
-  "And you're in good company, these teams replaced 'book a demo' and never looked back.",
+  "Hey! I'm Maya. I'll walk you through Browserbase in about three minutes. Let's start with the big picture.",
+  "This is your Browserbase dashboard, every cloud browser your agents run shows up here, with usage at a glance.",
+  "Open Sessions and you get the full picture of any run, a live view, network logs, and a replay you can scrub through.",
+  "The Playground lets you spin up a real cloud browser in one click and try it live, no setup.",
+  "Under the hood it's built for the whole web, stealth mode, residential proxies, and persistent contexts so logins just stick.",
+  "And it scales, thousands of concurrent browsers with sub-second starts, so your agents never wait.",
+  "Pricing scales with usage, not seats, so you only pay for the browser time you actually run.",
   "That's the tour. Want to keep going?",
 ];
 

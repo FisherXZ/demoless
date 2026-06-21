@@ -1,7 +1,7 @@
 "use client";
 
-// NextAuth/Google sign-in is deferred to a later phase.
-// This wrapper is a passthrough until then.
+import { SessionProvider } from "next-auth/react";
+
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <SessionProvider>{children}</SessionProvider>;
 }
