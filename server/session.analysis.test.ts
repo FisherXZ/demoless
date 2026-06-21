@@ -10,7 +10,7 @@ vi.mock("./deepgram/stt", () => ({
 vi.mock("./tts", () => ({
   createTts: vi.fn().mockReturnValue({
     synthesize: vi.fn().mockReturnValue((async function* () {})()),
-    voiceName: vi.fn().mockReturnValue("Maya"),
+    voiceName: vi.fn().mockReturnValue("Messi"),
   }),
 }));
 vi.mock("./bargeIn", () => ({

@@ -12,7 +12,7 @@ export const SECTIONS = [
 ];
 
 export const CAPTIONS = [
-  "Hey! I'm Maya. Before I show anything, what are you trying to figure out about Browserbase today?",
+  "Hey! I'm Messi. Before I show anything, what are you trying to figure out about Browserbase today?",
   "This is your Browserbase dashboard, every cloud browser your agents run shows up here, with usage at a glance.",
   "Open Sessions and you get the full picture of any run, a live view, network logs, and a replay you can scrub through.",
   "The Playground lets you spin up a real cloud browser in one click and try it live, no setup.",

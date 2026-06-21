@@ -5,7 +5,7 @@ Each is a real recurring, GUI-only/no-API workflow with cited inspiration **and*
 manual (how to role-play the persona and drive our agent through it).
 
 **How to use:** pick a persona → read its file → run it as a session against the demo (come in
-in-character, state the intent, watch Maya drive the browser) → log recurring questions + breakdown
+in-character, state the intent, watch Messi drive the browser) → log recurring questions + breakdown
 points in [`dogfooding-log.md`](dogfooding-log.md). Shared instructions for writing more:
 [`persona-research-brief.md`](persona-research-brief.md).
 
@@ -55,6 +55,6 @@ points in [`dogfooding-log.md`](dogfooding-log.md). Shared instructions for writ
 
 ## Known cleanup (not yet done)
 
-1. **Persona-name collisions.** Round-2 agents independently reused first names — "Priya" recurs ~9× (e.g. four personas named **"Priya Raman"**: #12, #13, #18, #19), plus "Okafor" (#21, #22, #27, #29) and "Dana" (#25, #27, #29). Round-1 also used **"Maya"** as a persona name (#1, #5, #8) which collides with the **agent's own name (Maya)**. Names are cosmetic and each file is self-contained, but a dedup pass (one distinct name per persona, none named "Maya") is pending.
+1. **Persona-name collisions.** Round-2 agents independently reused first names — "Priya" recurs ~9× (e.g. four personas named **"Priya Raman"**: #12, #13, #18, #19), plus "Okafor" (#21, #22, #27, #29) and "Dana" (#25, #27, #29). Round-1 also used **"Messi"** as a persona name (#1, #5, #8) which collides with the **agent's own name (Messi)**. Names are cosmetic and each file is self-contained, but a dedup pass (one distinct name per persona, none named "Messi") is pending.
 2. **Reddit citations.** reddit.com was hard-blocked from the research environment, so the sharpest first-person complaints (named subreddits per file) are **uncited** — grounded instead in HN/dev.to/GitHub/press/vendor forums. Pull verbatim Reddit quotes from a human browser before any of these face a customer.
 3. **Per-file runtime flags** to verify before relying on a workflow: each file's "biggest caveat" (e.g. swap in a confirmed vendor advisories page for #17; verify exact AutoZone Pro login URL for #22; #20/#27 collide with platform anti-automation ToS → keep read-and-alert, sandbox-only).

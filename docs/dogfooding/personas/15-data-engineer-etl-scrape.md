@@ -27,7 +27,7 @@
 *(All eight are read-only public pages — the "login-gated" variant of this persona is the same shape pointed at, e.g., a vendor analytics portal or a state unemployment-employer portal that does require sign-in; the WARN set is chosen because it's fully reproducible without real credentials.)*
 
 ## Session flow
-A scheduled daily run (weekday morning). For each configured state source, Maya drives a real cloud browser:
+A scheduled daily run (weekday morning). For each configured state source, Messi drives a real cloud browser:
 1. **Navigate** to the state WARN page; **wait for render** (critical for NY's Tableau viz and any JS dashboard — a plain fetch sees an empty shell).
 2. **Detect the format** at runtime: HTML table? linked Excel/CSV? PDF list? embedded BI dashboard? (This is the brittle part — the agent must notice when a source has *changed shape*, e.g. NY's Excel→Tableau move.)
 3. **Extract**: for an HTML table, read rows; for Excel/CSV, follow the download link; for a Tableau viz, reach the "Download → Data/Crosstab" or the `…/WARN.csv` export; for PDFs, open the latest and pull the layoff rows.
@@ -48,13 +48,13 @@ A scheduled daily run (weekday morning). For each configured state source, Maya 
 - **Recommended safe framing:** read-only + human-paced; **block → alert the human, don't evade**; **login/MFA is human-in-the-loop**; surface "format changed / zero rows" loudly rather than writing bad data; never auto-write to a *production* table without the run report being reviewed (load to staging, human promotes).
 
 ## Testing manual — how to dogfood as this persona
-- **Setup:** use only the **public WARN pages above** (no login, no PII) for the happy path. For the login-gated probe, use a **throwaway account on a sandbox/demo portal** — never a real vendor login, never real customer data. The reference product being demoed is Browserbase; you're testing whether Maya can drive these real sites end-to-end.
+- **Setup:** use only the **public WARN pages above** (no login, no PII) for the happy path. For the login-gated probe, use a **throwaway account on a sandbox/demo portal** — never a real vendor login, never real customer data. The reference product being demoed is Browserbase; you're testing whether Messi can drive these real sites end-to-end.
 - **Intent you bring in (in character):** *"I'm the data engineer who keeps our US-layoffs table fresh from state WARN portals. Every state's site is different and they keep changing. Pull today's notices from a few states, normalize them, and tell me what broke."*
 - **Session script (beats):**
   1. *"Start with New York — open the WARN dashboard at dol.ny.gov/warn-dashboard."* → watch the browser load the page; does it wait for the **Tableau viz** to render or grab an empty shell?
   2. *"Get the actual notice rows out — there's a 'View in Tableau Public' / a download somewhere."* → watch it find the export (the hard JS step). Ask: *"how many rows did you get for the last 30 days?"*
   3. *"Now do California — edd.ca.gov layoff/WARN page."* → watch it handle the **PDF + Excel** mix; ask which format it used.
-  4. *"Try Florida next."* → expect a **403/anti-bot** stumble; watch whether Maya **stops and tells you** vs. silently failing or hammering.
+  4. *"Try Florida next."* → expect a **403/anti-bot** stumble; watch whether Messi **stops and tells you** vs. silently failing or hammering.
   5. *"Normalize all three into one table: state, company, employees, notice date, source URL."* → check the schema mapping across three different source shapes.
   6. *"Compare to what we had yesterday and only show me what's new."* → (if no prior run, ask how it would diff) — watch for a sensible dedupe key.
   7. *"Give me a run report: for each state, what format you found, row count, and anything that looked broken."* → the brittleness ledger; this is the real artifact.

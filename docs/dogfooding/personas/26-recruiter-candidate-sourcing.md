@@ -25,15 +25,15 @@ The pain is that this is almost entirely **GUI-only clicking and copy-paste**: L
 | Personal sites / conference speaker lists | various | No | Easy. Portfolios, talk abstracts, "now"/blog pages — best source of a genuine personalization hook. |
 
 ## Session flow
-1. Priya states the req out loud: role, must-have skills, location/remote, seniority. Maya restates it as structured criteria and confirms before acting.
-2. Maya opens **GitHub search** (low-risk first), runs `language:Rust location:Berlin followers:>50`, reads the result list, opens 3–5 user profiles, and extracts handle / name / bio / top repos / recent commit activity into a working list.
-3. For each GitHub hit, Maya checks for a linked personal site / blog and reads it for a concrete hook (a recent post, a talk, a side project).
-4. Maya navigates to **LinkedIn** to corroborate current title/company for a candidate. **Human-confirm gate:** if a login wall, security checkpoint, or CAPTCHA appears, Maya **stops and hands the browser to Priya** — it must not auto-solve or auto-login.
-5. With Priya logged in (her own session, her own eyes), Maya *reads* the profile on screen and reads back the title/company/tenure; Priya confirms or corrects. Maya does **not** bulk-open profiles or page through search results programmatically (that's the ToS line).
-6. Maya assembles a shortlist table (name, source URL, current role, skill match, personalization hook) and reads it back for Priya to accept/reject rows.
-7. For accepted rows, Maya **drafts** a personalized first-touch message per candidate (referencing the specific hook), and presents the drafts.
-8. **Irreversible-action gate:** Maya never sends a connection request, InMail, or email. It stops at "drafts ready" and asks Priya to review and send manually from her own account.
-9. Maya exports the shortlist + drafts to a sheet / CSV / clipboard as the durable artifact.
+1. Priya states the req out loud: role, must-have skills, location/remote, seniority. Messi restates it as structured criteria and confirms before acting.
+2. Messi opens **GitHub search** (low-risk first), runs `language:Rust location:Berlin followers:>50`, reads the result list, opens 3–5 user profiles, and extracts handle / name / bio / top repos / recent commit activity into a working list.
+3. For each GitHub hit, Messi checks for a linked personal site / blog and reads it for a concrete hook (a recent post, a talk, a side project).
+4. Messi navigates to **LinkedIn** to corroborate current title/company for a candidate. **Human-confirm gate:** if a login wall, security checkpoint, or CAPTCHA appears, Messi **stops and hands the browser to Priya** — it must not auto-solve or auto-login.
+5. With Priya logged in (her own session, her own eyes), Messi *reads* the profile on screen and reads back the title/company/tenure; Priya confirms or corrects. Messi does **not** bulk-open profiles or page through search results programmatically (that's the ToS line).
+6. Messi assembles a shortlist table (name, source URL, current role, skill match, personalization hook) and reads it back for Priya to accept/reject rows.
+7. For accepted rows, Messi **drafts** a personalized first-touch message per candidate (referencing the specific hook), and presents the drafts.
+8. **Irreversible-action gate:** Messi never sends a connection request, InMail, or email. It stops at "drafts ready" and asks Priya to review and send manually from her own account.
+9. Messi exports the shortlist + drafts to a sheet / CSV / clipboard as the durable artifact.
 
 ## Inputs / Outputs / Artifacts
 - **Supplies:** the req (role, skills, location, seniority, any deal-breakers), her *own* logged-in LinkedIn session for any LinkedIn read step, optional tone/voice notes for outreach.
@@ -44,16 +44,16 @@ The pain is that this is almost entirely **GUI-only clicking and copy-paste**: L
 - **GUI-only / no-API by necessity on LinkedIn.** LinkedIn does not offer a sourcing API for this; programmatic access is forbidden. Verbatim from the **LinkedIn User Agreement §8.2** (<https://www.linkedin.com/legal/user-agreement>):
   - §8.2.2 — *"Develop, support or use software, devices, scripts, robots or any other means or processes (such as crawlers, browser plugins and add-ons or any other technology) to scrape or copy the Services, including profiles and other data from the Services"* (prohibited).
   - §8.2.13 — *"Use bots or other unauthorized automated methods to access the Services, add or download contacts, send or redirect messages, create, comment on, like, share, or re-share posts, or otherwise drive inauthentic engagement"* (prohibited).
-  - §8.2.1 — *"Create a false identity on LinkedIn… create a Member profile for anyone other than yourself (a real person), or use or attempt to use another's account"* (prohibited) — so Maya must never act *as* a synthetic LinkedIn identity; it operates the human's own session under human control.
+  - §8.2.1 — *"Create a false identity on LinkedIn… create a Member profile for anyone other than yourself (a real person), or use or attempt to use another's account"* (prohibited) — so Messi must never act *as* a synthetic LinkedIn identity; it operates the human's own session under human control.
 - **Legal weight is real, not theoretical.** In *hiQ Labs v. LinkedIn* the N.D. Cal. court held these ToS anti-scraping/fake-profile clauses **enforceable as breach of contract**, and hiQ accepted a **$500k consent judgment** plus an order to destroy scraped data/algorithms (Privacy World, Dec 2022). Public-data scraping may survive the CFAA, but it can still be contract breach + trespass to chattels.
-- **Recommended safe framing:** (a) **read-only, human-driven** on LinkedIn — Maya reads what's on Priya's own screen, never bulk-paginates or extracts at machine speed; (b) **human-confirms-irreversible-action** — no auto-connect/InMail/email send, ever, only drafts; (c) **hand off auth/CAPTCHA to the human**, never auto-solve; (d) prefer **public, automation-tolerant sources** (GitHub, personal sites, conference pages) for the heavy extraction and use LinkedIn only for human-supervised corroboration; (e) **privacy:** candidate PII (emails, phone) is sensitive — do not enrich/store contact info beyond what the candidate published, and never fabricate a hook.
+- **Recommended safe framing:** (a) **read-only, human-driven** on LinkedIn — Messi reads what's on Priya's own screen, never bulk-paginates or extracts at machine speed; (b) **human-confirms-irreversible-action** — no auto-connect/InMail/email send, ever, only drafts; (c) **hand off auth/CAPTCHA to the human**, never auto-solve; (d) prefer **public, automation-tolerant sources** (GitHub, personal sites, conference pages) for the heavy extraction and use LinkedIn only for human-supervised corroboration; (e) **privacy:** candidate PII (emails, phone) is sensitive — do not enrich/store contact info beyond what the candidate published, and never fabricate a hook.
 
 ## Testing manual — how to dogfood as this persona
 - **Setup:** throwaway/sandbox only. Use a **personal test LinkedIn account you own** (or skip the live LinkedIn read step and dogfood the GitHub-first path). Never use a client's Recruiter seat, never store real candidate contact details, never auto-send anything. Treat any profile you open as a real person and don't persist their data.
 - **Intent you bring in (in character):** *"I'm sourcing senior Rust engineers in Berlin for a fintech infra role. Find me a handful of strong candidates, find a real reason to reach out to each, and draft me a first message — I'll send them myself."*
 - **Session script (~8 beats):**
-  1. State the req; watch Maya **restate it as structured criteria** and confirm before searching. (Listen for: does it ask before acting?)
-  2. "Start on GitHub." Watch Maya build a search (language/location/followers) and read back the top hits.
+  1. State the req; watch Messi **restate it as structured criteria** and confirm before searching. (Listen for: does it ask before acting?)
+  2. "Start on GitHub." Watch Messi build a search (language/location/followers) and read back the top hits.
   3. "Open the top three and tell me about them." Watch it extract handle/repos/recent activity — does it summarize or just dump?
   4. "Find me a personalization hook for each." Watch it visit a linked blog/site and surface something *specific* (not generic).
   5. "Now check the first candidate on LinkedIn." Watch what it does at the **login/checkpoint wall** — it should hand the browser to you, not push through.

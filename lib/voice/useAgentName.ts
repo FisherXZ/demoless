@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
  * env directly. During a live session, prefer the `agentName` from
  * `useVoiceAgent`, which reflects the active language's voice.
  */
-const FALLBACK = "Maya";
+const FALLBACK = "Messi";
 
 let cached: string | null = null;
 let inflight: Promise<string> | null = null;

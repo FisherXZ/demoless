@@ -9,7 +9,7 @@ Demoless is an AI agent platform that runs live product demos for companies 24/7
 - A **Next.js 15 (App Router) + TypeScript + Tailwind frontend** — the buyer-facing demo (landing → form → live room) plus a multi-route **operator dashboard**.
 - A **Node voice-agent backend** (`server/`) that *runs the actual demo*: it **listens** (Deepgram STT), **thinks** (Claude with native tool-use), **drives a real browser** (Browserbase cloud Chrome), and **speaks** (TTS) — streaming all of it to the browser over a WebSocket.
 
-The reference product being demoed is **Browserbase** (`company: "browserbase"`); the agent persona is **Maya**. This is the result of the "single-brain convergence" (see `docs/superpowers/specs/2026-06-20-single-brain-convergence-design.md`), which merged the P1–P5 tracks into one streaming brain that owns voice, browser, and memory.
+The reference product being demoed is **Browserbase** (`company: "browserbase"`); the agent persona is **Messi**. This is the result of the "single-brain convergence" (see `docs/superpowers/specs/2026-06-20-single-brain-convergence-design.md`), which merged the P1–P5 tracks into one streaming brain that owns voice, browser, and memory.
 
 > This codebase has changed a lot. It is **not** "mostly a frontend prototype with mock data" anymore — the voice backend is the live system, and the memory + knowledge layers are wired into it.
 

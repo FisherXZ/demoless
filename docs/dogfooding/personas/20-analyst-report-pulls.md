@@ -93,7 +93,7 @@ textbook GUI-only-export workflow that a browser agent could drive end-to-end.
 - **Setup:** Google Ads **test/manager** account, Meta Ads **sandbox**, Stripe **test mode**
   (`dashboard.stripe.com/test`), and a throwaway Google Sheet. No real client data, no real PII, no
   real card data. *(Note: the reference product being demoed is **Browserbase**; this persona is the
-  generic ops-analyst flow you drive Maya through — substitute the demo target's own dashboards if the
+  generic ops-analyst flow you drive Messi through — substitute the demo target's own dashboards if the
   session is meant to showcase Browserbase's site specifically.)*
 - **Intent you bring in:** *"It's Monday — pull last week's numbers for Client A from Google Ads, Meta,
   and Stripe, and drop them into my weekly sheet so I can build the client report."*
@@ -105,7 +105,7 @@ textbook GUI-only-export workflow that a browser agent could drive end-to-end.
   3. *"Tell me the total spend and row count from that file."* — watch it read the export back.
   4. *"Now do the same in Meta Ads Manager — export the table data."* — watch for the export modal and
      any re-auth prompt.
-  5. *"Now Stripe — export last week's payments."* — **watch the MFA wall**; confirm Maya pauses and
+  5. *"Now Stripe — export last week's payments."* — **watch the MFA wall**; confirm Messi pauses and
      hands off rather than guessing.
   6. *"Paste all three into the Client A master sheet, one tab each."* — watch the consolidation.
   7. *"Summarize spend / conversions / revenue per source and flag anything weird vs. last week."*

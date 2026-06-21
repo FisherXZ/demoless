@@ -16,7 +16,7 @@ vi.mock("./tts", () => {
   return {
     createTts: vi.fn().mockReturnValue({
       synthesize,
-      voiceName: vi.fn().mockReturnValue("Maya"),
+      voiceName: vi.fn().mockReturnValue("Messi"),
     }),
   };
 });

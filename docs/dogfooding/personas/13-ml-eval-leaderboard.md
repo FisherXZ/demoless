@@ -30,15 +30,15 @@ It recurs because **the data moves weekly** (new model drops, leaderboard reshuf
 | arXiv (new-results scan) | https://arxiv.org/list/cs.CL/recent | No | Easy — static HTML/Atom feed; arXiv has an official API (so agent should prefer that, not scrape) |
 
 ## Session flow
-1. Maya opens **LMArena leaderboard**, waits for the JS table to render, reads the **top 8 rows** (model, org, Arena score, CI, votes) and extracts them into a structured list.
-2. Maya navigates to a **community HF leaderboard** (the archived Open LLM board or a successor Space), reads the top entries, and **flags any model present on HF but absent from LMArena's top 8** (and vice-versa).
-3. Maya opens **CodeSOTA / HF Trending Papers**, scans for **new entries on the task Priya cares about** (e.g. "code generation" or "long-context QA") published in the last week, capturing title + claimed metric + link.
-4. Maya opens **arXiv cs.CL recent** (via API where possible) and pulls **today's new papers** whose abstracts mention the models/benchmarks on Priya's watchlist.
-5. **Human-confirm / login handoff gate:** to do the cross-vendor answer comparison, Maya must reach a logged-in chat playground. It **pauses and hands off** for the tester to complete Google/email login + any MFA on ChatGPT / Claude / Gemini — Maya never types credentials.
-6. In the **ChatGPT** playground, Maya pastes **Priya's golden prompt verbatim**, waits for the full streamed answer, and captures the text.
-7. Maya repeats step 6 in **Claude** and **Gemini**, same prompt, capturing each answer.
-8. Maya assembles a **side-by-side comparison table** (model · answer snippet · obvious differences) and, for the regression check, **diffs each against last week's saved answer** for the same prompt, flagging changes.
-9. Maya produces a one-screen **digest**: leaderboard movers, new SOTA papers, and the 3-way answer diff — the artifact Priya forwards to her PM. No model is "selected" or shipped by the agent; selection stays with Priya.
+1. Messi opens **LMArena leaderboard**, waits for the JS table to render, reads the **top 8 rows** (model, org, Arena score, CI, votes) and extracts them into a structured list.
+2. Messi navigates to a **community HF leaderboard** (the archived Open LLM board or a successor Space), reads the top entries, and **flags any model present on HF but absent from LMArena's top 8** (and vice-versa).
+3. Messi opens **CodeSOTA / HF Trending Papers**, scans for **new entries on the task Priya cares about** (e.g. "code generation" or "long-context QA") published in the last week, capturing title + claimed metric + link.
+4. Messi opens **arXiv cs.CL recent** (via API where possible) and pulls **today's new papers** whose abstracts mention the models/benchmarks on Priya's watchlist.
+5. **Human-confirm / login handoff gate:** to do the cross-vendor answer comparison, Messi must reach a logged-in chat playground. It **pauses and hands off** for the tester to complete Google/email login + any MFA on ChatGPT / Claude / Gemini — Messi never types credentials.
+6. In the **ChatGPT** playground, Messi pastes **Priya's golden prompt verbatim**, waits for the full streamed answer, and captures the text.
+7. Messi repeats step 6 in **Claude** and **Gemini**, same prompt, capturing each answer.
+8. Messi assembles a **side-by-side comparison table** (model · answer snippet · obvious differences) and, for the regression check, **diffs each against last week's saved answer** for the same prompt, flagging changes.
+9. Messi produces a one-screen **digest**: leaderboard movers, new SOTA papers, and the 3-way answer diff — the artifact Priya forwards to her PM. No model is "selected" or shipped by the agent; selection stays with Priya.
 
 ## Inputs / Outputs / Artifacts
 - **Persona supplies:** a watchlist (models + benchmarks/tasks of interest), a handful of "golden" prompts, last week's saved answers for regression diffing, and (at the handoff gate) her own logged-in playground sessions.
@@ -55,7 +55,7 @@ It recurs because **the data moves weekly** (new model drops, leaderboard reshuf
 - **Setup:** sandbox / throwaway accounts only. Use **burner ChatGPT/Claude/Google accounts** (or your own personal, never a work/enterprise SSO account), and a **non-confidential golden prompt** (e.g. "Write a Python function to debounce calls; explain the edge cases"). Never paste real customer data, secrets, or PII. Read-only on all leaderboards; **do not vote** on LMArena.
 - **Intent you bring in:** *"I'm an ML eng deciding whether to switch our default model this sprint. Watch the leaderboards for movers, scan for new results on long-context and codegen, then run my golden prompt across ChatGPT, Claude, and Gemini so I can compare and spot regressions."*
 - **Session script (~8 beats):**
-  1. "Open the LMArena leaderboard and read me the top 8 — model, org, score, votes." → watch Maya wait out the JS render and extract the table.
+  1. "Open the LMArena leaderboard and read me the top 8 — model, org, score, votes." → watch Messi wait out the JS render and extract the table.
   2. "Now check a Hugging Face leaderboard — which models are highly ranked there but missing from LMArena's top 8?" → watch it cross-reference two sources.
   3. "Papers with Code is dead — go to CodeSOTA (or HF Trending Papers) and find anything new this week on code generation." → watch it handle the redirect/alternative.
   4. "Scan arXiv cs.CL recent for today's papers mentioning the models on my watchlist." → watch it prefer the feed/API, not scrape.

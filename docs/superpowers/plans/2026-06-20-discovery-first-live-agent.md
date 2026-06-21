@@ -131,8 +131,8 @@ Add to `server/orchestrator/loop.test.ts`:
 ```ts
 it("default greeting asks one discovery question before offering a walkthrough", () => {
   const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
-  const text = orch.greeting("en", "Maya");
-  expect(text).toContain("Maya");
+  const text = orch.greeting("en", "Messi");
+  expect(text).toContain("Messi");
   expect(text).toMatch(/what .*trying to figure out/i);
   expect(text).not.toMatch(/walk you through|show you/i);
   expect((text.match(/\?/g) ?? []).length).toBe(1);
@@ -144,7 +144,7 @@ Strengthen `server/orchestrator/loop.recall.test.ts`:
 ```ts
 it("returning-buyer greeting references recall and asks today's goal", () => {
   const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
-  const text = orch.greeting("en", "Maya", returningBuyer);
+  const text = orch.greeting("en", "Messi", returningBuyer);
   expect(text).toContain("parallel browser sessions");
   expect(text).toMatch(/today/i);
   expect(text).toMatch(/trying to figure out/i);
@@ -164,7 +164,7 @@ import type { DemoConfig } from "../config/demoConfig";
 const cfg: DemoConfig = {
   company: "browserbase",
   productName: "Browserbase",
-  persona: "Maya",
+  persona: "Messi",
   browseTargetUrl: "https://www.browserbase.com",
   corpusSeed: "",
 };
@@ -606,7 +606,7 @@ import { StubOrchestrator } from "./stub";
 
 describe("StubOrchestrator greeting", () => {
   it("asks a discovery question instead of offering a tour", () => {
-    const text = new StubOrchestrator().greeting("en", "Maya");
+    const text = new StubOrchestrator().greeting("en", "Messi");
     expect(text).toMatch(/what .*trying to figure out/i);
     expect(text).not.toMatch(/walk you through|what would you like to see first/i);
   });
@@ -660,7 +660,7 @@ Update `lib/demoConfig.ts`:
 
 ```ts
 export const GREETING =
-  "Hi, I'm Maya. Before I show anything, what are you trying to figure out about Browserbase today?";
+  "Hi, I'm Messi. Before I show anything, what are you trying to figure out about Browserbase today?";
 ```
 
 Append discovery-first bullets to `SYSTEM_PROMPT`, matching `server/brain/messages.ts`.
@@ -682,7 +682,7 @@ Update `components/DemoRoom.tsx` ready caption:
 Update `lib/data.ts` first static caption:
 
 ```ts
-"Hey! I'm Maya. Before I show anything, what are you trying to figure out about Browserbase today?",
+"Hey! I'm Messi. Before I show anything, what are you trying to figure out about Browserbase today?",
 ```
 
 - [x] **Step 4: Verify GREEN**

@@ -3,9 +3,9 @@
 You are grounding ONE dogfooding persona for **demoless** and writing it to its own file.
 
 ## What demoless is (the tool you're writing a test for)
-demoless is an AI **voice agent** (persona name "Maya") that runs **live product demos** by
+demoless is an AI **voice agent** (persona name "Messi") that runs **live product demos** by
 **driving a real cloud browser** (Browserbase) while it talks. A human tester comes in *as a
-given persona*, states an intent out loud / in text, and **watches Maya navigate real websites**
+given persona*, states an intent out loud / in text, and **watches Messi navigate real websites**
 end-to-end. The reference product being demoed is **Browserbase** (browser-automation infra for
 AI agents). Dogfooding (GitHub issue #7) = run sessions as the persona and log (a) recurring
 questions buyers keep asking and (b) agent breakdown points (wrong page, weak answer, dead air,
@@ -57,7 +57,7 @@ Why it's GUI-only/no-API; honest ToS / legal / ethics / privacy flags; recommend
 ## Testing manual — how to dogfood as this persona
 - **Setup:** sandbox / throwaway accounts only; never real PHI, real bank creds, or real PII.
 - **Intent you bring in:** 1–2 sentences, in character.
-- **Session script:** ~6–10 beats — the exact things you say/ask Maya, and what you watch the
+- **Session script:** ~6–10 beats — the exact things you say/ask Messi, and what you watch the
   browser do at each beat.
 - **Probes:** edge cases to push (auth wall, CAPTCHA, mid-flow page change, ambiguous request,
   an irreversible action that should trigger a confirm).

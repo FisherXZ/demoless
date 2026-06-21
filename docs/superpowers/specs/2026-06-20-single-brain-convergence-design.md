@@ -154,4 +154,4 @@ Seed **Browserbase** now. Adding Demoless-itself or another product later is a n
 ## 9. Open config items (deferred to planning, non-blocking)
 
 1. **`browseTargetUrl`** for the Browserbase demo — exact site the live browser starts on (e.g., a Browserbase showcase, browserbase.com, or a rich live site framed as "watch our agent drive any site"). Default pending confirmation.
-2. **`persona`** name for the Browserbase demo — default "Maya" (carried from P3) unless changed.
+2. **`persona`** name for the Browserbase demo — default "Messi" (carried from P3) unless changed.

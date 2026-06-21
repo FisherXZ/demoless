@@ -11,7 +11,7 @@
 - **Syften** sells indie hackers keyword alerts across HN, Indie Hackers, Product Hunt, Dev.to, Lobste.rs, etc., with filters like `site:indiehackers.com type:post title:'product hunt'` to *spot launches*. `https://syften.com/indiehackers` — *what breaks: monitoring is fragmented across communities; founders pay to consolidate it.*
 - **App-store ranks have no free official feed for indies** — tools like AppsRank/Rankor/AppFollow exist to track top-200 chart position and stack you against competitors. `https://apps.apple.com/us/app/appsrank-ranking-tracker/id6762045370` · `https://appfollow.io/blog/app-store-rating-history` — *what breaks: chart rank is a daily-moving GUI number with no cheap API.*
 - **Reddit caveat:** the user-community half of this workflow really lives in subreddits like **r/SaaS**, **r/indiehackers**, **r/SideProject** (e.g. "I built X" launch posts). reddit.com is hard-blocked here — **pull those verbatim from a human browser; uncited here.** Syften/HN/Indie Hackers stand in as the citable analogues.
-- **On-narrative note:** Browserbase itself launches on Product Hunt (3 launches, ~435 upvotes incl. Director) — `https://www.producthunt.com/products/browserbase` — so "watch Maya track a PH leaderboard" demos the product's own home turf.
+- **On-narrative note:** Browserbase itself launches on Product Hunt (3 launches, ~435 upvotes incl. Director) — `https://www.producthunt.com/products/browserbase` — so "watch Messi track a PH leaderboard" demos the product's own home turf.
 
 ## Real targets
 | Site | URL | Login? | Scrape/automation difficulty |
@@ -44,10 +44,10 @@
 - **Safe framing:** **alert, don't act** — this workflow is read-and-report; there is no irreversible action to take, so the agent should never upvote/comment/post on the persona's behalf (that would be the line). Subreddit + Reddit login = the human-confirm handoff.
 
 ## Testing manual — how to dogfood as this persona
-- **Setup:** throwaway Reddit + Product Hunt accounts only; no real product creds for any competitor; pre-auth the throwaway browser out-of-band so Maya never sees the password.
+- **Setup:** throwaway Reddit + Product Hunt accounts only; no real product creds for any competitor; pre-auth the throwaway browser out-of-band so Messi never sees the password.
 - **Intent you bring in:** *"I'm a solo founder of a Slack standup bot. Every morning, tell me what launched near my niche on Product Hunt and Hacker News, whether my two competitor apps moved in the App Store, and whether any of my three competitors shipped a changelog update."*
 - **Session script (beats):**
-  1. "Open today's Product Hunt leaderboard and read me anything Slack/standup/async/agent-related, with its rank and upvotes." → watch Maya hit the dated `/leaderboard/daily/...` URL and read the ranked list.
+  1. "Open today's Product Hunt leaderboard and read me anything Slack/standup/async/agent-related, with its rank and upvotes." → watch Messi hit the dated `/leaderboard/daily/...` URL and read the ranked list.
   2. "Now check Hacker News for Show HN and front-page stories in the last 24 hours mentioning [keyword/competitor]." → watch it query the Algolia API / read HN.
   3. "Open r/SaaS new and pull any 'I built' launch posts from today." → **watch the Reddit login handoff trigger.**
   4. "What's [Competitor A]'s current App Store chart rank, and did it move from yesterday?" → watch the store page render and the delta vs. stored baseline.
