@@ -4,7 +4,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
-import { Reply } from "../shared/contract";
+import { Reply, type NoteInput } from "../shared/contract";
 import type { LoopState, TurnType } from "./state";
 
 export interface CompleteRequest {
@@ -36,7 +36,16 @@ export function buildParams(req: CompleteRequest) {
 }
 
 const VALID_KIND = new Set(["say", "navigate", "click_or_type", "remember"]);
-const VALID_NOTE = new Set(["objection", "interest", "role", "question"]);
+const VALID_NOTE = new Set([
+  "objection",
+  "interest",
+  "role",
+  "question",
+  "pain_point",
+  "next_step",
+  "persona",
+  "preference",
+]);
 const VALID_PHASE = new Set(["HOOK", "DISCOVERY", "WALKTHROUGH", "CLOSE", "DONE"]);
 const VALID_TOUR = new Set(["advance", "stay", "resume"]);
 
@@ -57,7 +66,9 @@ export function coerceReply(raw: unknown): Reply {
     else if (c.kind === "remember") {
       const note = c.note as Record<string, unknown> | undefined;
       if (note && typeof note.value === "string") {
-        const type = VALID_NOTE.has(note.type as string) ? (note.type as "objection" | "interest" | "role" | "question") : "interest";
+        const type = VALID_NOTE.has(note.type as string)
+          ? (note.type as NoteInput["type"])
+          : "interest";
         out.commands.push({ kind: "remember", note: { type, value: note.value } });
       }
     }
@@ -115,18 +126,37 @@ export async function complete(req: CompleteRequest): Promise<Reply> {
   }
 }
 
+function directTarget(text: string): "pricing" | "docs" | null {
+  const lower = text.toLowerCase();
+  if (/\b(pricing|price|cost|plans?)\b/.test(lower)) return "pricing";
+  if (/\b(docs|documentation|api docs|reference|guide)\b/.test(lower)) return "docs";
+  return null;
+}
+
 function stub(req: CompleteRequest): Reply {
   const lastUser = [...req.messages].reverse().find((m) => m.role === "user")?.content ?? "";
   if (req.turn === "greet") {
     const b = req.state.buyer;
     const text =
       b && b.notes.length > 0
-        ? `Welcome back${b.name ? ", " + b.name : ""}! Last time you were curious about "${b.notes[b.notes.length - 1].value}". Want to pick up there?`
+        ? `Welcome back${b.name ? ", " + b.name : ""}! Last time you were interested in "${b.notes[b.notes.length - 1].value}". What are you trying to figure out today?`
         : `Hi — I'm your demo guide. Before I show you anything: what brought you here today?`;
     return { commands: [{ kind: "say", text }] };
   }
   if (req.turn === "screen") {
     return { commands: [{ kind: "say", text: `(stub) Here's ${req.state.screen?.summary ?? "the page"}.` }] };
+  }
+  const target = directTarget(lastUser);
+  if (target) {
+    const label = target === "docs" ? "docs" : "pricing";
+    return {
+      commands: [
+        { kind: "say", text: `Sure — I'll open ${label}. What are you comparing it against today?` },
+        { kind: "navigate", target },
+        { kind: "remember", note: { type: "interest", value: lastUser.slice(0, 60) } },
+      ],
+      tour: "stay",
+    };
   }
   return {
     commands: [

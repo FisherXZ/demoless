@@ -22,6 +22,27 @@ vi.mock("./bargeIn", () => ({
   novelWordCount: vi.fn().mockReturnValue(0),
   tokenize: vi.fn().mockReturnValue([]),
 }));
+vi.mock("../lib/memory/store", () => ({
+  loadBuyer: vi.fn().mockResolvedValue({
+    profile: {
+      email: "anonymous",
+      firstSeen: 0,
+      lastSeen: 0,
+      visitCount: 1,
+    },
+    notes: [],
+    isReturning: false,
+    recall: { line: "", topInterests: [], painPoints: [], objections: [] },
+  }),
+}));
+vi.mock("../lib/memory/pubsub", () => ({
+  publishPhase: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock("../lib/learnings", () => ({
+  getLearnings: vi.fn().mockResolvedValue([]),
+  buildLearningsContext: vi.fn().mockReturnValue(""),
+  reflectAndStore: vi.fn().mockResolvedValue(undefined),
+}));
 
 import { VoiceSession } from "./session";
 
@@ -34,6 +55,16 @@ function makeWs() {
     on: vi.fn(),
     sent,
   };
+}
+
+async function waitForEvent(ws: ReturnType<typeof makeWs>, eventType: string) {
+  for (let i = 0; i < 25; i++) {
+    const events = ws.sent.map((s) => JSON.parse(s) as { t: string });
+    const event = events.find((e) => e.t === eventType);
+    if (event) return event;
+    await new Promise((r) => setTimeout(r, 1));
+  }
+  throw new Error(`Timed out waiting for ${eventType}`);
 }
 
 describe("VoiceSession — browser session ownership", () => {
@@ -65,8 +96,7 @@ describe("VoiceSession — browser session ownership", () => {
     );
     await handler(JSON.stringify({ t: "audio_start", language: "en" }), false);
 
-    // Give async startSession time to resolve
-    await new Promise((r) => setTimeout(r, 10));
+    await waitForEvent(ws, "ready");
 
     expect(fakeStartSession).toHaveBeenCalledWith(getDemoConfig().browseTargetUrl);
 
@@ -106,7 +136,7 @@ describe("VoiceSession — browser session ownership", () => {
       (args: unknown[]) => args[0] === "message"
     );
     await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
-    await new Promise((r) => setTimeout(r, 10));
+    await waitForEvent(ws, "ready");
 
     // Trigger close
     const closeHandlerCall = (ws.on as Mock).mock.calls.find(
