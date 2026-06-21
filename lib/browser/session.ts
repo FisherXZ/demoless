@@ -3,13 +3,18 @@
 import Browserbase from "@browserbasehq/sdk";
 import { chromium, type Browser, type Page } from "playwright-core";
 
-const API_KEY = process.env.BROWSERBASE_API_KEY;
-const PROJECT_ID = process.env.BROWSERBASE_PROJECT_ID;
+// Read env lazily (NOT into module-level consts): the standalone voice server
+// loads .env.local AFTER importing this module (esbuild hoists imports above the
+// dotenv.config() call), so capturing at import time freezes these as undefined.
+// Next.js loads env before any module, so reading at call time is correct there
+// too. See the load-order note in server/index.ts.
+const apiKey = () => process.env.BROWSERBASE_API_KEY;
+const projectId = () => process.env.BROWSERBASE_PROJECT_ID;
 // When set, every demo session reuses a pre-authenticated Browserbase Context
 // (seed it once with scripts/seed-context.mjs). The product being demoed then
 // loads already logged-in. persist:false so prospects' clicks don't overwrite
 // the saved login. Unset => plain sessions (current public-site behavior).
-const CONTEXT_ID = process.env.BROWSERBASE_CONTEXT_ID;
+const contextId = () => process.env.BROWSERBASE_CONTEXT_ID;
 
 /** What the room shows the audience after each move ("screen_is_on"). */
 export interface ScreenState {
@@ -32,12 +37,13 @@ const store: Map<string, LiveSession> =
 (globalThis as { __bbSessions?: Map<string, LiveSession> }).__bbSessions = store;
 
 function client(): Browserbase {
-  if (!API_KEY || !PROJECT_ID) {
+  const key = apiKey();
+  if (!key || !projectId()) {
     throw new Error(
       "Missing BROWSERBASE_API_KEY / BROWSERBASE_PROJECT_ID (set them in .env.local)"
     );
   }
-  return new Browserbase({ apiKey: API_KEY });
+  return new Browserbase({ apiKey: key });
 }
 
 async function screen(sessionId: string, page: Page): Promise<ScreenState> {
@@ -64,7 +70,7 @@ export async function startSession(
   // keepAlive keeps the session up if our CDP connection blips (e.g. dev HMR);
   // we release it explicitly in stopSession. timeout caps an abandoned session.
   const session = await bb.sessions.create({
-    projectId: PROJECT_ID!,
+    projectId: projectId()!,
     keepAlive: true,
     timeout: 900,
     // worldcuparena.live (Fly.io) drops Browserbase's datacenter IPs, so the
@@ -72,7 +78,7 @@ export async function startSession(
     proxies: true,
     browserSettings: {
       viewport: { width: 1280, height: 720 },
-      ...(CONTEXT_ID ? { context: { id: CONTEXT_ID, persist: false } } : {}),
+      ...(contextId() ? { context: { id: contextId()!, persist: false } } : {}),
     },
   });
   const debug = await bb.sessions.debug(session.id);
@@ -131,7 +137,7 @@ export async function stopSession(sessionId: string): Promise<void> {
   }
   // keepAlive sessions persist after the CDP connection closes, so end it explicitly.
   await client()
-    .sessions.update(sessionId, { projectId: PROJECT_ID!, status: "REQUEST_RELEASE" })
+    .sessions.update(sessionId, { projectId: projectId()!, status: "REQUEST_RELEASE" })
     .catch(() => {});
 }
 

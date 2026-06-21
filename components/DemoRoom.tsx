@@ -61,7 +61,10 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
   const rawCaption = voice.lastCaption || vals.caption;
   const mayaCaption = rawCaption.replace(/Maya/g, agentName);
 
-  const otherLang: Language = voice.language === "en" ? "es" : "en";
+  // Cycle through every configured language (EN -> ES -> 中文 -> EN).
+  const langCodes = Object.keys(LANGUAGES) as Language[];
+  const otherLang: Language =
+    langCodes[(langCodes.indexOf(voice.language) + 1) % langCodes.length];
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
