@@ -25,9 +25,15 @@ textarea,
 button {
   font-family: inherit;
 }
-input:focus,
-select:focus,
-textarea:focus {
+:where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid #3a41d6;
+  outline-offset: 2px;
+}
+
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+button:focus:not(:focus-visible) {
   outline: none;
 }
 
