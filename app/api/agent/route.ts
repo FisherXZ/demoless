@@ -2,27 +2,10 @@ import { NextResponse } from "next/server";
 import { pageContext, navigate, clickText } from "@/lib/browser/session";
 import { decide, hasLLM, type BrowserAction } from "@/lib/agent/brain";
 import type { PageContext } from "@/lib/browser/session";
+import { SECTIONS } from "@/lib/demoConfig";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-// Each section is a real deep-link: the SPA's viewFromPath() reads the URL path
-// on load (/blog, /leaderboard, …), so navigating straight to the URL is far
-// more reliable than text-clicking a nav tab (which could miss or hit the wrong
-// element). Live is the site root.
-const ORIGIN = new URL(process.env.DEMO_TARGET_URL || "https://worldcuparena.live/").origin;
-
-// Fast path: obvious section navigation resolved by simple matching, so it
-// skips BOTH the page scan and the Claude round-trip (~2s saved). Claude still
-// handles questions and anything that doesn't clearly map to a section.
-const SECTIONS: { label: string; path: string; words: string[] }[] = [
-  { label: "Leaderboard", path: "/leaderboard", words: ["leaderboard", "rankings", "ranking", "standings", "board"] },
-  { label: "Agents", path: "/agents", words: ["agents", "agent", "models", "model", "bots", "players", "competitors"] },
-  { label: "Matches", path: "/matches", words: ["matches", "match", "games", "head to head", "head-to-head"] },
-  { label: "Blog", path: "/blog", words: ["blog", "posts", "articles", "article", "news", "writeup"] },
-  { label: "About", path: "/about", words: ["about", "info", "story", "who made", "what is demoless"] },
-  { label: "Live", path: "/", words: ["live", "home", "homepage", "dashboard", "chart", "overview"] },
-];
 
 const QUESTION_STARTS = [
   "what", "which", "how", "why", "who", "where", "when",
@@ -42,7 +25,7 @@ function fastRoute(message: string): { reply: string; action: BrowserAction } | 
     if (s.words.some((w) => m.includes(w))) {
       return {
         reply: `Sure, here's ${s.label.toLowerCase()}.`,
-        action: { type: "navigate", url: ORIGIN + s.path },
+        action: { type: "navigate", url: s.url },
       };
     }
   }
@@ -51,9 +34,9 @@ function fastRoute(message: string): { reply: string; action: BrowserAction } | 
 
 // Used only when there is no LLM key and the fast path didn't match.
 function keywordFallback(): { reply: string; action: BrowserAction } {
+  const options = SECTIONS.map((s) => s.label.toLowerCase()).join(", ");
   return {
-    reply:
-      "I can show you the leaderboard, matches, agents, blog, or about. What would you like to see?",
+    reply: `I can show you the ${options}. What would you like to see?`,
     action: null,
   };
 }

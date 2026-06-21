@@ -6,26 +6,26 @@ import { useVoiceAgent } from "@/lib/voice/useVoiceAgent";
 import { useAgentName } from "@/lib/voice/useAgentName";
 import { LANGUAGES, type Language } from "@/lib/voice/messages";
 
-const TARGET = "https://worldcuparena.live/";
+const TARGET = process.env.NEXT_PUBLIC_DEMO_TARGET_URL || "https://worldcuparena.live/";
 
 const SUGGESTIONS = [
-  "Show me the leaderboard",
-  "Open the blog",
-  "What is this benchmark?",
+  "Show me my sessions",
+  "Open the playground",
+  "What is Browserbase?",
 ];
 
 const GREETING =
-  "Hi! I'm Maya. This is WorldCup Arena, a live AI-model trading benchmark. Ask me to show you anything, the leaderboard, the agents, how it works.";
+  "Hi! I'm Maya. This is Browserbase, the headless-browser platform that gives AI agents reliable access to the whole web. Ask me to show you anything: your sessions, the playground, pricing, or how it works.";
 
-// Mirrors the server fast path so the chat can answer instantly for obvious
-// sections while the browser catches up.
+// Mirrors the server fast path (lib/demoConfig.ts) so the chat can answer
+// instantly for obvious sections while the browser catches up.
 const SECTION_WORDS: { label: string; words: string[] }[] = [
-  { label: "Leaderboard", words: ["leaderboard", "rankings", "ranking", "standings", "board"] },
-  { label: "Agents", words: ["agents", "agent", "models", "model", "bots", "players", "competitors"] },
-  { label: "Matches", words: ["matches", "match", "games", "head to head", "head-to-head"] },
-  { label: "Blog", words: ["blog", "posts", "articles", "article", "news", "writeup"] },
-  { label: "About", words: ["about", "info", "story", "who made"] },
-  { label: "Live", words: ["live", "home", "homepage", "dashboard", "chart", "overview"] },
+  { label: "Overview", words: ["overview", "dashboard", "home", "main", "analytics", "usage"] },
+  { label: "Sessions", words: ["sessions", "session", "runs", "run history", "history", "recent"] },
+  { label: "Functions", words: ["functions", "function"] },
+  { label: "Playground", words: ["playground", "try it", "try out", "sandbox", "test it"] },
+  { label: "Pricing", words: ["pricing", "price", "cost", "plan", "plans", "how much"] },
+  { label: "Docs", words: ["docs", "documentation", "reference", "api docs", "guide"] },
 ];
 const QUESTION_STARTS = [
   "what", "which", "how", "why", "who", "where", "when",
@@ -250,7 +250,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               {liveViewUrl ? (
                 <iframe
                   src={liveViewUrl}
-                  title="WorldCup Arena (live)"
+                  title="Browserbase (live)"
                   className="w-full h-full"
                   sandbox="allow-same-origin allow-scripts allow-forms"
                   allow="clipboard-read; clipboard-write"
@@ -260,7 +260,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                   <div className="text-stone350 text-sm">
                     {connecting
                       ? "Connecting to the live product…"
-                      : "Maya is ready to walk you through WorldCup Arena."}
+                      : "Maya is ready to walk you through Browserbase."}
                   </div>
                   {!connecting && (
                     <button

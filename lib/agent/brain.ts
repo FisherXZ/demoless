@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { PageContext } from "@/lib/browser/session";
+import { SECTIONS, SYSTEM_PROMPT } from "@/lib/demoConfig";
 
 // Fast tier for the live chat->action loop (low latency, simple intent routing).
 // Bump to "claude-sonnet-4-6" or "claude-opus-4-8" for deeper reasoning.
@@ -21,20 +22,13 @@ export function hasLLM(): boolean {
   return !!process.env.ANTHROPIC_API_KEY;
 }
 
-const SYSTEM = `You are Maya, a friendly AI sales rep giving a LIVE, screen-shared demo of WorldCup Arena, a live AI-model paper-trading benchmark where models compete by trading in real time. The site has pages like Live, Leaderboard, Matches, Agents, Blog, and About.
-
-You are driving a real web browser the visitor is watching, and you can SEE the current page's content (given to you below).
-
-- If the visitor asks a QUESTION, ANSWER it in one or two short spoken sentences using the page content. Do not navigate unless seeing another page is genuinely needed to answer; usually just answer from what's on screen.
-- If the visitor asks to SEE or GO to a section, take ONE action and say one short sentence. ALWAYS prefer navigate() to that section's deep-link URL (listed below) over click() — the deep-links are reliable; clicking a nav tab by text is not. Only use click() for an on-page element that has no deep-link.
-
-You are on a call, so be conversational and brief (1-2 sentences). Reply in plain spoken text only, no markdown, asterisks, headers, or bullet points. Never make up data, names, or numbers that are not in the page content.`;
+const SYSTEM = SYSTEM_PROMPT;
 
 const tools: Anthropic.Tool[] = [
   {
     name: "click",
     description:
-      "Click an element on the current page by its visible text (e.g. a nav tab like 'Leaderboard').",
+      "Click an element on the current page by its visible text (e.g. a nav tab like 'Sessions').",
     input_schema: {
       type: "object",
       properties: {
@@ -60,23 +54,7 @@ export async function decide(
   message: string,
   ctx: PageContext
 ): Promise<AgentDecision> {
-  const origin = (() => {
-    try {
-      return new URL(ctx.url).origin;
-    } catch {
-      return "";
-    }
-  })();
-  const deeplinks = [
-    ["Live", "/"],
-    ["Leaderboard", "/leaderboard"],
-    ["Matches", "/matches"],
-    ["Agents", "/agents"],
-    ["Blog", "/blog"],
-    ["About", "/about"],
-  ]
-    .map(([label, path]) => `${label} -> ${origin}${path}`)
-    .join(", ");
+  const deeplinks = SECTIONS.map((s) => `${s.label} -> ${s.url}`).join(", ");
 
   const grounding = `Current page: ${ctx.title || "(untitled)"} (${ctx.url})
 Section deep-links (navigate() to one of these to switch sections): ${deeplinks}
