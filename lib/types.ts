@@ -2,6 +2,7 @@ import type { ChangeEvent } from "react";
 
 export type Screen = "landing" | "form" | "room" | "dashboard";
 
+/** Manually-entered pre-call fields. Identity from the form (name/email). */
 export interface FormState {
   name: string;
   email: string;
@@ -92,6 +93,8 @@ export interface DemoVals {
   goForm: () => void;
   goDashboard: () => void;
   startDemo: () => void;
+
+  recallLine?: string; // "welcome back…" for returning buyers
 
   form: FormState;
   onName: FieldChange;

@@ -87,12 +87,13 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
         <div className="grid grid-cols-2 gap-y-4 gap-x-[18px]">
           <label className="col-span-1 flex flex-col gap-[7px]">
             <span className="text-[13px] font-semibold text-ink2">
-              Full name
+              Your name
             </span>
             <input
+              type="text"
               value={vals.form.name}
               onChange={vals.onName}
-              placeholder="Jordan Lee"
+              placeholder="Alex"
               className={fieldClass}
             />
           </label>
@@ -101,9 +102,10 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
               Work email
             </span>
             <input
+              type="email"
               value={vals.form.email}
               onChange={vals.onEmail}
-              placeholder="jordan@company.com"
+              placeholder="alex@company.com"
               className={fieldClass}
             />
           </label>

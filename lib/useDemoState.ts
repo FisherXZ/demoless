@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { enterDemo } from "./actions";
 import {
   SECTIONS,
   CAPTIONS,
@@ -28,6 +29,7 @@ interface DemoState {
   captionsOn: boolean;
   selectedId: string | null;
   elapsed: number;
+  recallLine?: string;
   form: FormState;
 }
 
@@ -127,8 +129,26 @@ export function useDemoState(): DemoVals {
     goLanding: () => patch({ screen: "landing" }),
     goForm: () => patch({ screen: "form" }),
     goDashboard: () => patch({ screen: "dashboard", selectedId: null }),
-    startDemo: () =>
-      patch({ screen: "room", moment: 0, elapsed: 0, paused: false }),
+    startDemo: async () => {
+      // Persist the buyer into P4 Redis and pull recall before entering.
+      // Identity comes from the form email (NextAuth deferred to later phase).
+      const { recallLine } = await enterDemo({
+        email: form.email,
+        name: form.name,
+        role: form.role,
+        size: form.size,
+        useCase: form.useCase,
+      });
+      patch({
+        screen: "room",
+        moment: 0,
+        elapsed: 0,
+        paused: false,
+        recallLine,
+      });
+    },
+
+    recallLine: s.recallLine,
 
     form,
     onName: (e) => setF("name", e.target.value),
