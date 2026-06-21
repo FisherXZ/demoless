@@ -19,7 +19,6 @@ import {
 } from "./orchestrator";
 import type { ConversationTurn } from "./orchestrator/types";
 import { createTts, type TtsProvider } from "./tts";
-import { ChunkChannel } from "./util/chunkChannel";
 import {
   startSession as defaultStartSession,
   stopSession as defaultStopSession,
@@ -45,6 +44,7 @@ import {
   defaultDemoSessionFinalizer,
   type DemoSessionFinalizer,
 } from "./demoSession/finalize";
+import { streamSpeechTurn } from "./demoSession/speech";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
@@ -544,93 +544,35 @@ export class VoiceSession {
     turn: number,
     signal: AbortSignal
   ): Promise<string[]> {
-    const jobs: { text: string; filler: boolean; channel: ChunkChannel }[] = [];
     const spoken: string[] = [];
-    let producerDone = false;
-    let wake: (() => void) | null = null;
-    const wakeConsumer = () => {
-      if (wake) {
-        const w = wake;
-        wake = null;
-        w();
-      }
-    };
-
-    // Producer: pull sentences and kick off their synthesis immediately.
-    const producer = (async () => {
-      try {
-        for await (const { text, filler } of texts) {
-          if (signal.aborted) break;
-          const channel = new ChunkChannel();
-          jobs.push({ text, filler, channel });
-          wakeConsumer();
-          void (async () => {
-            try {
-              for await (const chunk of this.tts.synthesize(
-                text,
-                this.language,
-                signal
-              )) {
-                if (signal.aborted) break;
-                channel.push(chunk);
-              }
-            } catch (err) {
-              if (!signal.aborted) {
-                this.send({
-                  t: "error",
-                  message: `TTS: ${(err as Error).message}`,
-                });
-              }
-            } finally {
-              channel.close();
-            }
-          })();
-        }
-      } finally {
-        producerDone = true;
-        wakeConsumer();
-      }
-    })();
-
-    // Consumer: send each sentence's caption + audio chunks in order.
-    let i = 0;
-    let seq = 0;
-    while (!signal.aborted) {
-      if (i >= jobs.length) {
-        if (producerDone) break;
-        // Register the waiter, then re-check to avoid a missed wakeup.
-        const waited = new Promise<void>((res) => {
-          wake = res;
-        });
-        if (i < jobs.length || producerDone) {
-          wake = null;
-        } else {
-          await waited;
-        }
+    for await (const event of streamSpeechTurn({
+      texts,
+      tts: this.tts,
+      language: this.language,
+      turn,
+      signal,
+    })) {
+      if (event.type === "say") {
+        this.send({ t: "say", text: event.text, turn: event.turn });
+        this.noteAgentWords(event.text);
+        this.agentSpeaking = true;
+        this.setState("speaking");
+        if (!event.filler) spoken.push(event.text);
         continue;
       }
-
-      const job = jobs[i++];
-      this.send({ t: "say", text: job.text, turn });
-      this.noteAgentWords(job.text);
-      this.agentSpeaking = true;
-      this.setState("speaking");
-      // Filler lines are spoken aloud but excluded from history.
-      if (!job.filler) spoken.push(job.text);
-
-      for await (const chunk of job.channel) {
-        if (signal.aborted) break;
+      if (event.type === "audio") {
         this.send({
           t: "tts_chunk",
-          b64: chunk.toString("base64"),
+          b64: event.chunk.toString("base64"),
           sampleRate: AUDIO_SAMPLE_RATE,
-          turn,
-          seq: seq++,
+          turn: event.turn,
+          seq: event.seq,
         });
+        continue;
       }
+      this.send({ t: "error", message: event.message });
     }
 
-    await producer;
     return spoken;
   }
 
