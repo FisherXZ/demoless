@@ -71,6 +71,35 @@ export function coerceReply(raw: unknown): Reply {
   return out;
 }
 
+export interface StreamRequest { system: string; messages: Anthropic.MessageParam[]; tools: Anthropic.Tool[] }
+export type ModelEvent =
+  | { kind: "text"; delta: string }
+  | { kind: "tool_use"; id: string; name: string; input: any }
+  | { kind: "end" };
+
+const MODEL = () => process.env.ANTHROPIC_MODEL ?? "claude-opus-4-8";
+
+export async function* streamWithTools(req: StreamRequest): AsyncIterable<ModelEvent> {
+  const stream = getClient().messages.stream({
+    model: MODEL(), max_tokens: 2048, system: req.system, messages: req.messages, tools: req.tools,
+    // 2048: matches main (e167048), avoids mid-output truncation
+  });
+  const toolBuf: Record<string, { name: string; json: string }> = {};
+  for await (const ev of stream as any) {
+    if (ev.type === "content_block_start" && ev.content_block?.type === "tool_use")
+      toolBuf[ev.index] = { name: ev.content_block.name, json: "" };
+    else if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta")
+      yield { kind: "text", delta: ev.delta.text };
+    else if (ev.type === "content_block_delta" && ev.delta?.type === "input_json_delta")
+      toolBuf[ev.index].json += ev.delta.partial_json;
+    else if (ev.type === "content_block_stop" && toolBuf[ev.index]) {
+      const b = toolBuf[ev.index];
+      yield { kind: "tool_use", id: String(ev.index), name: b.name, input: b.json ? JSON.parse(b.json) : {} };
+    }
+  }
+  yield { kind: "end" };
+}
+
 export async function complete(req: CompleteRequest): Promise<Reply> {
   if (useStub()) return Reply.parse(stub(req));
   try {
