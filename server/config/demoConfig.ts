@@ -11,3 +11,16 @@ export interface DemoConfig {
   /** Optional seed text for corpus bootstrapping; may be empty. */
   corpusSeed: string;
 }
+
+const BROWSERBASE: DemoConfig = {
+  company: "browserbase",
+  productName: "Browserbase",
+  persona: process.env.DEMO_PERSONA ?? "Maya",
+  browseTargetUrl: process.env.DEMO_BROWSE_URL ?? "https://www.browserbase.com",
+  corpusSeed: "browserbase",
+};
+
+export function getDemoConfig(company = "browserbase"): DemoConfig {
+  if (company === "browserbase") return BROWSERBASE;
+  throw new Error(`no DemoConfig for company '${company}'`);
+}
