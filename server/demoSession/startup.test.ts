@@ -43,6 +43,7 @@ describe("demo session startup", () => {
       createOrchestrator,
       loadBuyer,
       getLearnings,
+      learningsEnabled: true,
       buildLearningsContext: (learnings) =>
         `Past demo learnings:\n${learnings.map((l) => `- ${l.text}`).join("\n")}`,
       getDemoConfig: () => ({
@@ -83,6 +84,49 @@ describe("demo session startup", () => {
       learningsContext: "Past demo learnings:\n- Show sessions before pricing.",
       orchestrator,
     });
+  });
+
+  it("skips learnings entirely when disabled (default)", async () => {
+    const getLearnings = vi.fn(async () => [
+      { id: "l1", text: "Show sessions before pricing.", confidence: 0.9, ts: 4 },
+    ]);
+    const buildLearningsContext = vi.fn(() => "should not be used");
+
+    const startup = createDemoSessionStartup({
+      startSession: vi.fn(async () => ({
+        liveViewUrl: "https://live.example.com/final",
+        sessionId: "bb-123",
+        url: "https://browserbase.test/",
+        title: "Browserbase",
+      })),
+      createOrchestrator: vi.fn(() => ({ runTurn: vi.fn(async function* () {}) })),
+      loadBuyer: vi.fn(async () => ({
+        profile: { email: "buyer@example.com", firstSeen: 1, lastSeen: 2, visitCount: 1 },
+        notes: [],
+        isReturning: false,
+        recall: { line: "", topInterests: [], painPoints: [], objections: [] },
+      })),
+      getLearnings,
+      buildLearningsContext,
+      learningsEnabled: false,
+      getDemoConfig: () => ({
+        company: "browserbase",
+        productName: "Browserbase",
+        persona: "Messi",
+        browseTargetUrl: "https://browserbase.test/",
+        corpusSeed: "browserbase",
+      }),
+      log: vi.fn(),
+    });
+
+    const prepared = await startup.prepare({
+      buyerId: "buyer@example.com",
+      onLiveView: vi.fn(),
+    });
+
+    expect(getLearnings).not.toHaveBeenCalled();
+    expect(buildLearningsContext).not.toHaveBeenCalled();
+    expect(prepared.learningsContext).toBe("");
   });
 
   it("prewarms once and lets the next prepare adopt the warm browser", async () => {
@@ -211,6 +255,7 @@ describe("demo session startup", () => {
       getLearnings: vi.fn(async () => {
         throw new Error("learnings down");
       }),
+      learningsEnabled: true,
       getDemoConfig: () => ({
         company: "browserbase",
         productName: "Browserbase",
