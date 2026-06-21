@@ -175,7 +175,7 @@ it never loops for ambiance.
   is two clean cards, not a single CTA.
 - **Demo room** — full-screen `night`. Center = real Browserbase live-view. Right
   rail = **live memory panel** (signal cards stream in). Thin `brand` progress bar
-  over the product (replaces the section rail). Maya tile flat (no gradient), with a
+  over the product (replaces the section rail). Messi tile flat (no gradient), with a
   `live`-green speaking pulse. Captions over a functional scrim.
 
 ### New — dashboard patterns (build these to spec)

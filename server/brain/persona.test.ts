@@ -11,6 +11,7 @@ describe("detectPersona", () => {
       "CTO",
       "IT / Security",
       "Data Scientist",
+      "Machine Learning Lead",
       "Sales Engineer",
     ]) {
       expect(detectPersona(role)).toBe("technical");

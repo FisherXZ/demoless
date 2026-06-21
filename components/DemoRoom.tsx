@@ -35,7 +35,7 @@ function statusLabel(status: string, name: string): string {
 }
 
 interface ChatMsg {
-  role: "maya" | "you";
+  role: "messi" | "you";
   text: string;
 }
 
@@ -50,16 +50,16 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Agent name follows the selected voice model; fall back to "Maya" before a
+  // Agent name follows the selected voice model; fall back to "Messi" before a
   // voice session reports its name.
-  const agentName = voice.active && voice.agentName ? voice.agentName : "Maya";
+  const agentName = voice.active && voice.agentName ? voice.agentName : "Messi";
 
-  const mayaSpeaking = voice.agentSpeaking;
+  const agentSpeaking = voice.agentSpeaking;
 
   // Captions: prefer real spoken text once the voice loop is running. Swap any
-  // "Maya" in the caption for the configured name so it stays consistent.
+  // default agent-name mentions in the caption for the configured name.
   const rawCaption = voice.lastCaption || vals.caption;
-  const mayaCaption = rawCaption.replace(/Maya/g, agentName);
+  const agentCaption = rawCaption.replace(/Messi/g, agentName);
 
   // Cycle through every configured language (EN -> ES -> 中文 -> EN).
   const langCodes = Object.keys(LANGUAGES) as Language[];
@@ -71,7 +71,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
   }, [messages]);
 
   // Auto-start the moment the room mounts: the visitor already clicked
-  // "Join AI Demo", so Maya connects + greets immediately with no extra click.
+  // "Join AI Demo", so the agent connects + greets immediately with no extra click.
   const autoStarted = useRef(false);
   useEffect(() => {
     if (autoStarted.current) return;
@@ -148,7 +148,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
 
       {/* Stage */}
       <div className="flex-1 flex gap-3.5 px-5 pb-3.5 min-h-0">
-        {/* Product share — the real cloud browser Maya drives */}
+        {/* Product share — the real cloud browser the agent drives */}
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="relative flex-1 min-h-0 overflow-hidden rounded-[14px] border border-coal bg-white shadow-[0_1px_2px_rgba(0,0,0,0.35)]">
             <div className="h-11 border-b border-hair flex items-center gap-3.5 px-4 flex-none">
@@ -210,7 +210,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               )}
             </div>
 
-            {/* Maya avatar tile */}
+            {/* Agent avatar tile */}
             <div className="absolute bottom-3.5 right-3.5 h-[116px] w-[168px] overflow-hidden rounded-[12px] border border-coalline bg-coal shadow-[0_1px_2px_rgba(0,0,0,0.35)]">
               <div className="absolute inset-0 flex items-center justify-center text-white/90 text-3xl font-bold">
                 {agentName.charAt(0).toUpperCase()}
@@ -219,7 +219,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               <div className="absolute left-2 bottom-[7px] flex items-center gap-1.5 pointer-events-none">
                 <span className="relative w-[9px] h-[9px]">
                   <span className="absolute inset-0 rounded-full bg-live" />
-                  {mayaSpeaking && (
+                  {agentSpeaking && (
                     <span
                       className="absolute -inset-1 rounded-full bg-live"
                       style={{ animation: "dlSpeak 1.3s infinite" }}
@@ -248,14 +248,14 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                   <span className="text-[#a5b4fc] font-bold text-xs font-mono">
                     {agentName.toUpperCase()}&nbsp;&nbsp;
                   </span>
-                  {mayaCaption}
+                  {agentCaption}
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Chat panel — drive Maya by text (voice drives her in parallel) */}
+        {/* Chat panel — drive the agent by text (voice drives in parallel) */}
         <div className="w-[330px] flex-none bg-night2 rounded-[14px] flex flex-col overflow-hidden">
           <div className="px-4 py-3 border-b border-coalline flex-none">
             <div className="text-[11px] tracking-[0.1em] uppercase text-dim font-bold font-mono">
@@ -307,7 +307,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                 if (e.key === "Enter") send(input);
               }}
               disabled={!voice.active}
-              placeholder={voice.active ? "Ask Maya to show you…" : "Start the demo first"}
+              placeholder={voice.active ? `Ask ${agentName} to show you…` : "Start the demo first"}
               className="flex-1 min-w-0 bg-night3 border border-coalline rounded-lg px-3 py-2 text-sm text-white placeholder:text-dim disabled:opacity-50"
             />
             <button

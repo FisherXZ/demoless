@@ -1,6 +1,6 @@
 # Demoless P2 - Voice Agent
 
-The voice layer for Demoless: it lets a prospect talk to "Maya" (the AI rep) by
+The voice layer for Demoless: it lets a prospect talk to "Messi" (the AI rep) by
 voice and hear spoken answers, with barge-in and a language toggle. It is built
 as a self-contained, mergeable slice so it drops in alongside P1 (LLM loop),
 P3 (browser), P4 (memory), and P5 (frontend).
@@ -70,8 +70,8 @@ PcmPlayer (Web Audio queue) <--tts_chunk--- TtsProvider (Aura-2 REST) ----------
 
 ### UI
 - `components/DemoRoom.tsx` - the mic button starts/stops the voice loop, the
-  caption overlay shows the live prospect transcript + Maya's spoken text, the
-  Maya tile pulses only while she's actually speaking, and an EN/ES toggle
+  caption overlay shows the live prospect transcript + Messi's spoken text, the
+  Messi tile pulses only while speaking, and an EN/ES toggle
   switches languages. Changes are additive: without a voice server the mock
   prototype still runs.
 
@@ -88,11 +88,11 @@ PcmPlayer (Web Audio queue) <--tts_chunk--- TtsProvider (Aura-2 REST) ----------
    npm run dev:all        # web on :3000, voice gateway on :3001
    ```
    Or separately: `npm run dev` and `npm run dev:voice`.
-3. Open http://localhost:3000, start a demo, and click the mic button. Maya
+3. Open http://localhost:3000, start a demo, and click the mic button. Messi
    greets you; ask a product question and you should hear a spoken answer.
 
 Headphones recommended on stage: the mic + speakers in the same room can let
-Maya's own voice trigger barge-in.
+Messi's own voice trigger barge-in.
 
 ## The P1 integration boundary
 

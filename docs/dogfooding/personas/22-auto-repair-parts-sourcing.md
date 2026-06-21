@@ -45,7 +45,7 @@
 - **Setup:** RockAuto needs no login (use it as the no-auth anchor). For the gated portals, use **sandbox / throwaway shop-demo accounts only** if available; otherwise script those beats as **expected auth-wall dead-ends** and log them — never enter a real shop's live commercial credentials. No real PII; the "customer" and vehicle are fictional.
 - **Intent you bring in:** "I run a 3-bay shop. For a 2016 Honda CR-V 2.4L front brake job I need the cheapest in-stock-today pads and rotors, OE-or-better — check my suppliers and tell me where to buy, but don't order."
 - **Session script (beats):**
-  1. Say the vehicle + parts + quality bar once; watch Maya restate it back (confirm she captured VIN/engine, not just model).
+  1. Say the vehicle + parts + quality bar once; watch Messi restate it back (confirm she captured VIN/engine, not just model).
   2. Ask her to start with RockAuto; watch the browser walk Make→Year→Model→engine→brakes and read prices + closeout flags aloud.
   3. Ask "now check WorldPac speedDIAL" → watch her hit the login wall and **hand off for credentials/MFA** (don't give real ones — confirm she pauses and asks).
   4. Repeat the handoff probe for O'Reilly First Call and AutoZone Pro; note whether she re-enters the vehicle cleanly each time or loses context.

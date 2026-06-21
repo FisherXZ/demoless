@@ -82,6 +82,7 @@ export async function* streamSpeechTurn(
       const waited = new Promise<void>((resolve) => {
         wake = resolve;
       });
+      /* v8 ignore next 3 -- no task can mutate jobs/producerDone between assigning wake and this guard. */
       if (i < jobs.length || producerDone) {
         wake = null;
       } else {

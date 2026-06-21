@@ -11,7 +11,7 @@ async function collect<T>(events: AsyncIterable<T>): Promise<T[]> {
 describe("demo session speech streaming", () => {
   it("streams captions and audio in text order while excluding filler from the interface", async () => {
     const tts: TtsProvider = {
-      voiceName: vi.fn().mockReturnValue("Maya"),
+      voiceName: vi.fn().mockReturnValue("Messi"),
       synthesize: vi.fn(async function* (text: string) {
         yield Buffer.from(`audio:${text}`);
       }),
@@ -60,7 +60,7 @@ describe("demo session speech streaming", () => {
 
   it("emits a TTS error after the caption when synthesis fails", async () => {
     const tts: TtsProvider = {
-      voiceName: vi.fn().mockReturnValue("Maya"),
+      voiceName: vi.fn().mockReturnValue("Messi"),
       synthesize: vi.fn(async function* () {
         throw new Error("provider down");
       }),
@@ -89,7 +89,7 @@ describe("demo session speech streaming", () => {
   it("suppresses TTS errors raised after the turn is aborted", async () => {
     const ac = new AbortController();
     const tts: TtsProvider = {
-      voiceName: vi.fn().mockReturnValue("Maya"),
+      voiceName: vi.fn().mockReturnValue("Messi"),
       synthesize: vi.fn(async function* () {
         ac.abort();
         throw new Error("late provider failure");
@@ -122,7 +122,7 @@ describe("demo session speech streaming", () => {
     const ac = new AbortController();
     ac.abort();
     const tts: TtsProvider = {
-      voiceName: vi.fn().mockReturnValue("Maya"),
+      voiceName: vi.fn().mockReturnValue("Messi"),
       synthesize: vi.fn(async function* () {
         yield Buffer.from("never");
       }),
@@ -149,7 +149,7 @@ describe("demo session speech streaming", () => {
   it("drops queued audio if the signal aborts before the consumer drains it", async () => {
     const ac = new AbortController();
     const tts: TtsProvider = {
-      voiceName: vi.fn().mockReturnValue("Maya"),
+      voiceName: vi.fn().mockReturnValue("Messi"),
       synthesize: vi.fn(async function* () {
         yield Buffer.from("late audio");
         ac.abort();
@@ -178,7 +178,7 @@ describe("demo session speech streaming", () => {
   it("drops a TTS chunk that arrives after the signal is aborted", async () => {
     const ac = new AbortController();
     const tts: TtsProvider = {
-      voiceName: vi.fn().mockReturnValue("Maya"),
+      voiceName: vi.fn().mockReturnValue("Messi"),
       synthesize: vi.fn(async function* () {
         ac.abort();
         yield Buffer.from("late audio");

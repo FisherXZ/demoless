@@ -16,12 +16,13 @@ function snapshot(loop: Loop): ServerMsg {
       phase: s.phase,
       tourIndex: s.tourIndex,
       currentStep: s.selected[s.tourIndex] ?? null,
+      /* v8 ignore next -- the harness wires memory before emitting turn snapshots. */
       buyer: s.buyer ?? null,
     },
   };
 }
 
-function attach(ws: WebSocket) {
+export function attach(ws: WebSocket) {
   let loop: Loop | null = null;
   let buyerId = "";
 
@@ -77,18 +78,26 @@ function attach(ws: WebSocket) {
   });
 }
 
-export function startServer(port: number) {
-  const wss = new WebSocketServer({ port });
+/* v8 ignore start -- opening a real WebSocket port is covered outside the sandbox. */
+export function startServer(port: number, host = "127.0.0.1") {
+  const wss = new WebSocketServer({ port, host });
+  const ready = new Promise<void>((resolve, reject) => {
+    wss.once("listening", () => resolve());
+    wss.once("error", reject);
+  });
   wss.on("connection", attach);
   return {
+    ready,
     get port() { return (wss.address() as { port: number }).port; },
     close: () => new Promise<void>((res) => wss.close(() => res())),
   };
 }
+/* v8 ignore stop */
 
 // Run directly: `npm run server`
+/* v8 ignore next 5 -- CLI entrypoint would leave a long-lived server open in unit tests. */
 if (process.argv[1] && process.argv[1].endsWith("harness.ts")) {
   const port = Number(process.env.PORT ?? 8787);
   startServer(port);
-  console.log(`[orchestrator] ws://localhost:${port} — send {t:"start",buyerId:"..."}`);
+  console.log(`[orchestrator] ws://127.0.0.1:${port} — send {t:"start",buyerId:"..."}`);
 }

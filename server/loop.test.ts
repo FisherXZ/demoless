@@ -64,6 +64,17 @@ describe("Loop", () => {
     expect(loop.getState().tourIndex).toBe(1);
   });
 
+  it("applies object tour jumps within the selected catalog bounds", async () => {
+    mockComplete.mockResolvedValue({ commands: [], tour: { jump: 10 } });
+    const loop = new Loop("s1", "u1");
+    (loop.getState() as { selected: string[] }).selected = ["a", "b", "c"];
+
+    loop.send({ kind: "user_said", text: "jump", final: true });
+    await flush();
+
+    expect(loop.getState().tourIndex).toBe(2);
+  });
+
   it("buyer_loaded updates state without a turn", async () => {
     const loop = new Loop("s1", "u1");
     const got: Command[] = [];
@@ -73,5 +84,24 @@ describe("Loop", () => {
     expect(got).toHaveLength(0);
     expect(loop.getState().buyer?.id).toBe("u1");
     expect(mockComplete).not.toHaveBeenCalled();
+  });
+
+  it("logs a failed turn and keeps the queue usable for the next turn", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockComplete
+      .mockRejectedValueOnce(new Error("model failed"))
+      .mockResolvedValueOnce({ commands: [{ kind: "say", text: "recovered" }] });
+    const loop = new Loop("s1", "u1");
+    const got: Command[] = [];
+    loop.onCommand((c) => got.push(c));
+
+    loop.send({ kind: "user_said", text: "first", final: true });
+    await flush();
+    loop.send({ kind: "user_said", text: "second", final: true });
+    await flush();
+
+    expect(error).toHaveBeenCalledWith("[loop] turn failed:", expect.any(Error));
+    expect(got).toEqual([{ kind: "say", text: "recovered" }]);
+    error.mockRestore();
   });
 });

@@ -29,6 +29,7 @@ export function parseLearnings(raw: string): LearningInput[] {
   if (start === -1 || end === -1 || end < start) return [];
   try {
     const arr = JSON.parse(raw.slice(start, end + 1));
+    /* v8 ignore next -- defensive only: the extracted window is bracket-delimited. */
     if (!Array.isArray(arr)) return [];
     return arr
       .filter((x) => x && typeof x.text === "string" && x.text.trim())

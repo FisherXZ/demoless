@@ -5,7 +5,7 @@ import type { DemoConfig } from "../config/demoConfig";
 const cfg: DemoConfig = {
   company: "browserbase",
   productName: "Browserbase",
-  persona: "Maya",
+  persona: "Messi",
   browseTargetUrl: "https://www.browserbase.com",
   corpusSeed: "",
 };
@@ -48,5 +48,22 @@ describe("buildSystem discovery contract", () => {
     expect(system).toMatch(/do not assign/i);
     expect(system).toMatch(/scores/i);
     expect(system).toMatch(/certainty/i);
+  });
+
+  it("uses the runtime voice-derived agent name in configured prompts", () => {
+    const system = buildSystem(
+      {
+        ...cfg,
+        systemPrompt:
+          "You are Messi, a friendly Browserbase sales rep. Messi asks one question at a time.",
+      },
+      "",
+      undefined,
+      "Thalia"
+    );
+
+    expect(system).toContain("You are Thalia");
+    expect(system).toContain("Thalia asks one question");
+    expect(system).not.toContain("Messi");
   });
 });

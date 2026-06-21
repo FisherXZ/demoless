@@ -48,7 +48,7 @@ describe("demo session startup", () => {
       getDemoConfig: () => ({
         company: "browserbase",
         productName: "Browserbase",
-        persona: "Maya",
+        persona: "Messi",
         browseTargetUrl: "https://browserbase.test/",
         corpusSeed: "browserbase",
       }),
@@ -112,7 +112,7 @@ describe("demo session startup", () => {
       getDemoConfig: () => ({
         company: "browserbase",
         productName: "Browserbase",
-        persona: "Maya",
+        persona: "Messi",
         browseTargetUrl: "https://browserbase.test/",
         corpusSeed: "browserbase",
       }),
@@ -171,7 +171,7 @@ describe("demo session startup", () => {
       getDemoConfig: () => ({
         company: "browserbase",
         productName: "Browserbase",
-        persona: "Maya",
+        persona: "Messi",
         browseTargetUrl: "https://browserbase.test/",
         corpusSeed: "browserbase",
       }),
@@ -214,7 +214,7 @@ describe("demo session startup", () => {
       getDemoConfig: () => ({
         company: "browserbase",
         productName: "Browserbase",
-        persona: "Maya",
+        persona: "Messi",
         browseTargetUrl: "https://browserbase.test/",
         corpusSeed: "browserbase",
       }),

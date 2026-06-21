@@ -115,3 +115,28 @@ describe("publishPhase", () => {
     await unsub();
   });
 });
+
+describe("malformed payloads", () => {
+  it("ignores malformed JSON payloads without crashing the subscriber", async () => {
+    const received: unknown[] = [];
+    const unsub = await createNotesSubscriber((e) => received.push(e));
+
+    await (await import("./redis")).getRedis().publish("demoless:notes", "{nope");
+
+    expect(received).toHaveLength(0);
+    await unsub();
+  });
+
+  it("ignores messages published on unrelated channels", async () => {
+    const received: unknown[] = [];
+    const unsub = await createNotesSubscriber((e) => received.push(e));
+
+    await (await import("./redis")).getRedis().publish(
+      "demoless:other",
+      JSON.stringify({ type: "note_added", note })
+    );
+
+    expect(received).toHaveLength(0);
+    await unsub();
+  });
+});
