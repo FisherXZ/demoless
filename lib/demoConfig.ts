@@ -12,7 +12,9 @@ function dashboardBase(url: string): string {
   try {
     const u = new URL(url);
     u.pathname = u.pathname.replace(/\/[^/]*\/?$/, "");
-    return u.origin + u.pathname;
+    // Assigning an empty pathname normalizes back to "/", so strip any trailing
+    // slash here — otherwise `${BASE}/overview` double-slashes for a root URL.
+    return (u.origin + u.pathname).replace(/\/$/, "");
   } catch {
     return "https://www.browserbase.com";
   }

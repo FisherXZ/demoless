@@ -27,3 +27,11 @@ export function companySlug(company: string): string {
 export function chunkKey(company: string, id: string): string {
   return `${KB_PREFIX}${companySlug(company)}:${id}`;
 }
+
+/** Key prefix for the source-of-record hashes (curated prose, not derived vectors). */
+export const KB_SOURCE_PREFIX = "demoless:kb-source:";
+
+/** Hash holding one curated source doc: `demoless:kb-source:{company}:{docId}`. */
+export function sourceKey(company: string, id: string): string {
+  return `${KB_SOURCE_PREFIX}${companySlug(company)}:${id}`;
+}

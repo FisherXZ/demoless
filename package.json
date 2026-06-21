@@ -15,6 +15,9 @@
     "test:watch": "vitest",
     "memory:smoke": "tsx scripts/memory-smoke.ts",
     "knowledge:seed": "tsx scripts/knowledge-seed.ts",
+    "knowledge:curate": "tsx scripts/knowledge-curate.ts",
+    "knowledge:reindex": "tsx scripts/knowledge-reindex.ts",
+    "knowledge:export": "tsx scripts/knowledge-export.ts",
     "knowledge:smoke": "tsx scripts/knowledge-smoke.ts"
   },
   "dependencies": {
