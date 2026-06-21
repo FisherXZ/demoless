@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { NS, sessionKey, recapKey, SESSIONS_INDEX, replayUrl } from "./keys";
+import { NS, sessionKey, recapKey, SESSIONS_INDEX, buyerSessionsKey, replayUrl } from "./keys";
 
 describe("sessions keys", () => {
   it("namespaces session and recap keys by id", () => {
@@ -8,7 +8,10 @@ describe("sessions keys", () => {
     expect(recapKey("s1")).toBe("demoless:session:s1:recap");
     expect(SESSIONS_INDEX).toBe("demoless:sessions");
   });
-  it("builds a browserbase replay url", () => {
-    expect(replayUrl("s1")).toBe("https://www.browserbase.com/sessions/s1");
+  it("namespaces a buyer's session index by email", () => {
+    expect(buyerSessionsKey("a@b.com")).toBe("demoless:buyer:a@b.com:sessions");
+  });
+  it("builds a browserbase replay url from the browserbase session id", () => {
+    expect(replayUrl("bb1")).toBe("https://www.browserbase.com/sessions/bb1");
   });
 });

@@ -20,6 +20,7 @@ describe("demo session finalizer", () => {
     });
 
     finalizer.finalize({
+      id: "demo-789",
       browserSessionId: "bb-789",
       company: "browserbase",
       role: "Founder",
@@ -45,10 +46,11 @@ describe("demo session finalizer", () => {
     const record = saveSession.mock.calls[0][0];
     expect(record).toBe(analyzeAndStore.mock.calls[0][0]);
     expect(record).toMatchObject({
-      id: "bb-789",
+      id: "demo-789",
       company: "browserbase",
       role: "Founder",
       phaseReached: "WALKTHROUGH",
+      browserbaseSessionId: "bb-789",
       replayUrl: "https://replay.example.com/bb-789",
       transcript: [
         expect.objectContaining({ role: "user", text: "we need SOC2 proof" }),

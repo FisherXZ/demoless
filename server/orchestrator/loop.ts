@@ -29,10 +29,10 @@ export class LoopOrchestrator implements Orchestrator {
     const product = this.deps.cfg.productName;
     const base =
       lang === "zh"
-        ? `你好，我是${agentName}。要我带你快速了解一下${product}吗？`
+        ? `你好，我是${agentName}。你今天想了解${product}的哪件事？`
         : lang === "es"
-          ? `Hola, soy ${agentName}. ¿Quieres que te muestre ${product}?`
-          : `Hi, I'm ${agentName}. Want me to walk you through ${product}?`;
+          ? `Hola, soy ${agentName}. ¿Qué estás tratando de entender sobre ${product} hoy?`
+          : `Hi, I'm ${agentName}. What are you trying to figure out about ${product} today?`;
     if (buyer?.isReturning && buyer.recall.line) {
       return `${buyer.recall.line} ${base}`;
     }

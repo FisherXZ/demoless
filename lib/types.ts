@@ -1,20 +1,16 @@
 import type { ChangeEvent } from "react";
+import type { BuyerIdentity } from "./voice/messages";
 
 export type Screen = "landing" | "form" | "room" | "dashboard";
 
-/** Manually-entered pre-call fields. Identity from the form (name/email). */
+/** Identity captured by the pre-call form. Audience persona is no longer
+ *  pre-collected — the agent learns it through discovery. */
 export interface FormState {
   name: string;
   email: string;
-  role: string;
-  size: string;
-  useCase: string;
-  pain: string;
 }
 
-export type FieldChange = (
-  e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-) => void;
+export type FieldChange = (e: ChangeEvent<HTMLInputElement>) => void;
 
 export interface Lead {
   id: string;
@@ -101,14 +97,11 @@ export interface DemoVals {
   startDemo: () => void;
 
   recallLine?: string; // "welcome back…" for returning buyers
+  buyerIdentity?: BuyerIdentity;
 
   form: FormState;
   onName: FieldChange;
   onEmail: FieldChange;
-  onRole: FieldChange;
-  onSize: FieldChange;
-  onUseCase: FieldChange;
-  onPain: FieldChange;
 
   tailoredFor: string;
   clock: string;

@@ -48,7 +48,14 @@ async function main() {
   r.recordUser("what does it cost", 1);
   r.recordPage("https://acme.com/pricing", 1);
   r.recordAgent("It's $99 per seat.", 1);
-  const record = r.build({ id: ID, company: "Acme", role: "Engineer", phaseReached: "WALKTHROUGH" });
+  const record = r.build({
+    id: ID,
+    company: "Acme",
+    status: "ended",
+    createdAt: Date.now(),
+    role: "Engineer",
+    phaseReached: "WALKTHROUGH",
+  });
 
   await saveSession(record);
   check("session persisted", (await loadSession(ID))?.id === ID);

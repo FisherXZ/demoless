@@ -171,6 +171,9 @@ describe("VoiceSession — barge-in history recording", () => {
         }),
         stopSession: vi.fn().mockResolvedValue(undefined),
         createOrchestrator: vi.fn().mockReturnValue(fakeOrchestrator),
+        saveSession: vi.fn().mockResolvedValue(undefined),
+        loadSession: vi.fn().mockResolvedValue(null),
+        analyzeAndStore: vi.fn().mockResolvedValue(undefined),
       }
     );
 
@@ -178,7 +181,14 @@ describe("VoiceSession — barge-in history recording", () => {
     const [[, msgHandler]] = (ws.on as Mock).mock.calls.filter(
       (args: unknown[]) => args[0] === "message"
     );
-    await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
+    await msgHandler(
+      JSON.stringify({
+        t: "audio_start",
+        language: "en",
+        buyer: { demoSessionId: "demo-1", buyerEmail: "buyer@example.com" },
+      }),
+      false
+    );
     await waitForReady(ws);
 
     // Send text input — starts a turn
@@ -242,13 +252,23 @@ describe("VoiceSession — barge-in history recording", () => {
         }),
         stopSession: vi.fn().mockResolvedValue(undefined),
         createOrchestrator: vi.fn().mockReturnValue(fakeOrchestrator),
+        saveSession: vi.fn().mockResolvedValue(undefined),
+        loadSession: vi.fn().mockResolvedValue(null),
+        analyzeAndStore: vi.fn().mockResolvedValue(undefined),
       }
     );
 
     const [[, msgHandler]] = (ws.on as Mock).mock.calls.filter(
       (args: unknown[]) => args[0] === "message"
     );
-    await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
+    await msgHandler(
+      JSON.stringify({
+        t: "audio_start",
+        language: "en",
+        buyer: { demoSessionId: "demo-1", buyerEmail: "buyer@example.com" },
+      }),
+      false
+    );
     await waitForReady(ws);
 
     await msgHandler(

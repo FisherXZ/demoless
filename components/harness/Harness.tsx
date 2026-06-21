@@ -17,6 +17,10 @@ const NOTE_COLOR: Record<Note["type"], string> = {
   interest: "bg-goodsoft text-good",
   role: "bg-brandsoft text-branddeep",
   question: "bg-chip text-muted",
+  pain_point: "bg-warnsoft text-warn",
+  next_step: "bg-brandsoft text-branddeep",
+  persona: "bg-brandsoft text-branddeep",
+  preference: "bg-goodsoft text-good",
 };
 
 export default function Harness() {

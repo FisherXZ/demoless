@@ -29,9 +29,9 @@ export class StubOrchestrator implements Orchestrator {
 
   greeting(language: Language, agentName: string): string {
     if (language === "es") {
-      return `Hola, soy ${agentName}, la representante de Demoless. Encantada de mostrarte el producto. Que te gustaria ver primero?`;
+      return `Hola, soy ${agentName}, la representante de Demoless. ¿Qué estás tratando de entender hoy?`;
     }
-    return `Hi, I'm ${agentName}, your Demoless product specialist. Happy to walk you through it. What would you like to see first?`;
+    return `Hi, I'm ${agentName}, your Demoless product specialist. What are you trying to figure out today?`;
   }
 
   async *runTurn(
@@ -109,7 +109,11 @@ You are speaking out loud, so your replies must sound like natural speech:
 - Keep answers short: 1-3 sentences. This is a conversation, not a monologue.
 - No markdown, no bullet points, no lists, no emoji. Plain spoken sentences only.
 - Be warm and concrete. Use specific facts. If you don't know, say so briefly and offer to follow up.
-- End most turns with a light question to keep the conversation moving.
+- Run discovery before any generic walkthrough: learn why the buyer is here, the workflow or problem they care about, and the background they bring.
+- Ask one short question at a time. Do not ask a form-like list or multiple discovery questions in a row.
+- If the visitor directly asks for a specific area, answer or show that area first, then ask one short contextual follow-up.
+- Do not assign lead scores, intent scores, confidence labels, or certainty claims.
+- End most turns with at most one light question to keep the conversation moving.
 - ${lang}
 
 Ground every claim in these product facts. Do not invent pricing, security, or integration details that aren't here:
@@ -118,4 +122,3 @@ ${blob}${memory}
 
 ${personaBlock(context.role)}`;
 }
-

@@ -70,6 +70,18 @@ export const AUDIO_SAMPLE_RATE = 24000;
 /** High-level state of the agent, surfaced to the UI. */
 export type AgentState = "idle" | "listening" | "thinking" | "speaking";
 
+/**
+ * Verified identity for one live demo session. Created up-front by `enterDemo`
+ * (server action) and carried on the wire so the server records the session
+ * under the right buyer. Replaces the old self-reported `role` field — audience
+ * persona is now learned through discovery, not pre-collected on the form.
+ */
+export interface BuyerIdentity {
+  demoSessionId: string;
+  buyerEmail: string;
+  buyerName?: string;
+}
+
 /* ----------------------------------------------------------------------- *
  * Orchestrator output (the P1 boundary)
  * ----------------------------------------------------------------------- */
@@ -100,11 +112,7 @@ export interface AudioStartMessage {
   /** Sample rate of the PCM frames that will follow. */
   sampleRate: number;
   language: Language;
-  /**
-   * The visitor's self-reported role from the pre-call form. Used server-side
-   * to pick an audience persona (technical vs non-technical) for the prompt.
-   */
-  role?: string;
+  buyer: BuyerIdentity;
 }
 
 export interface AudioStopMessage {
@@ -125,8 +133,7 @@ export interface BargeInMessage {
 export interface TextInputMessage {
   t: "text_input";
   text: string;
-  /** Visitor role for persona selection (see {@link AudioStartMessage.role}). */
-  role?: string;
+  buyer?: BuyerIdentity;
 }
 
 /** Ask the server to pre-create the cloud browser before the mic is enabled,

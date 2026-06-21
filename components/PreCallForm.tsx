@@ -7,7 +7,6 @@ import { requestBrowserWarmup } from "@/lib/voice/warmBrowser";
 
 const fieldClass =
   "border border-line3 rounded-[10px] px-[14px] py-3 text-[15px] bg-white transition-colors focus:border-brand focus:shadow-[0_0_0_3px_#eef0ff]";
-const selectClass = `${fieldClass} appearance-none cursor-pointer`;
 
 export default function PreCallForm({ vals }: { vals: DemoVals }) {
   const agentName = useAgentName();
@@ -46,7 +45,7 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
           </div>
 
           <h2 className="text-[28px] font-extrabold tracking-[-.025em] leading-[1.15] m-0 mb-7 max-w-[360px]">
-            A few quick details so I can tailor your walkthrough.
+            A few quick details so I know who is joining.
           </h2>
 
           <div className="flex flex-col gap-4">
@@ -114,74 +113,6 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
               onChange={vals.onEmail}
               placeholder="alex@company.com"
               className={fieldClass}
-            />
-          </label>
-          <label className="col-span-1 flex flex-col gap-[7px]">
-            <span className="text-[13px] font-semibold text-ink2">
-              Your role
-            </span>
-            <select
-              value={vals.form.role}
-              onChange={vals.onRole}
-              className={selectClass}
-            >
-              <option>VP of Sales</option>
-              <option>Sales / RevOps</option>
-              <option>Founder / CEO</option>
-              <option>Marketing</option>
-              <option>Operations</option>
-              <option>Product Manager</option>
-              <option>Engineering / Developer</option>
-              <option>Data / ML</option>
-              <option>DevOps / Platform</option>
-              <option>IT / Security</option>
-              <option>Other</option>
-            </select>
-          </label>
-          <label className="col-span-1 flex flex-col gap-[7px]">
-            <span className="text-[13px] font-semibold text-ink2">
-              Company size
-            </span>
-            <select
-              value={vals.form.size}
-              onChange={vals.onSize}
-              className={selectClass}
-            >
-              <option>1–10</option>
-              <option>11–50</option>
-              <option>51–200</option>
-              <option>201–1,000</option>
-              <option>1,000+</option>
-            </select>
-          </label>
-          <label className="col-span-2 flex flex-col gap-[7px]">
-            <span className="text-[13px] font-semibold text-ink2">
-              Primary use case
-            </span>
-            <select
-              value={vals.form.useCase}
-              onChange={vals.onUseCase}
-              className={selectClass}
-            >
-              <option>Outbound sales</option>
-              <option>Inbound / PLG conversion</option>
-              <option>Partner &amp; channel demos</option>
-              <option>Customer onboarding</option>
-            </select>
-          </label>
-          <label className="col-span-2 flex flex-col gap-[7px]">
-            <span className="text-[13px] font-semibold text-ink2">
-              Biggest pain point{" "}
-              <span className="text-faint font-normal">
-                - so {agentName} can speak to it
-              </span>
-            </span>
-            <textarea
-              value={vals.form.pain}
-              onChange={vals.onPain}
-              placeholder="Reps waste hours demoing leads who never convert…"
-              rows={2}
-              className={`${fieldClass} resize-none leading-[1.4]`}
             />
           </label>
         </div>

@@ -15,11 +15,15 @@ function noteFor(text: string): NoteInput {
   const t = text.toLowerCase();
   const type: NoteInput["type"] = /\?$/.test(text.trim())
     ? "question"
-    : /(expensive|cost|price|pricing|budget)/.test(t)
-      ? "objection"
-      : /(i am|i'm|my role|we are|our team)/.test(t)
-        ? "role"
-        : "interest";
+    : /(next|follow up|send|book|schedule|trial)/.test(t)
+      ? "next_step"
+      : /(pain|problem|struggle|waste|slow|manual|hours|hard)/.test(t)
+        ? "pain_point"
+        : /(expensive|cost|price|pricing|budget)/.test(t)
+          ? "objection"
+          : /(i am|i'm|my role|we are|our team)/.test(t)
+            ? "role"
+            : "interest";
   return { type, value: text.trim().slice(0, 120) };
 }
 
@@ -66,7 +70,7 @@ export function createMockServer(emit: (m: ServerMsg) => void): MockServer {
         let buyer = buyers.get(msg.buyerId);
         const returning = !!buyer && buyer.notes.length > 0;
         if (!buyer) buyer = { id: msg.buyerId, notes: [] };
-        const lastInterest = buyer.notes.find((x) => x.type === "interest");
+        const lastMemory = buyer.notes[buyer.notes.length - 1];
         buyer = { ...buyer, name: buyer.name ?? msg.buyerId, lastSeen: new Date().toISOString() };
         buyers.set(msg.buyerId, buyer);
 
@@ -77,7 +81,7 @@ export function createMockServer(emit: (m: ServerMsg) => void): MockServer {
             cmd: {
               kind: "say",
               text: returning
-                ? `Welcome back, ${buyer!.name}! Last time you were interested in ${lastInterest?.value ?? "the product"}. Want to pick up there?`
+                ? `Welcome back, ${buyer!.name}! Last time you mentioned ${lastMemory?.value ?? "the product"}. What are you trying to figure out today?`
                 : `Hi ${buyer!.name}, I'm your demo agent. What brought you in today?`,
             },
           }),

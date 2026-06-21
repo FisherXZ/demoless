@@ -24,7 +24,12 @@ vi.mock("./bargeIn", () => ({
 }));
 vi.mock("../lib/memory/store", () => ({
   loadBuyer: vi.fn().mockResolvedValue({
-    profile: { email: "anonymous" },
+    profile: {
+      email: "anonymous",
+      firstSeen: 0,
+      lastSeen: 0,
+      visitCount: 1,
+    },
     notes: [],
     isReturning: false,
     recall: { line: "", topInterests: [], painPoints: [], objections: [] },
@@ -52,6 +57,16 @@ function makeWs() {
   };
 }
 
+async function waitForEvent(ws: ReturnType<typeof makeWs>, eventType: string) {
+  for (let i = 0; i < 25; i++) {
+    const events = ws.sent.map((s) => JSON.parse(s) as { t: string });
+    const event = events.find((e) => e.t === eventType);
+    if (event) return event;
+    await new Promise((r) => setTimeout(r, 1));
+  }
+  throw new Error(`Timed out waiting for ${eventType}`);
+}
+
 describe("VoiceSession — browser session ownership", () => {
   it("calls startSession with browseTargetUrl and emits live_view with the URL", async () => {
     const ws = makeWs();
@@ -73,19 +88,27 @@ describe("VoiceSession — browser session ownership", () => {
       startSession: fakeStartSession,
       stopSession: fakeStopSession,
       createOrchestrator: fakeCreateOrchestrator,
+      saveSession: vi.fn().mockResolvedValue(undefined),
+      loadSession: vi.fn().mockResolvedValue(null),
+      analyzeAndStore: vi.fn().mockResolvedValue(undefined),
     });
 
     // Simulate audio_start control message
     const [[, handler]] = (ws.on as Mock).mock.calls.filter(
       (args: unknown[]) => args[0] === "message"
     );
-    await handler(JSON.stringify({ t: "audio_start", language: "en" }), false);
+    await handler(
+      JSON.stringify({
+        t: "audio_start",
+        language: "en",
+        buyer: { demoSessionId: "demo-1", buyerEmail: "buyer@example.com" },
+      }),
+      false
+    );
 
-    await vi.waitFor(() => {
-      const events = ws.sent.map((s) => JSON.parse(s) as { t: string });
-      expect(events.some((e) => e.t === "ready")).toBe(true);
-    });
+    await waitForEvent(ws, "ready");
 
+    // Cold-start path passes the target URL plus an early live-view callback.
     expect(fakeStartSession).toHaveBeenCalledWith(
       getDemoConfig().browseTargetUrl,
       expect.any(Function)
@@ -120,17 +143,24 @@ describe("VoiceSession — browser session ownership", () => {
       startSession: fakeStartSession,
       stopSession: fakeStopSession,
       createOrchestrator: fakeCreateOrchestrator,
+      saveSession: vi.fn().mockResolvedValue(undefined),
+      loadSession: vi.fn().mockResolvedValue(null),
+      analyzeAndStore: vi.fn().mockResolvedValue(undefined),
     });
 
     // Trigger audio_start so sessionId gets set
     const [[, msgHandler]] = (ws.on as Mock).mock.calls.filter(
       (args: unknown[]) => args[0] === "message"
     );
-    await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
-    await vi.waitFor(() => {
-      const events = ws.sent.map((s) => JSON.parse(s) as { t: string });
-      expect(events.some((e) => e.t === "ready")).toBe(true);
-    });
+    await msgHandler(
+      JSON.stringify({
+        t: "audio_start",
+        language: "en",
+        buyer: { demoSessionId: "demo-1", buyerEmail: "buyer@example.com" },
+      }),
+      false
+    );
+    await waitForEvent(ws, "ready");
 
     // Trigger close
     const closeHandlerCall = (ws.on as Mock).mock.calls.find(
@@ -166,16 +196,23 @@ describe("VoiceSession — browser session ownership", () => {
       stopSession: fakeStopSession,
       createOrchestrator: fakeCreateOrchestrator,
       finalizer: fakeFinalizer,
+      saveSession: vi.fn().mockResolvedValue(undefined),
+      loadSession: vi.fn().mockResolvedValue(null),
+      analyzeAndStore: vi.fn().mockResolvedValue(undefined),
     });
 
     const [[, msgHandler]] = (ws.on as Mock).mock.calls.filter(
       (args: unknown[]) => args[0] === "message"
     );
-    await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
-    await vi.waitFor(() => {
-      const events = ws.sent.map((s) => JSON.parse(s) as { t: string });
-      expect(events.some((e) => e.t === "ready")).toBe(true);
-    });
+    await msgHandler(
+      JSON.stringify({
+        t: "audio_start",
+        language: "en",
+        buyer: { demoSessionId: "demo-1", buyerEmail: "buyer@example.com" },
+      }),
+      false
+    );
+    await waitForEvent(ws, "ready");
 
     const closeHandlerCall = (ws.on as Mock).mock.calls.find(
       (args: unknown[]) => args[0] === "close"
@@ -208,12 +245,22 @@ describe("VoiceSession — browser session ownership", () => {
       startSession: fakeStartSession,
       stopSession: fakeStopSession,
       createOrchestrator: fakeCreateOrchestrator,
+      saveSession: vi.fn().mockResolvedValue(undefined),
+      loadSession: vi.fn().mockResolvedValue(null),
+      analyzeAndStore: vi.fn().mockResolvedValue(undefined),
     });
 
     const [[, msgHandler]] = (ws.on as Mock).mock.calls.filter(
       (args: unknown[]) => args[0] === "message"
     );
-    await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
+    await msgHandler(
+      JSON.stringify({
+        t: "audio_start",
+        language: "en",
+        buyer: { demoSessionId: "demo-1", buyerEmail: "buyer@example.com" },
+      }),
+      false
+    );
 
     const closeHandlerCall = (ws.on as Mock).mock.calls.find(
       (args: unknown[]) => args[0] === "close"
