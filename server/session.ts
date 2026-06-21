@@ -799,7 +799,7 @@ export class VoiceSession {
         replayUrl: replayUrl(id),
       });
       void this.deps.saveSession(record).catch(() => {});
-      void this.deps.analyzeAndStore(record);
+      void this.deps.analyzeAndStore(record).catch(() => {});
     }
     this.cancelActive();
     void this.stopStt();

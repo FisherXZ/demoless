@@ -60,5 +60,6 @@ describe("VoiceSession analysis", () => {
     ws.emit("error", new Error("boom"));
     ws.emit("close");
     expect(saveSession).toHaveBeenCalledTimes(1);
+    expect(analyzeAndStore).toHaveBeenCalledTimes(1);
   });
 });
