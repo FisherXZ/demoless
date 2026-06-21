@@ -41,8 +41,15 @@ export function makeExecutor(d: ExecutorDeps): ToolExecutor {
             await d.memory.remember(d.buyerId, { text: input.note, type: input.type });
             return { ok: true, content: "noted" };
           case "search_knowledge": {
-            const hits = await d.knowledge.searchKnowledge(d.company, input.query);
-            return { ok: true, content: hits.length ? d.knowledge.buildAnswerContext(hits) : "No matching facts." };
+            try {
+              const hits = await d.knowledge.searchKnowledge(d.company, input.query);
+              return { ok: true, content: hits.length ? d.knowledge.buildAnswerContext(hits) : "No matching facts." };
+            } catch (ragErr) {
+              if (/Redis Stack/i.test((ragErr as Error).message)) {
+                return { ok: true, content: "Knowledge base unavailable; answer from general product facts." };
+              }
+              throw ragErr;
+            }
           }
           case "set_phase": phase = input.phase; return { ok: true, content: `phase=${phase}` };
         }
