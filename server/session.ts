@@ -127,6 +127,10 @@ export class VoiceSession {
 
   /** Browserbase session id, set once startSession resolves. */
   private browserSessionId: string | null = null;
+
+  /** Memoized one-time startup (browser + orchestrator), shared by the
+   *  audio_start (mic) and text_input (typed) entry points so it runs once. */
+  private startPromise: Promise<void> | null = null;
   private readonly deps: VoiceSessionDeps;
 
   constructor(
@@ -164,7 +168,7 @@ export class VoiceSession {
     if (!msg) return;
     switch (msg.t) {
       case "audio_start":
-        void this.startListening(msg.language);
+        void this.ensureStarted(msg.language);
         break;
       case "audio_stop":
         void this.stopListening();
@@ -176,10 +180,20 @@ export class VoiceSession {
         this.bargeIn();
         break;
       case "text_input":
+        // A text-only visitor may type before enabling the mic; make sure the
+        // browser session + orchestrator are started before running a turn
+        // (otherwise this.orchestrator is null and runTurn crashes).
         this.send({ t: "user_said", text: msg.text, final: true });
-        void this.runTurn(msg.text);
+        void this.ensureStarted(this.language).then(() => this.runTurn(msg.text));
         break;
     }
+  }
+
+  /** Start the browser session + orchestrator exactly once, regardless of
+   *  whether the first client message is audio_start or text_input. */
+  private ensureStarted(language: Language): Promise<void> {
+    if (!this.startPromise) this.startPromise = this.startListening(language);
+    return this.startPromise;
   }
 
   private async startListening(language: Language) {
