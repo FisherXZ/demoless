@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:voice": "tsx watch server/index.ts",
+    "dev:all": "concurrently -n web,voice -c cyan,magenta \"npm:dev\" \"npm:dev:voice\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -12,20 +14,28 @@
     "knowledge:smoke": "tsx scripts/knowledge-smoke.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
+    "@browserbasehq/sdk": "^2.14.1",
+    "@deepgram/sdk": "^5.4.0",
     "ioredis": "^5.4.1",
     "next": "15.1.6",
     "next-auth": "^5.0.0-beta.31",
+    "playwright-core": "^1.61.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/ws": "^8.18.1",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^10.0.3",
+    "dotenv": "^17.4.2",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "tsx": "^4.19.2",
+    "tsx": "^4.22.4",
     "typescript": "^5"
   }
 }

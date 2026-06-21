@@ -1,12 +1,14 @@
 "use client";
 
 import type { DemoVals } from "@/lib/types";
+import { useAgentName } from "@/lib/voice/useAgentName";
 
 const fieldClass =
   "border border-line3 rounded-[10px] px-[14px] py-3 text-[15px] bg-white transition-colors focus:border-brand focus:shadow-[0_0_0_3px_#eef0ff]";
 const selectClass = `${fieldClass} appearance-none cursor-pointer`;
 
 export default function PreCallForm({ vals }: { vals: DemoVals }) {
+  const agentName = useAgentName();
   return (
     <div className="min-h-screen grid grid-cols-[0.85fr_1fr]">
       {/* Left dark panel */}
@@ -24,12 +26,12 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
           <div className="flex items-center gap-[14px] mb-[26px]">
             <div className="relative w-16 h-16">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-coal to-brand flex items-center justify-center text-white text-2xl font-bold">
-                M
+                {agentName.charAt(0)}
               </div>
               <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-live border-[3px] border-night" />
             </div>
             <div>
-              <div className="text-[18px] font-bold">Maya</div>
+              <div className="text-[18px] font-bold">{agentName}</div>
               <div className="text-[14px] text-faint font-mono">
                 AI Product Specialist
               </div>
@@ -79,7 +81,7 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
           Join your AI demo
         </h1>
         <p className="text-[16px] text-muted2 m-0 mb-[30px]">
-          Step into the call, Maya is ready when you are.
+          Step into the call, {agentName} is ready when you are.
         </p>
 
         {/* Identity — verified via Google, not typed. */}
@@ -187,7 +189,7 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
             <span className="text-[13px] font-semibold text-ink2">
               Biggest pain point{" "}
               <span className="text-faint font-normal">
-                - so Maya can speak to it
+                - so {agentName} can speak to it
               </span>
             </span>
             <textarea
