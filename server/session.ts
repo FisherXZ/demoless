@@ -49,6 +49,7 @@ import {
   type DemoSessionFinalizer,
 } from "./demoSession/finalize";
 import { streamSpeechTurn } from "./demoSession/speech";
+import { speechGateway } from "./util/speechGateway";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
@@ -264,8 +265,16 @@ export class VoiceSession {
         this.onControl(data.toString());
       }
     });
-    ws.on("close", () => this.dispose());
-    ws.on("error", () => this.dispose());
+    ws.on("close", (code, reason) => {
+      console.log(
+        `[voice] client close code=${code} reason=${reason?.toString() || "(none)"}`
+      );
+      this.dispose();
+    });
+    ws.on("error", (err) => {
+      console.error("[voice] client ws error:", err);
+      this.dispose();
+    });
   }
 
   private onControl(raw: string) {
@@ -461,9 +470,10 @@ export class VoiceSession {
       }
     });
 
-    stt.on("error", (err) =>
-      this.send({ t: "error", message: `STT: ${err.message}` })
-    );
+    stt.on("error", (err) => {
+      console.error("[voice] STT error:", err.message);
+      this.send({ t: "error", message: `STT: ${err.message}` });
+    });
 
     await stt.start(this.language);
     this.stt = stt;
@@ -591,12 +601,18 @@ export class VoiceSession {
     )) {
       if (signal.aborted) return;
       switch (cmd.type) {
-        case "say":
-          yield { text: cmd.text, filler: false };
+        case "say": {
+          // Gate out stage directions / filler so the agent's internal "I'll
+          // click into this" narration never reaches the voice. See speechGateway.
+          const clean = speechGateway(cmd.text);
+          if (clean) yield { text: clean, filler: false };
           break;
-        case "filler":
-          yield { text: cmd.text, filler: true };
+        }
+        case "filler": {
+          const clean = speechGateway(cmd.text);
+          if (clean) yield { text: clean, filler: true };
           break;
+        }
         case "navigate":
           this.recorder.recordAction("navigate", cmd.url, this.turnCounter);
           break;
