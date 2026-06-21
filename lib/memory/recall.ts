@@ -31,11 +31,12 @@ export function composeRecall(notes: Note[]): Recall {
   const objections = textsOfType(notes, "objection").slice(0, 3);
   const nextStep = textsOfType(notes, "next_step")[0];
 
-  // What they "cared about": interests first, then pains, capped at 2 for a
-  // natural-sounding greeting.
-  const cared = [...topInterests, ...painPoints].slice(0, 2);
+  // What they "cared about": interests first, then pains. Capped at 1 so the
+  // returning-buyer greeting is a punchy single callback, not a recital of
+  // everything we remember.
+  const cared = [...topInterests, ...painPoints].slice(0, 1);
   const line = cared.length
-    ? `Welcome back — last time you cared about ${prose(cared)}.`
+    ? `Welcome back — last time you were focused on ${prose(cared)}.`
     : "";
 
   return { line, topInterests, painPoints, objections, nextStep };

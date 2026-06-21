@@ -37,7 +37,7 @@ describe("composeRecall", () => {
     expect(recall.objections).toEqual(["security review"]);
     expect(recall.nextStep).toBe("send the SOC2 report");
     expect(recall.line).toBe(
-      "Welcome back — last time you cared about new high preference and old high interest."
+      "Welcome back — last time you were focused on new high preference."
     );
   });
 
@@ -47,7 +47,7 @@ describe("composeRecall", () => {
     ]);
 
     expect(recall.line).toBe(
-      "Welcome back — last time you cared about SOC2 automation."
+      "Welcome back — last time you were focused on SOC2 automation."
     );
   });
 

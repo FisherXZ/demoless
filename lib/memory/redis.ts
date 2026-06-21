@@ -11,7 +11,15 @@ import Redis from "ioredis";
  * (redis://localhost:6379). See .env.example.
  */
 
-const REDIS_URL = process.env.REDIS_URL ?? "redis://localhost:6379";
+// Read REDIS_URL lazily (at first use), not at module-load. server/index.ts
+// loads .env.local via dotenv as a top-level statement, but ESM hoists the
+// imports that pull in this module above it — so a module-level capture reads
+// the default before .env.local is applied and silently pins the voice server
+// to localhost:6379 while the web app (Next.js loads env first) uses the
+// configured URL. Reading on first getRedis() call avoids that ordering trap.
+function redisUrl(): string {
+  return process.env.REDIS_URL ?? "redis://localhost:6379";
+}
 
 let client: Redis | null = null;
 let subscriber: Redis | null = null;
@@ -19,7 +27,7 @@ let subscriber: Redis | null = null;
 /** Command client. Reused across calls. */
 export function getRedis(): Redis {
   if (!client) {
-    client = new Redis(REDIS_URL, { lazyConnect: false });
+    client = new Redis(redisUrl(), { lazyConnect: false });
   }
   return client;
 }
@@ -27,7 +35,7 @@ export function getRedis(): Redis {
 /** Dedicated client for Pub/Sub subscriptions (separate connection). */
 export function getSubscriber(): Redis {
   if (!subscriber) {
-    subscriber = new Redis(REDIS_URL, { lazyConnect: false });
+    subscriber = new Redis(redisUrl(), { lazyConnect: false });
   }
   return subscriber;
 }
