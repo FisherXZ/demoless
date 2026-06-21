@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, type ReactNode } from "react";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", glyph: "▸" },
@@ -11,9 +11,27 @@ const NAV = [
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+  // useSearchParams must sit under a Suspense boundary in the App Router.
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen bg-obsidian text-chalk">
+          <main className="dl-grid dl-scroll min-w-0 flex-1 bg-obsidian">{children}</main>
+        </div>
+      }
+    >
+      <DashboardShell>{children}</DashboardShell>
+    </Suspense>
+  );
+}
+
+function DashboardShell({ children }: { children: ReactNode }) {
   const path = usePathname() ?? "";
+  const searchParams = useSearchParams();
+  const mode = searchParams?.get("mode") === "live" ? "live" : "demo";
   const isActive = (href: string) =>
     href === "/dashboard" ? path === href : path.startsWith(href);
+  const withMode = (href: string, nextMode = mode) => `${href}?mode=${nextMode}`;
 
   return (
     <div className="flex min-h-screen bg-obsidian text-chalk">
@@ -36,7 +54,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             return (
               <Link
                 key={n.href}
-                href={n.href}
+                href={withMode(n.href)}
                 aria-current={on ? "page" : undefined}
                 className={
                   "group relative flex items-center gap-[11px] rounded-[9px] px-[11px] py-[8px] text-[13px] transition-colors duration-150 " +
@@ -60,6 +78,26 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
+
+        {/* Demo / Live data-source toggle. Demo = seeded corpus; Live = real records. */}
+        <div className="mt-4 rounded-[10px] border border-edge bg-slate p-[4px]">
+          <div className="grid grid-cols-2 gap-[3px]">
+            {(["demo", "live"] as const).map((m) => (
+              <Link
+                key={m}
+                href={withMode(path, m)}
+                className={
+                  "rounded-[7px] px-2 py-[6px] text-center font-mono text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors " +
+                  (mode === m
+                    ? "bg-slate2 text-chalk"
+                    : "text-ember hover:bg-obsidian hover:text-ash")
+                }
+              >
+                {m}
+              </Link>
+            ))}
+          </div>
+        </div>
 
         <div className="mt-5 rounded-[10px] border border-edge bg-slate px-[12px] py-[11px]">
           <div className="flex items-center gap-[7px]">

@@ -26,6 +26,12 @@ describe("contract", () => {
     ).not.toThrow();
   });
 
+  it("accepts durable discovery note types", () => {
+    for (const type of ["pain_point", "next_step", "persona", "preference"] as const) {
+      expect(() => NoteInput.parse({ type, value: `${type} signal` })).not.toThrow();
+    }
+  });
+
   it("accepts a Reply with commands and a tour directive", () => {
     const ok = Reply.parse({
       commands: [{ kind: "say", text: "hi" }],

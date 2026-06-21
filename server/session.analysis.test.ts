@@ -18,6 +18,18 @@ vi.mock("./bargeIn", () => ({
   novelWordCount: vi.fn().mockReturnValue(0),
   tokenize: vi.fn().mockReturnValue([]),
 }));
+// Keep startup off any live Redis so the turn isn't blocked.
+vi.mock("../lib/memory/store", () => ({
+  loadBuyer: vi.fn().mockResolvedValue({
+    profile: { email: "buyer@example.com" }, notes: [], isReturning: false, recall: null,
+  }),
+}));
+vi.mock("../lib/memory/pubsub", () => ({ publishPhase: vi.fn().mockResolvedValue(undefined) }));
+vi.mock("../lib/learnings", () => ({
+  getLearnings: vi.fn().mockResolvedValue([]),
+  buildLearningsContext: vi.fn().mockReturnValue(""),
+  reflectAndStore: vi.fn().mockResolvedValue(undefined),
+}));
 
 import { VoiceSession } from "./session";
 
@@ -27,40 +39,72 @@ function fakeWs() {
   return ws;
 }
 
+const BUYER = { demoSessionId: "demo-1", buyerEmail: "buyer@example.com", buyerName: "Bea" };
+
+/** Build a session that has identified itself + started a (fake) browser, so
+ *  dispose has a real demo session to persist. Returns the spies. */
+async function startedSession() {
+  const ws = fakeWs();
+  const saveSession = vi.fn(async () => {});
+  const analyzeAndStore = vi.fn(async () => {});
+  new VoiceSession(ws, "dg-key", {
+    startSession: vi.fn().mockResolvedValue({
+      liveViewUrl: "https://live.example.com", sessionId: "bb-1",
+      url: "https://www.browserbase.com", title: "",
+    }),
+    stopSession: vi.fn(async () => {}),
+    createOrchestrator: vi.fn().mockReturnValue({
+      runTurn: vi.fn(async function* () {}), greeting: vi.fn().mockReturnValue(null),
+    }),
+    reflectAndStore: vi.fn(async () => {}),
+    saveSession,
+    loadSession: vi.fn().mockResolvedValue(null),
+    analyzeAndStore,
+  });
+  ws.emit("message", JSON.stringify({ t: "audio_start", language: "en", buyer: BUYER }), false);
+  await new Promise((r) => setTimeout(r, 10)); // let startListening settle
+  return { ws, saveSession, analyzeAndStore };
+}
+
 describe("VoiceSession analysis", () => {
-  it("persists and analyzes the session once on socket close", () => {
-    const ws = fakeWs();
-    const saveSession = vi.fn(async () => {});
-    const analyzeAndStore = vi.fn(async () => {});
-    new VoiceSession(ws, "dg-key", {
-      startSession: vi.fn(),
-      stopSession: vi.fn(async () => {}),
-      createOrchestrator: vi.fn(),
-      reflectAndStore: vi.fn(async () => {}),
-      saveSession,
-      analyzeAndStore,
-    });
+  it("persists and analyzes the identified session once on socket close", async () => {
+    const { ws, saveSession, analyzeAndStore } = await startedSession();
+    saveSession.mockClear(); // ignore the live snapshots taken while running
+
     ws.emit("close");
-    expect(saveSession).toHaveBeenCalledTimes(1);
+
+    // analyze runs exactly once, at teardown; the final save is the ended record.
     expect(analyzeAndStore).toHaveBeenCalledTimes(1);
-    // both receive the same SessionRecord shape
-    expect((saveSession.mock.calls as unknown[][])[0][0]).toHaveProperty("transcript");
-    expect((analyzeAndStore.mock.calls as unknown[][])[0][0]).toHaveProperty("events");
+    expect(saveSession).toHaveBeenCalledTimes(1);
+    const ended = (saveSession.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
+    expect(ended).toMatchObject({ id: "demo-1", status: "ended", buyerEmail: "buyer@example.com" });
+    expect(ended).toHaveProperty("transcript");
+    const analyzed = (analyzeAndStore.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
+    expect(analyzed).toHaveProperty("events");
   });
 
-  it("does not persist twice when error then close both fire", () => {
+  it("does not analyze twice when error then close both fire", async () => {
+    const { ws, analyzeAndStore } = await startedSession();
+
+    ws.emit("error", new Error("boom"));
+    ws.emit("close");
+
+    expect(analyzeAndStore).toHaveBeenCalledTimes(1);
+  });
+
+  it("never persists a session that never identified itself", () => {
     const ws = fakeWs();
     const saveSession = vi.fn(async () => {});
     const analyzeAndStore = vi.fn(async () => {});
     new VoiceSession(ws, "dg-key", {
       startSession: vi.fn(), stopSession: vi.fn(async () => {}),
       createOrchestrator: vi.fn(), reflectAndStore: vi.fn(async () => {}),
-      saveSession, analyzeAndStore,
+      saveSession, loadSession: vi.fn(async () => null), analyzeAndStore,
     });
-    ws.emit("error", new Error("boom"));
-    ws.emit("close");
-    expect(saveSession).toHaveBeenCalledTimes(1);
-    expect(analyzeAndStore).toHaveBeenCalledTimes(1);
+    ws.emit("close"); // closed before any audio_start/buyer identity
+
+    expect(saveSession).not.toHaveBeenCalled();
+    expect(analyzeAndStore).not.toHaveBeenCalled();
   });
 
   it("swallows synchronous finalizer failures during teardown", () => {

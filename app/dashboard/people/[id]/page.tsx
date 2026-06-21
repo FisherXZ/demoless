@@ -2,6 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Group, SignalRow } from "@/components/dashboard/SignalGroup";
 import { getBuyerSession, intentOf } from "@/lib/dashboard/data";
+import {
+  resolveDashboardMode,
+  dashboardHref,
+  getLivePerson,
+  type LivePersonView,
+} from "@/lib/dashboard/source";
+import { relativeTime } from "@/lib/dashboard/recapFormat";
 
 function scoreClass(n: number) {
   return n >= 80 ? "text-goodlit" : n >= 65 ? "text-brandlit2" : "text-warnlit";
@@ -13,10 +20,20 @@ function intentHex(n: number) {
 
 export default async function PersonDetail({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { id } = await params;
+  const [{ id }, resolvedSearch] = await Promise.all([params, searchParams]);
+  const mode = resolveDashboardMode(resolvedSearch);
+
+  if (mode === "live") {
+    const person = await getLivePerson(id);
+    if (!person) notFound();
+    return <LivePersonDetail person={person} />;
+  }
+
   const s = getBuyerSession(id);
   if (!s) notFound();
   const b = s.buyer;
@@ -124,6 +141,103 @@ export default async function PersonDetail({
             <button className="w-full cursor-pointer rounded-[10px] border-none bg-brandlit p-[12px] text-[14px] font-bold text-obsidian transition-colors hover:bg-brandlit2">
               {s.followUp.cta}
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── live person detail — factual buyer record (no scores / follow-up AI) ─────
+
+function LivePersonDetail({ person }: { person: LivePersonView }) {
+  const now = Date.now();
+  return (
+    <div className="dl-page mx-auto max-w-[860px] px-[34px] py-[26px] text-chalk">
+      <Link
+        href={dashboardHref("/dashboard/people", "live")}
+        className="font-mono text-[12px] font-semibold text-brandlit2 hover:text-brandlit"
+      >
+        ← Back to people
+      </Link>
+
+      <div className="mb-5 mt-3 flex items-center gap-[13px]">
+        <span className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-slate2 font-mono text-[15px] font-bold text-brandlit2">
+          {person.initials}
+        </span>
+        <div className="min-w-0">
+          <div className="truncate text-[22px] font-extrabold tracking-[-0.02em] text-chalk">
+            {person.name}
+          </div>
+          <div className="truncate text-[13px] text-ember">
+            {person.email} · {person.company}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-[1fr_300px] gap-4">
+        {/* session history — factual records, newest first */}
+        <div className="flex flex-col gap-4">
+          <div className="rounded-[14px] border border-edge bg-slate p-[18px]">
+            <span className="mb-3 block font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
+              Sessions
+            </span>
+            <div className="flex flex-col">
+              {person.sessions.map((sess) => (
+                <Link
+                  key={sess.id}
+                  href={dashboardHref(`/dashboard/sessions/${sess.id}`, "live")}
+                  className="group flex items-center gap-3 border-t border-edge2 py-[11px] transition-colors first:border-t-0 hover:bg-slate2"
+                >
+                  <span
+                    className={
+                      "flex-none rounded-[5px] px-[7px] py-px font-mono text-[9px] font-semibold uppercase tracking-[0.05em] " +
+                      (sess.isLive ? "bg-[#E6F4EA] text-goodlit" : "bg-slate2 text-ember")
+                    }
+                  >
+                    {sess.isLive ? "Live" : sess.status}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-[13px] text-ash">
+                    {sess.recapSummary || "No recap generated yet"}
+                  </span>
+                  <span className="flex-none font-mono text-[11px] text-ember">
+                    {sess.isLive ? "now" : relativeTime(sess.whenTs, now)}
+                  </span>
+                  <span className="flex-none font-mono text-[13px] text-ember transition-transform group-hover:translate-x-0.5 group-hover:text-brandlit">
+                    →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* factual snapshot — counts only, no scores */}
+        <div className="flex flex-col gap-4">
+          <div className="rounded-[14px] border border-edge bg-slate p-[18px]">
+            <Group label="Snapshot">
+              <div className="mb-2 flex items-center text-[13px]">
+                <span className="text-ash">Sessions</span>
+                <span className="dl-num ml-auto font-mono font-semibold text-chalk">
+                  {person.sessionCount}
+                </span>
+              </div>
+              <div className="flex items-center text-[13px]">
+                <span className="text-ash">Last seen</span>
+                <span className="ml-auto font-mono font-semibold text-chalk">
+                  {relativeTime(person.lastSeenTs, now)}
+                </span>
+              </div>
+            </Group>
+          </div>
+
+          <div className="rounded-[14px] border border-edge bg-slate p-[18px]">
+            <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
+              Post-demo packet
+            </span>
+            <p className="m-0 text-[13px] leading-[1.5] text-ash">
+              Pending — generated from captured evidence after a session ends.
+            </p>
           </div>
         </div>
       </div>

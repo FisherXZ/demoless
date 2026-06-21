@@ -51,4 +51,14 @@ describe("LoopOrchestrator", () => {
     expect(systems[0]).toContain("visitor is speaking Spanish");
     expect(systems[1]).toContain("visitor is speaking Mandarin Chinese");
   });
+
+  it("default greeting asks one discovery question before offering a walkthrough", () => {
+    const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
+    const text = orch.greeting("en", "Maya");
+
+    expect(text).toContain("Maya");
+    expect(text).toMatch(/what .*trying to figure out/i);
+    expect(text).not.toMatch(/walk you through|show you/i);
+    expect((text.match(/\?/g) ?? []).length).toBe(1);
+  });
 });

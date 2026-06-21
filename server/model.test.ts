@@ -78,6 +78,20 @@ describe("coerceReply", () => {
     ]);
   });
 
+  it("preserves durable discovery note types when coercing replies", () => {
+    const r = coerceReply({
+      commands: [
+        { kind: "remember", note: { type: "pain_point", value: "demo prep takes hours" } },
+        { kind: "remember", note: { type: "next_step", value: "send security docs" } },
+      ],
+    });
+
+    expect(r.commands).toEqual([
+      { kind: "remember", note: { type: "pain_point", value: "demo prep takes hours" } },
+      { kind: "remember", note: { type: "next_step", value: "send security docs" } },
+    ]);
+  });
+
   it("drops commands whose required fields are malformed", () => {
     const r = coerceReply({
       commands: [
@@ -98,7 +112,6 @@ describe("coerceReply", () => {
   it("does not add select when select is not an array", () => {
     expect(coerceReply({ commands: [], select: "sessions" }).select).toBeUndefined();
   });
-
 
   it("keeps valid commands and drops unknown command kinds", () => {
     const r = coerceReply({
@@ -253,7 +266,7 @@ describe("complete", () => {
 
     expect(r.commands[0]).toEqual({
       kind: "say",
-      text: 'Welcome back, Avery! Last time you were curious about "security automation". Want to pick up there?',
+      text: 'Welcome back, Avery! Last time you were interested in "security automation". What are you trying to figure out today?',
     });
   });
 
@@ -290,6 +303,64 @@ describe("complete", () => {
       kind: "say",
       text: "(stub) Here's the page.",
     });
+  });
+});
+
+describe("complete stub discovery behavior", () => {
+  it("returning greeting asks what the buyer is figuring out today", async () => {
+    const previous = process.env.USE_STUB;
+    process.env.USE_STUB = "1";
+    try {
+      const r = await complete({
+        system: "s",
+        messages: [{ role: "user", content: "[The visitor just opened the demo.]" }],
+        turn: "greet",
+        state: {
+          ...state,
+          buyer: {
+            id: "u",
+            notes: [{ type: "interest", value: "pricing", at: "2026-06-20T00:00:00Z" }],
+          },
+        } as any,
+      });
+
+      expect(r.commands[0]).toMatchObject({ kind: "say" });
+      expect((r.commands[0] as any).text).toMatch(/pricing/);
+      expect((r.commands[0] as any).text).toMatch(/trying to figure out today/i);
+      expect((r.commands[0] as any).text).not.toMatch(/pick up there/i);
+    } finally {
+      if (previous === undefined) delete process.env.USE_STUB;
+      else process.env.USE_STUB = previous;
+    }
+  });
+
+  it("direct pricing request navigates and asks a contextual follow-up", async () => {
+    const previous = process.env.USE_STUB;
+    process.env.USE_STUB = "1";
+    try {
+      const r = await complete({
+        system: "s",
+        messages: [{ role: "user", content: "show pricing" }],
+        turn: "human",
+        state,
+      });
+
+      expect(r.commands).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ kind: "navigate", target: "pricing" }),
+          expect.objectContaining({
+            kind: "remember",
+            note: expect.objectContaining({ type: "interest" }),
+          }),
+        ])
+      );
+      const say = r.commands.find((c) => c.kind === "say") as any;
+      expect(say.text).toMatch(/pricing/i);
+      expect(say.text).toMatch(/\?/);
+    } finally {
+      if (previous === undefined) delete process.env.USE_STUB;
+      else process.env.USE_STUB = previous;
+    }
   });
 });
 

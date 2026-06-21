@@ -67,6 +67,11 @@ vi.mock("../lib/memory/pubsub", () => ({
 import { VoiceSession } from "./session";
 
 type Sent = { t: string; [key: string]: unknown };
+const buyer = {
+  demoSessionId: "demo-session-1",
+  buyerEmail: "buyer@example.com",
+  buyerName: "Bea",
+};
 
 function makeWs(readyState = 1) {
   const ws = new EventEmitter() as EventEmitter & {
@@ -143,19 +148,47 @@ function mount(options: {
   const fakeOrchestrator = options.fakeOrchestrator ?? orchestrator();
   const startup = options.startup ?? startupFor(fakeOrchestrator);
   const stopSession = options.stopSession ?? vi.fn().mockResolvedValue(undefined);
+  const saveSession = vi.fn().mockResolvedValue(undefined);
+  const loadSession = vi.fn().mockResolvedValue({
+    id: buyer.demoSessionId,
+    company: "browserbase",
+    status: "created",
+    buyerEmail: buyer.buyerEmail,
+    buyerName: buyer.buyerName,
+    createdAt: 123,
+    events: [],
+    transcript: [],
+  });
   const finalizer = { finalize: vi.fn() };
   const session = new VoiceSession(ws as any, "dg-key", {
     startup: startup as any,
     finalizer,
     stopSession,
+    saveSession,
+    loadSession,
   });
-  return { session, ws, startup, fakeOrchestrator, stopSession, finalizer };
+  return {
+    session,
+    ws,
+    startup,
+    fakeOrchestrator,
+    stopSession,
+    finalizer,
+    saveSession,
+    loadSession,
+  };
 }
 
 function control(ws: ReturnType<typeof makeWs>, message: Record<string, unknown> | string) {
+  const withBuyer =
+    typeof message === "object" &&
+    (message.t === "audio_start" || message.t === "text_input") &&
+    !message.buyer
+      ? { ...message, buyer }
+      : message;
   ws.emit(
     "message",
-    typeof message === "string" ? message : JSON.stringify(message),
+    typeof withBuyer === "string" ? withBuyer : JSON.stringify(withBuyer),
     false
   );
 }
@@ -259,7 +292,7 @@ describe("VoiceSession STT and control paths", () => {
     });
     expect(sent(ws, "buyer_loaded")).toHaveLength(2);
     expect(sent(ws, "set_phase")).toContainEqual({ t: "set_phase", phase: "demo" });
-    expect(fakes.publishPhase).toHaveBeenCalledWith("anonymous", "demo");
+    expect(fakes.publishPhase).toHaveBeenCalledWith("buyer@example.com", "demo");
     expect((session as any).history).toEqual([
       { role: "user", text: "show dashboard" },
       { role: "agent", text: "Here is the dashboard." },
@@ -267,7 +300,6 @@ describe("VoiceSession STT and control paths", () => {
     expect(fakeOrchestrator.runTurn).toHaveBeenCalledWith(
       { text: "show dashboard", language: "en" },
       expect.objectContaining({
-        role: "founder",
         buyerNotes: ["prior note"],
         learningsContext: "known lesson",
       }),
