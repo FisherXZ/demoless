@@ -12,7 +12,7 @@
  */
 let warmed = false;
 
-export function requestBrowserWarmup(): void {
+export function requestBrowserWarmup(company?: string): void {
   if (
     warmed ||
     typeof window === "undefined" ||
@@ -27,7 +27,7 @@ export function requestBrowserWarmup(): void {
     const ws = new WebSocket(url);
     ws.onopen = () => {
       try {
-        ws.send(JSON.stringify({ t: "prewarm" }));
+        ws.send(JSON.stringify({ t: "prewarm", company }));
       } catch {
         /* best-effort */
       }

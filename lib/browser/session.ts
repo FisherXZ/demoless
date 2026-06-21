@@ -144,6 +144,93 @@ export async function clickText(
   return screen(sessionId, s.page);
 }
 
+/** type command. Fills text into a field. `into` (optional) identifies the
+ *  field by its placeholder, accessible label, or role name; without it we type
+ *  into the first visible text field on the page. Demos mostly mean a search box
+ *  or the one obvious input, so this stays forgiving. */
+export async function typeText(
+  sessionId: string,
+  text: string,
+  into?: string
+): Promise<ScreenState> {
+  const s = store.get(sessionId);
+  if (!s) throw new Error("No live session — start one first");
+  const field = into
+    ? s.page
+        .getByPlaceholder(into, { exact: false })
+        .or(s.page.getByLabel(into, { exact: false }))
+        .or(s.page.getByRole("textbox", { name: into }))
+        .first()
+    : s.page.locator("input:visible, textarea:visible, [contenteditable]:visible").first();
+  await field.fill(text, { timeout: 8000 });
+  await s.page.waitForTimeout(100);
+  return screen(sessionId, s.page);
+}
+
+/** press command. Presses a single key (e.g. "Enter", "Escape", "Tab") — the
+ *  usual way to submit a search box or form after type(). */
+export async function pressKey(
+  sessionId: string,
+  key: string
+): Promise<ScreenState> {
+  const s = store.get(sessionId);
+  if (!s) throw new Error("No live session — start one first");
+  await s.page.keyboard.press(key);
+  await settle(s.page);
+  return screen(sessionId, s.page);
+}
+
+/** wait command. Blocks until a long-running action (an extraction, scrape, or
+ *  navigation) actually produces output, so the agent reads REAL results instead
+ *  of an empty in-progress page. If `until` is given we poll for that text to
+ *  appear; otherwise we wait for the visible text to stop changing. Capped at
+ *  `seconds` (default 15, max 30) and never throws — on timeout we return
+ *  whatever is on screen so the agent can report or retry. */
+export async function waitFor(
+  sessionId: string,
+  until?: string,
+  seconds = 15
+): Promise<ScreenState> {
+  const s = store.get(sessionId);
+  if (!s) throw new Error("No live session — start one first");
+  const timeout = Math.min(Math.max(seconds, 1), 30) * 1000;
+  if (until && until.trim()) {
+    await s.page
+      .waitForFunction(
+        (t: string) => (document.body?.innerText || "").toLowerCase().includes(t),
+        until.toLowerCase(),
+        { timeout, polling: 500 }
+      )
+      .catch(() => {}); // timed out — return the current page, don't throw
+  } else {
+    // No target text: wait for the page text to settle (two equal reads) so we
+    // don't read mid-render. Falls through at the timeout regardless.
+    const start = Date.now();
+    let prev = "";
+    while (Date.now() - start < timeout) {
+      await s.page.waitForTimeout(600);
+      const now = await s.page.evaluate(() => document.body?.innerText || "").catch(() => "");
+      if (now && now === prev) break;
+      prev = now;
+    }
+  }
+  return screen(sessionId, s.page);
+}
+
+/** scroll command. Scrolls the page up or down by roughly one viewport so the
+ *  audience sees content below the fold and lazy-loaded sections render. */
+export async function scroll(
+  sessionId: string,
+  direction: "down" | "up"
+): Promise<ScreenState> {
+  const s = store.get(sessionId);
+  if (!s) throw new Error("No live session — start one first");
+  const dy = (direction === "up" ? -1 : 1) * 600;
+  await s.page.mouse.wheel(0, dy);
+  await s.page.waitForTimeout(250);
+  return screen(sessionId, s.page);
+}
+
 export async function stopSession(sessionId: string): Promise<void> {
   const s = store.get(sessionId);
   if (s) {

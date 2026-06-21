@@ -7,6 +7,7 @@ const cfg = {
   productName: "Browserbase",
   persona: "Messi",
   browseTargetUrl: "https://x",
+  sections: [],
   corpusSeed: "",
 };
 const executor = { phase: "HOOK", run: async () => ({ ok: true, content: "" }) };

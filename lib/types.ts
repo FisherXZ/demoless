@@ -1,7 +1,7 @@
 import type { ChangeEvent } from "react";
 import type { BuyerIdentity, Language } from "./voice/messages";
 
-export type Screen = "landing" | "form" | "room" | "dashboard";
+export type Screen = "landing" | "form" | "room" | "handoff" | "dashboard";
 
 /** Identity captured by the pre-call form. Audience persona is no longer
  *  pre-collected — the agent learns it through discovery. */
@@ -99,8 +99,15 @@ export interface DemoVals {
 
   goLanding: () => void;
   goForm: () => void;
+  goHandoff: () => void;
   goDashboard: () => void;
   startDemo: () => void;
+
+  /** Product the visitor chose to demo (e.g. "browserbase", "clay"). Sent to
+   *  the voice gateway so it loads that product's config. */
+  company: string;
+  /** Pick a product and advance to the pre-call form. */
+  chooseDemo: (company: string) => void;
 
   recallLine?: string; // "welcome back…" for returning buyers
   buyerIdentity?: BuyerIdentity;

@@ -42,6 +42,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
     buyer: vals.buyerIdentity,
     language: vals.form.language,
     role: vals.form.role,
+    company: vals.company,
   });
   useAgentName(); // side-effect: syncs agent name from server
 
@@ -88,7 +89,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
 
   function end() {
     if (voice.active) voice.stop();
-    vals.goDashboard();
+    vals.goHandoff();
   }
 
   return (

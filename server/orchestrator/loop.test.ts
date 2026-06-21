@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { LoopOrchestrator } from "./loop";
+import { SECTIONS } from "../config/demoConfig";
 
-const cfg = { company: "browserbase", productName: "Browserbase", persona: "Messi", browseTargetUrl: "https://x", corpusSeed: "" };
+const cfg = { company: "browserbase", productName: "Browserbase", persona: "Messi", browseTargetUrl: "https://x", sections: SECTIONS, corpusSeed: "" };
 const executor = { phase: "HOOK", run: async () => ({ ok: true, content: "" }) };
 
 describe("LoopOrchestrator", () => {

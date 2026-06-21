@@ -56,6 +56,9 @@ export interface DemoSessionStartupDeps {
 
 export interface PrepareDemoSessionArgs {
   buyerId: string;
+  /** Which product to demo (selected on the landing page). Defaults to the
+   *  Browserbase config when absent or unknown. */
+  company?: string;
   onLiveView: (liveViewUrl: string, sessionId: string) => void;
 }
 
@@ -70,13 +73,14 @@ export interface PreparedDemoSession {
 }
 
 export interface DemoSessionStartup {
-  prewarm(): Promise<void>;
+  prewarm(company?: string): Promise<void>;
   prepare(args: PrepareDemoSessionArgs): Promise<PreparedDemoSession>;
 }
 
 interface WarmSession {
   sessionId: string;
   liveViewUrl: string;
+  company: string;
   at: number;
 }
 
@@ -102,25 +106,48 @@ export function createDemoSessionStartup(
   const log = deps.log ?? console.log;
   let warmSession: WarmSession | null = null;
 
-  const takeWarmSession = (): Omit<WarmSession, "at"> | null => {
-    if (warmSession && now() - warmSession.at < WARM_TTL_MS) {
+  const takeWarmSession = (
+    company: string
+  ): Omit<WarmSession, "at"> | null => {
+    // Only reuse a warm browser that was opened for the SAME product — its tab
+    // is parked on that product's URL, so handing it to another demo is wrong.
+    if (
+      warmSession &&
+      warmSession.company === company &&
+      now() - warmSession.at < WARM_TTL_MS
+    ) {
       const { sessionId, liveViewUrl } = warmSession;
       warmSession = null;
-      return { sessionId, liveViewUrl };
+      return { sessionId, liveViewUrl, company };
     }
     warmSession = null;
     return null;
   };
 
   return {
-    async prewarm() {
-      if (warmSession && now() - warmSession.at < WARM_TTL_MS) return;
+    async prewarm(company) {
+      // Resolve the requested product (fall back to default for an unknown
+      // slug) so the warm browser opens THAT product's URL.
+      let cfg: DemoConfig;
       try {
-        const cfg = getDemoConfig();
+        cfg = getDemoConfig(company);
+      } catch {
+        cfg = getDemoConfig();
+      }
+      // Already have a fresh warm browser for this product — nothing to do.
+      if (
+        warmSession &&
+        warmSession.company === cfg.company &&
+        now() - warmSession.at < WARM_TTL_MS
+      ) {
+        return;
+      }
+      try {
         const session = await startSession(cfg.browseTargetUrl);
         warmSession = {
           sessionId: session.sessionId,
           liveViewUrl: session.liveViewUrl,
+          company: cfg.company,
           at: now(),
         };
       } catch {
@@ -129,8 +156,15 @@ export function createDemoSessionStartup(
     },
 
     async prepare(args) {
-      const cfg = getDemoConfig();
-      const warm = takeWarmSession();
+      // Resolve the requested product; fall back to the default for an unknown
+      // slug so a malformed query never crashes a live session.
+      let cfg: DemoConfig;
+      try {
+        cfg = getDemoConfig(args.company);
+      } catch {
+        cfg = getDemoConfig();
+      }
+      const warm = takeWarmSession(cfg.company);
       let sessionId: string;
       let liveViewUrl: string;
 

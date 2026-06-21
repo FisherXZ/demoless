@@ -118,6 +118,9 @@ export interface AudioStartMessage {
    * to pick an audience persona (technical vs non-technical) for the prompt.
    */
   role?: string;
+  /** Product to demo, picked on the landing page (e.g. "browserbase", "clay").
+   *  Server defaults to Browserbase when absent. */
+  company?: string;
 }
 
 export interface AudioStopMessage {
@@ -141,12 +144,17 @@ export interface TextInputMessage {
   buyer?: BuyerIdentity;
   /** Visitor role for persona selection (see {@link AudioStartMessage.role}). */
   role?: string;
+  /** Product to demo (see {@link AudioStartMessage.company}). */
+  company?: string;
 }
 
 /** Ask the server to pre-create the cloud browser before the mic is enabled,
  *  so the real session can adopt it (opt-in warm-up). */
 export interface PrewarmMessage {
   t: "prewarm";
+  /** Product picked on the landing page, so the warm browser opens that
+   *  product's URL and is only reused by a matching session. */
+  company?: string;
 }
 
 export type ClientMessage =

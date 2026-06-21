@@ -13,9 +13,11 @@ const launchGradient = {
 function LaunchButton({
   onClick,
   large = false,
+  label = "Launch Demo Now",
 }: {
   onClick: () => void;
   large?: boolean;
+  label?: string;
 }) {
   return (
     <button
@@ -26,7 +28,7 @@ function LaunchButton({
         (large ? "px-7 py-4 text-[17px]" : "px-[20px] py-[11px] text-[15px]")
       }
     >
-      Launch Demo Now
+      {label}
       <svg
         width="16"
         height="16"
@@ -145,7 +147,7 @@ export default function Landing({ vals }: { vals: DemoVals }) {
               Sign in
             </button>
           )}
-          <LaunchButton onClick={vals.goForm} />
+          <LaunchButton onClick={() => vals.chooseDemo("browserbase")} />
         </div>
       </header>
 
@@ -153,15 +155,21 @@ export default function Landing({ vals }: { vals: DemoVals }) {
       <section className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-14 px-10 pb-14 pt-12 lg:grid-cols-[1.05fr_1fr]">
         <div>
           <h1 className="m-0 max-w-[600px] font-serif text-[clamp(40px,5.2vw,60px)] font-medium leading-[1.04] tracking-[-0.02em] text-chalk">
-            An AI sales agent that sells while you sleep.
+            An AI sales agent that demos while you sleep.
           </h1>
           <p className="mb-9 mt-6 max-w-[520px] text-[18px] leading-[1.55] text-ash">
             Convert buyers the moment they show intent. Demoless gives each prospect a live,
             voice-led product walkthrough in their own language, then sends your team a scored
             summary of what they cared about before the lead goes cold.
           </p>
-          <div className="flex items-center gap-3">
-            <LaunchButton onClick={vals.goForm} large />
+          <div className="flex flex-wrap items-center gap-3">
+            <LaunchButton onClick={() => vals.chooseDemo("browserbase")} large />
+            <button
+              onClick={() => vals.chooseDemo("clay")}
+              className="rounded-[14px] border border-edge bg-slate px-7 py-4 text-[17px] font-semibold text-chalk transition-colors hover:border-ember"
+            >
+              Try the Clay demo
+            </button>
             <Link
               href="/dashboard"
               className="rounded-[10px] border border-edge bg-slate px-[20px] py-[14px] text-[16px] font-semibold text-chalk transition-colors hover:border-ember"
@@ -274,7 +282,7 @@ export default function Landing({ vals }: { vals: DemoVals }) {
           <h2 className="m-0 max-w-[560px] font-serif text-[clamp(28px,3.6vw,38px)] font-medium leading-[1.1] tracking-[-0.015em]">
             See it the way your buyers will. Take the demo yourself.
           </h2>
-          <LaunchButton onClick={vals.goForm} large />
+          <LaunchButton onClick={() => vals.chooseDemo("browserbase")} large />
         </div>
       </section>
 
@@ -297,7 +305,7 @@ export default function Landing({ vals }: { vals: DemoVals }) {
               Dashboard
             </Link>
             <button
-              onClick={vals.goForm}
+              onClick={() => vals.chooseDemo("browserbase")}
               className="cursor-pointer border-none bg-transparent p-0 text-[13px] font-medium text-ash hover:text-chalk"
             >
               Launch demo

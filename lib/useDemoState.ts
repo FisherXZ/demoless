@@ -23,6 +23,7 @@ import type {
 
 interface DemoState {
   screen: Screen;
+  company: string;
   moment: number;
   paused: boolean;
   muted: boolean;
@@ -37,6 +38,7 @@ interface DemoState {
 
 const initialState: DemoState = {
   screen: "landing",
+  company: "browserbase",
   moment: 0,
   paused: false,
   muted: true,
@@ -141,7 +143,11 @@ export function useDemoState(): DemoVals {
 
     goLanding: () => patch({ screen: "landing" }),
     goForm: () => patch({ screen: "form" }),
+    goHandoff: () => patch({ screen: "handoff" }),
     goDashboard: () => patch({ screen: "dashboard", selectedId: null }),
+
+    company: s.company,
+    chooseDemo: (company: string) => patch({ company, screen: "form" }),
     startDemo: async () => {
       // Persist the buyer into P4 Redis, create a demo session up-front, and pull
       // recall before entering. Identity comes from the form email (NextAuth

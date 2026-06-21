@@ -7,6 +7,10 @@ const fakes = () => ({
     // REAL shapes: navigate/clickText -> ScreenState (no links/text); pageContext -> PageContext
     navigate: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
     clickText: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
+    typeText: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
+    pressKey: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
+    scroll: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
+    waitFor: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
     pageContext: vi.fn(async () => ({ url: "/x", title: "X", links: ["/a"], text: "hello world" })),
   },
   memory: { remember: vi.fn(async () => ({ id: "n1" })) },
@@ -30,6 +34,36 @@ describe("ToolExecutor", () => {
     expect(f.browser.pageContext).toHaveBeenCalledWith("s1");
     expect(r.ok).toBe(true);
     expect(r.content).toContain("Links: /a");
+  });
+  it("type fills a field THEN reads pageContext for text", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("type", { text: "tesla.com", into: "URL" });
+    expect(f.browser.typeText).toHaveBeenCalledWith("s1", "tesla.com", "URL");
+    expect(f.browser.pageContext).toHaveBeenCalledWith("s1");
+    expect(r.ok).toBe(true);
+    expect(r.content).toContain("hello world");
+  });
+  it("press sends a key THEN reads pageContext for text", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("press", { key: "Enter" });
+    expect(f.browser.pressKey).toHaveBeenCalledWith("s1", "Enter");
+    expect(f.browser.pageContext).toHaveBeenCalledWith("s1");
+    expect(r.ok).toBe(true);
+  });
+  it("scroll moves the page THEN reads pageContext for text", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("scroll", { direction: "down" });
+    expect(f.browser.scroll).toHaveBeenCalledWith("s1", "down");
+    expect(f.browser.pageContext).toHaveBeenCalledWith("s1");
+    expect(r.ok).toBe(true);
+  });
+  it("wait blocks for results THEN reads pageContext for the real output", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("wait", { until: "Filing", seconds: 20 });
+    expect(f.browser.waitFor).toHaveBeenCalledWith("s1", "Filing", 20);
+    expect(f.browser.pageContext).toHaveBeenCalledWith("s1");
+    expect(r.ok).toBe(true);
+    expect(r.content).toContain("hello world");
   });
   it("look reads the current page without mutating browser state", async () => {
     const f = fakes(); const ex = makeExecutor(f as any);

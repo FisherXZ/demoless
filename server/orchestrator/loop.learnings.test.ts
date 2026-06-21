@@ -8,6 +8,7 @@ const cfg = {
   productName: "Browserbase",
   persona: "Messi",
   browseTargetUrl: "x",
+  sections: [],
   corpusSeed: "",
 } as DemoConfig;
 const executor = { run: vi.fn() } as unknown as ToolExecutor;

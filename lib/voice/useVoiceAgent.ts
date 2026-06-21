@@ -57,6 +57,9 @@ export interface VoiceAgentOptions {
   /** Visitor's self-reported role (from the pre-call form). Sent to the gateway
    *  so it can pick an audience persona (technical vs non-technical). */
   role?: string;
+  /** Product to demo, picked on the landing page (e.g. "browserbase", "clay").
+   *  Sent to the gateway so it loads that product's config. */
+  company?: string;
 }
 
 export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
@@ -83,11 +86,13 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const languageRef = useRef<Language>(language);
   const buyerRef = useRef<BuyerIdentity | undefined>(options.buyer);
   const roleRef = useRef<string | undefined>(options.role);
+  const companyRef = useRef<string | undefined>(options.company);
   const mutedRef = useRef(false);
 
   languageRef.current = language;
   buyerRef.current = options.buyer;
   roleRef.current = options.role;
+  companyRef.current = options.company;
 
   const teardown = useCallback(() => {
     node.current?.port.close();
@@ -193,6 +198,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
           text,
           buyer: buyerRef.current,
           role: roleRef.current,
+          company: companyRef.current,
         })
       );
     }
@@ -249,6 +255,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
             language: languageRef.current,
             buyer: buyerRef.current,
             role: roleRef.current,
+            company: companyRef.current,
           })
         );
       };

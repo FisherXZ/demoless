@@ -21,7 +21,7 @@ const SHOW_PRODUCT_DIRECTIVE =
   "\n\nCRITICAL THIS TURN: The visitor asked to see the product or its features. You already navigated to the Overview dashboard and spoke an opening line. Add at most ONE short new sentence only if the screen shows something worth naming — otherwise stay silent (tools only). Do NOT ask discovery questions.";
 
 const SEC_FILING_DIRECTIVE =
-  "\n\nCRITICAL THIS TURN: The visitor asked to extract SEC filings. You already opened the Playground, ran the SEC template, and spoke an opening line. Add at most ONE short new sentence only if the screen shows something new — otherwise stay silent (tools only). Do NOT ask discovery questions or describe your clicks.";
+  "\n\nCRITICAL THIS TURN: The visitor asked to extract SEC filings. You already opened the Playground, ran the SEC template, and spoke an opening line. The run is now IN PROGRESS — do not stop here. Call wait() (e.g. until the filings appear), then read the page and tell the visitor the REAL extracted findings — specific filings, dates, or figures on screen — not that it's running. You may speak one short progress line while it loads. Do NOT ask discovery questions or describe your clicks.";
 
 /** True when the visitor wants an SEC filing extraction demo in the Playground. */
 export function wantsSecFilingDemo(text: string): boolean {

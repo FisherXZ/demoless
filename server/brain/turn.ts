@@ -23,7 +23,9 @@ export interface TurnArgs {
 export async function* runTurn(args: TurnArgs): AsyncIterable<Command> {
   const stream = args.stream ?? defaultStream;
   const messages = [...args.messages];
-  for (let hop = 0; hop < 8; hop++) {
+  // Up to 12 tool rounds so a full task (navigate → type → run → wait → read →
+  // summarize) can finish in one turn instead of stalling mid-task.
+  for (let hop = 0; hop < 12; hop++) {
     if (args.signal.aborted) break;
     const chunker = new SentenceChunker();
     const toolCalls: { id: string; name: ToolName; input: any }[] = [];

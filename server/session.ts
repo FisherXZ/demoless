@@ -95,7 +95,8 @@ export class VoiceSession {
 
   /** Visitor's self-reported role from the pre-call form; picks the persona. */
   private role: string | undefined;
-  private company = ""; // set in startListening; "" means a session that never started
+  private company = ""; // resolved slug, set in startListening; "" = never started
+  private requestedCompany: string | undefined; // product picked on the landing page
   private lastPhase: string | undefined;
   private disposed = false; // dispose() is bound to both ws "close" and "error"
 
@@ -285,6 +286,7 @@ export class VoiceSession {
       case "audio_start":
         if (!this.acceptBuyer(msg.buyer)) return;
         if (msg.role) this.role = msg.role;
+        if (msg.company) this.requestedCompany = msg.company;
         this.ensureStarted(msg.language).catch((e) => this.onStartupError(e));
         break;
       case "audio_stop":
@@ -297,7 +299,7 @@ export class VoiceSession {
         this.bargeIn();
         break;
       case "prewarm":
-        void this.prewarm();
+        void this.prewarm(msg.company);
         break;
       case "text_input":
         // A text-only visitor may type before enabling the mic; make sure the
@@ -305,6 +307,7 @@ export class VoiceSession {
         // (otherwise this.orchestrator is null and runTurn crashes).
         if (!this.acceptBuyer(msg.buyer)) return;
         if (msg.role) this.role = msg.role;
+        if (msg.company) this.requestedCompany = msg.company;
         this.send({ t: "user_said", text: msg.text, final: true });
         this.ensureStarted(this.language)
           .then(() => this.runTurn(msg.text))
@@ -392,8 +395,8 @@ export class VoiceSession {
     this.send({ t: "error", message: "Could not start the demo session." });
   }
 
-  private async prewarm() {
-    await this.deps.startup.prewarm();
+  private async prewarm(company?: string) {
+    await this.deps.startup.prewarm(company);
   }
 
   private async startListening(language: Language) {
@@ -414,6 +417,7 @@ export class VoiceSession {
 
     const prepared = await this.deps.startup.prepare({
       buyerId: this.buyerEmail,
+      company: this.requestedCompany,
       onLiveView: (url, sessionId) => {
         this.browserSessionId = sessionId;
         this.send({ t: "live_view", url });

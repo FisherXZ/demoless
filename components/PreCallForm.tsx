@@ -17,8 +17,8 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
   // Warm up the cloud browser while the visitor fills the form, so the room
   // opens faster. No-op unless NEXT_PUBLIC_VOICE_PREWARM=1.
   useEffect(() => {
-    requestBrowserWarmup();
-  }, []);
+    requestBrowserWarmup(vals.company);
+  }, [vals.company]);
   // A valid work email is required: it keys the buyer + the demo session.
   // Without it enterDemo can't create a session and the room fails with
   // "Missing demo session identity", so gate the button instead.

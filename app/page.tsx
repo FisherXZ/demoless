@@ -6,6 +6,7 @@ import { useDemoState } from "@/lib/useDemoState";
 import Landing from "@/components/Landing";
 import PreCallForm from "@/components/PreCallForm";
 import DemoRoom from "@/components/DemoRoom";
+import DemoHandoff from "@/components/DemoHandoff";
 
 export default function Page() {
   const vals = useDemoState();
@@ -22,6 +23,7 @@ export default function Page() {
       {vals.screen === "landing" && <Landing vals={vals} />}
       {vals.screen === "form" && <PreCallForm vals={vals} />}
       {vals.screen === "room" && <DemoRoom vals={vals} />}
+      {vals.screen === "handoff" && <DemoHandoff vals={vals} />}
     </div>
   );
 }

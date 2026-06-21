@@ -5,6 +5,10 @@ export interface PageContext { url: string; title: string; links: string[]; text
 export interface BrowserLane {
   navigate(sessionId: string, url: string): Promise<ScreenState>;
   clickText(sessionId: string, text: string): Promise<ScreenState>;
+  typeText(sessionId: string, text: string, into?: string): Promise<ScreenState>;
+  pressKey(sessionId: string, key: string): Promise<ScreenState>;
+  scroll(sessionId: string, direction: "down" | "up"): Promise<ScreenState>;
+  waitFor(sessionId: string, until?: string, seconds?: number): Promise<ScreenState>;
   pageContext(sessionId: string): Promise<PageContext>;
 }
 export interface MemoryLane { remember(buyerId: string, n: { text: string; type: string }): Promise<unknown> }
@@ -34,6 +38,18 @@ export function makeExecutor(d: ExecutorDeps): ToolExecutor {
             return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };
           case "click":
             await d.browser.clickText(d.sessionId, input.text);           // ScreenState (no text)
+            return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };
+          case "type":
+            await d.browser.typeText(d.sessionId, input.text, input.into);
+            return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };
+          case "press":
+            await d.browser.pressKey(d.sessionId, input.key);
+            return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };
+          case "scroll":
+            await d.browser.scroll(d.sessionId, input.direction);
+            return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };
+          case "wait":
+            await d.browser.waitFor(d.sessionId, input.until, input.seconds);
             return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };
           case "look":
             return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };

@@ -7,6 +7,7 @@ const cfg: DemoConfig = {
   productName: "Browserbase",
   persona: "Messi",
   browseTargetUrl: "https://www.browserbase.com",
+  sections: [],
   corpusSeed: "",
 };
 

@@ -2,7 +2,6 @@ import type { Orchestrator, TurnInput, TurnContext } from "./types";
 import type { Command, Language } from "../../lib/voice/messages";
 import type { ToolExecutor } from "../brain/executor";
 import type { DemoConfig } from "../config/demoConfig";
-import { SECTIONS } from "../config/demoConfig";
 import type { BuyerMemory } from "../../lib/memory/types";
 import { runTurn } from "../brain/turn";
 import { buildSystem, toMessages } from "../brain/messages";
@@ -63,13 +62,18 @@ export class LoopOrchestrator implements Orchestrator {
     const memoryContext = [buyerBlock, ctx.learningsContext]
       .filter(Boolean)
       .join("\n\n");
-    const playbook = matchPlaybook(input.text, SECTIONS);
+    // Playbooks are Browserbase-specific (SEC-filing, product tour); only fire
+    // them for that company so other demos drive the brain unscripted.
+    const playbook =
+      this.deps.cfg.company === "browserbase"
+        ? matchPlaybook(input.text, this.deps.cfg.sections)
+        : null;
     let system =
       buildSystem(this.deps.cfg, memoryContext, ctx.role, ctx.agentName) +
       languageDirective(input.language);
     if (playbook) system += playbook.directive;
     system +=
-      "\n\nVOICE PACE: Always stay concise — one or two short sentences per turn, never a monologue. Never use generic filler like \"here's how Browserbase handles that\" — every line must be specific to what's on screen or what the visitor asked.";
+      `\n\nVOICE PACE: Always stay concise — one or two short sentences per turn, never a monologue. Never use generic filler like "here's how ${this.deps.cfg.productName} handles that" — every line must be specific to what's on screen or what the visitor asked.`;
 
     const messages = [...toMessages(ctx.history), { role: "user" as const, content: input.text }];
 
