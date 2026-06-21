@@ -52,7 +52,7 @@ export default function RecapPanel({ view }: { view: RecapView }) {
   return (
     <div>
       <div className="mb-4 flex items-center gap-2">
-        <span className={"rounded px-2 py-1 text-[12px] font-semibold " + LABEL_STYLE[r.label]}>{LABEL_TEXT[r.label]}</span>
+        <span className={`rounded px-2 py-1 text-[12px] font-semibold ${LABEL_STYLE[r.label]}`}>{LABEL_TEXT[r.label]}</span>
         <EvidenceChips evidence={r.labelEvidence} />
       </div>
 
