@@ -264,9 +264,11 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
             <div className="text-[11px] tracking-[0.1em] uppercase text-dim font-bold font-mono">
               Talk to {agentName}
             </div>
-            <div className="text-[11px] text-faint2 mt-0.5">
-              {voice.active ? "she drives the live product" : "start the demo to chat"}
-            </div>
+            {!voice.active && (
+              <div className="text-[11px] text-faint2 mt-0.5">
+                start the demo to chat
+              </div>
+            )}
           </div>
 
           <div ref={scrollRef} className="dl-scroll flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 min-h-0">
