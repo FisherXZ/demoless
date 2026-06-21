@@ -4,7 +4,8 @@ import SessionList from "@/components/dashboard/SessionList";
 import { Group, SignalRow } from "@/components/dashboard/SignalGroup";
 import { getSession, fmtDuration, intentOf, kpis } from "@/lib/dashboard/data";
 import RecapPanel from "@/components/dashboard/RecapPanel";
-import { getRecapView } from "@/lib/dashboard/source";
+import { getRecapView, type RecapView } from "@/lib/dashboard/source";
+import type { RecapReport } from "@/lib/sessions";
 
 function scoreClass(n: number) {
   return n >= 80 ? "text-goodlit" : n >= 65 ? "text-brandlit2" : "text-warnlit";
@@ -12,6 +13,105 @@ function scoreClass(n: number) {
 function intentClass(n: number) {
   const i = intentOf(n);
   return i === "High" ? "text-goodlit" : i === "Medium" ? "text-warnlit" : "text-ash";
+}
+
+function recapLabelText(label: RecapReport["label"]): string {
+  if (label === "hot") return "Hot";
+  if (label === "follow_up_needed") return "Follow-up";
+  return "Nurture";
+}
+
+function recapScore(label: RecapReport["label"]): number {
+  if (label === "hot") return 86;
+  if (label === "follow_up_needed") return 68;
+  return 42;
+}
+
+function recapScoreClass(label: RecapReport["label"]): string {
+  if (label === "hot") return "text-goodlit";
+  if (label === "follow_up_needed") return "text-warnlit";
+  return "text-ash";
+}
+
+function RealRecapRail({ view }: { view: RecapView }) {
+  const recap = view.recap;
+
+  if (!recap) {
+    return (
+      <>
+        <Group label="Snapshot">
+          <div className="mb-2 flex items-center text-[13px]">
+            <span className="text-ash">Status</span>
+            <span className="ml-auto font-mono font-semibold text-warnlit">Analyzing</span>
+          </div>
+          <p className="m-0 text-[13px] leading-[1.45] text-ash">
+            Recap is still processing. Keep the replay link visible and refresh after analysis completes.
+          </p>
+        </Group>
+        <Group label="Evidence">
+          <SignalRow signal={{ type: "question", value: "No scored signals available yet.", at: "" }} />
+        </Group>
+      </>
+    );
+  }
+
+  const score = recapScore(recap.label);
+
+  return (
+    <>
+      <Group label="Snapshot">
+        <div className="mb-2 flex items-center text-[13px]">
+          <span className="text-ash">Recap label</span>
+          <span className={"ml-auto font-mono font-semibold " + recapScoreClass(recap.label)}>
+            {recapLabelText(recap.label)}
+          </span>
+        </div>
+        <div className="mb-2 flex items-center text-[13px]">
+          <span className="text-ash">Demo score</span>
+          <span className={"dl-num ml-auto font-mono text-[26px] font-semibold " + recapScoreClass(recap.label)}>
+            {score}
+          </span>
+        </div>
+        <div className="flex items-center text-[13px]">
+          <span className="text-ash">Evidence</span>
+          <span className="ml-auto font-mono font-semibold text-chalk">
+            {recap.labelEvidence.length} cited
+          </span>
+        </div>
+      </Group>
+
+      <Group label="Buyer signals">
+        {recap.buyingSignals.slice(0, 3).map((signal, i) => (
+          <SignalRow key={i} signal={{ type: "interest", value: signal.text, at: "" }} />
+        ))}
+        {recap.buyingSignals.length === 0 && (
+          <SignalRow signal={{ type: "question", value: "No buying signals captured.", at: "" }} />
+        )}
+      </Group>
+
+      <Group label="Objections and questions">
+        {recap.objectionsQuestions.slice(0, 3).map((item, i) => (
+          <SignalRow
+            key={i}
+            signal={{
+              type: item.kind === "objection" ? "objection" : "question",
+              value: item.text,
+              at: "",
+            }}
+          />
+        ))}
+        {recap.objectionsQuestions.length === 0 && (
+          <SignalRow signal={{ type: "interest", value: "No objections captured.", at: "" }} />
+        )}
+      </Group>
+
+      {recap.nextAction.text && (
+        <Group label="Next action">
+          <SignalRow signal={{ type: "role", value: recap.nextAction.text, at: "" }} />
+        </Group>
+      )}
+    </>
+  );
 }
 
 export default async function SessionDetail({
@@ -32,7 +132,7 @@ export default async function SessionDetail({
             {view.record.company}
           </span>
         </header>
-        <div className="grid min-h-0 flex-1 grid-cols-[240px_1fr]">
+        <div className="grid min-h-0 flex-1 grid-cols-[240px_1fr_252px]">
           {/* left — sessions list */}
           <div className="dl-scroll min-w-0 overflow-y-auto border-r border-edge">
             <SessionList selectedId={view.record.id} />
@@ -52,6 +152,9 @@ export default async function SessionDetail({
               )}
               <RecapPanel view={view} />
             </div>
+          </div>
+          <div className="dl-scroll min-w-0 overflow-y-auto border-l border-edge bg-[#EDF0F4] px-4 py-[18px]">
+            <RealRecapRail view={view} />
           </div>
         </div>
       </div>
