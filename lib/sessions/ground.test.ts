@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { verifyEvidence, groundInsights } from "./ground";
+import { verifyEvidence, groundInsights, groundEvidenceList } from "./ground";
 import type { RecapReport, SessionRecord } from "./types";
 
 const record: SessionRecord = {
@@ -98,5 +98,27 @@ describe("groundInsights", () => {
     );
     expect(out.label).toBe("hot");
     expect(out.labelEvidence.length).toBeGreaterThan(0);
+  });
+
+  it("downgrades follow_up_needed to nurture when no buying signal survives", () => {
+    const out = groundInsights(
+      baseReport({ label: "follow_up_needed", buyingSignals: [], labelEvidence: [] }),
+      record
+    );
+    expect(out.label).toBe("nurture");
+  });
+});
+
+describe("groundEvidenceList", () => {
+  it("keeps only verifiable evidence and drops the rest", () => {
+    const kept = groundEvidenceList(
+      [
+        { kind: "quote", speaker: "user", text: "how much does the Pro plan cost", turn: 0, ts: 0 },
+        { kind: "quote", speaker: "user", text: "this was never said", turn: 0, ts: 0 },
+      ],
+      record
+    );
+    expect(kept).toHaveLength(1);
+    expect(kept[0]).toMatchObject({ kind: "quote", turn: 1 });
   });
 });
