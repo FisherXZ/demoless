@@ -113,6 +113,11 @@ export interface AudioStartMessage {
   sampleRate: number;
   language: Language;
   buyer: BuyerIdentity;
+  /**
+   * The visitor's self-reported role from the pre-call form. Used server-side
+   * to pick an audience persona (technical vs non-technical) for the prompt.
+   */
+  role?: string;
 }
 
 export interface AudioStopMessage {
@@ -134,6 +139,8 @@ export interface TextInputMessage {
   t: "text_input";
   text: string;
   buyer?: BuyerIdentity;
+  /** Visitor role for persona selection (see {@link AudioStartMessage.role}). */
+  role?: string;
 }
 
 /** Ask the server to pre-create the cloud browser before the mic is enabled,

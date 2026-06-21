@@ -90,6 +90,9 @@ export class VoiceSession {
   private recorder = new SessionRecorder();
   private buyerNotes: string[] = [];
   private learningsContext = "";
+
+  /** Visitor's self-reported role from the pre-call form; picks the persona. */
+  private role: string | undefined;
   private company = ""; // set in startListening; "" means a session that never started
   private lastPhase: string | undefined;
   private disposed = false; // dispose() is bound to both ws "close" and "error"
@@ -271,6 +274,7 @@ export class VoiceSession {
     switch (msg.t) {
       case "audio_start":
         if (!this.acceptBuyer(msg.buyer)) return;
+        if (msg.role) this.role = msg.role;
         void this.ensureStarted(msg.language);
         break;
       case "audio_stop":
@@ -290,6 +294,7 @@ export class VoiceSession {
         // browser session + orchestrator are started before running a turn
         // (otherwise this.orchestrator is null and runTurn crashes).
         if (!this.acceptBuyer(msg.buyer)) return;
+        if (msg.role) this.role = msg.role;
         this.send({ t: "user_said", text: msg.text, final: true });
         void this.ensureStarted(this.language).then(() => this.runTurn(msg.text));
         break;
@@ -580,6 +585,7 @@ export class VoiceSession {
         buyerNotes: this.buyerNotes,
         agentName: this.agentName,
         learningsContext: this.learningsContext,
+        role: this.role,
       },
       signal
     )) {

@@ -41,6 +41,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
   const voice = useVoiceAgent({
     buyer: vals.buyerIdentity,
     language: vals.form.language,
+    role: vals.form.role,
   });
   useAgentName(); // side-effect: syncs agent name from server
 

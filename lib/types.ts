@@ -8,11 +8,15 @@ export type Screen = "landing" | "form" | "room" | "dashboard";
 export interface FormState {
   name: string;
   email: string;
+  /** Self-reported role; classified into an audience persona for the agent. */
+  role: string;
   /** Language the visitor picks on the form; seeds the voice session. */
   language: Language;
 }
 
-export type FieldChange = (e: ChangeEvent<HTMLInputElement>) => void;
+export type FieldChange = (
+  e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => void;
 
 export interface Lead {
   id: string;
@@ -104,6 +108,7 @@ export interface DemoVals {
   form: FormState;
   onName: FieldChange;
   onEmail: FieldChange;
+  onRole: FieldChange;
   onLanguage: (lang: Language) => void;
 
   tailoredFor: string;

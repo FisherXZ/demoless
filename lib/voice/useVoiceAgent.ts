@@ -54,6 +54,9 @@ export interface VoiceAgentOptions {
   /** Language the visitor chose on the form; seeds the session so the first
    *  utterance is transcribed and answered in it (no Whisper auto-detect). */
   language?: Language;
+  /** Visitor's self-reported role (from the pre-call form). Sent to the gateway
+   *  so it can pick an audience persona (technical vs non-technical). */
+  role?: string;
 }
 
 export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
@@ -79,10 +82,12 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const decoder = useRef<PcmChunkDecoder | null>(null);
   const languageRef = useRef<Language>(language);
   const buyerRef = useRef<BuyerIdentity | undefined>(options.buyer);
+  const roleRef = useRef<string | undefined>(options.role);
   const mutedRef = useRef(false);
 
   languageRef.current = language;
   buyerRef.current = options.buyer;
+  roleRef.current = options.role;
 
   const teardown = useCallback(() => {
     node.current?.port.close();
@@ -183,7 +188,12 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const sendText = useCallback((text: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
-        JSON.stringify({ t: "text_input", text, buyer: buyerRef.current })
+        JSON.stringify({
+          t: "text_input",
+          text,
+          buyer: buyerRef.current,
+          role: roleRef.current,
+        })
       );
     }
   }, []);
@@ -238,6 +248,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
             sampleRate: AUDIO_SAMPLE_RATE,
             language: languageRef.current,
             buyer: buyerRef.current,
+            role: roleRef.current,
           })
         );
       };

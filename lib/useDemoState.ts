@@ -47,6 +47,7 @@ const initialState: DemoState = {
   form: {
     name: "",
     email: "",
+    role: "VP of Sales",
     language: "en",
   },
 };
@@ -167,6 +168,7 @@ export function useDemoState(): DemoVals {
     form,
     onName: (e) => setF("name", e.target.value),
     onEmail: (e) => setF("email", e.target.value),
+    onRole: (e) => setF("role", e.target.value),
     onLanguage: (lang) => setF("language", lang),
 
     tailoredFor,

@@ -10,6 +10,7 @@ const LANG_CODES = Object.keys(LANGUAGES) as Language[];
 
 const fieldClass =
   "border border-line3 rounded-[10px] px-[14px] py-3 text-[15px] bg-white transition-colors focus:border-brand focus:shadow-[0_0_0_3px_#eef0ff]";
+const selectClass = `${fieldClass} appearance-none cursor-pointer`;
 
 export default function PreCallForm({ vals }: { vals: DemoVals }) {
   const agentName = useAgentName();
@@ -122,6 +123,27 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
               className={fieldClass}
             />
           </label>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-[7px]">
+          <span className="text-[13px] font-semibold text-ink2">Your role</span>
+          <select
+            value={vals.form.role}
+            onChange={vals.onRole}
+            className={selectClass}
+          >
+            <option>VP of Sales</option>
+            <option>Sales / RevOps</option>
+            <option>Founder / CEO</option>
+            <option>Marketing</option>
+            <option>Operations</option>
+            <option>Product Manager</option>
+            <option>Engineering / Developer</option>
+            <option>Data / ML</option>
+            <option>DevOps / Platform</option>
+            <option>IT / Security</option>
+            <option>Other</option>
+          </select>
         </div>
 
         <div className="mt-4 flex flex-col gap-[7px]">
