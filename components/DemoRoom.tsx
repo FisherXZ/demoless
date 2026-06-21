@@ -58,10 +58,10 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
 
   const agentSpeaking = voice.agentSpeaking;
 
-  // Captions: prefer real spoken text once the voice loop is running. Swap any
-  // default agent-name mentions in the caption for the configured name.
-  const rawCaption = voice.lastCaption || vals.caption;
-  const agentCaption = rawCaption.replace(/Messi/g, agentName);
+  // Captions: only show what the voice agent actually spoke. The static
+  // vals.caption is for the scripted demo path — using it here flashes stale
+  // copy before the personalized greeting arrives.
+  const agentCaption = voice.lastCaption.replace(/Messi/g, agentName);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -231,7 +231,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
             </div>
 
             {/* captions */}
-            {vals.captionsOn && (
+            {vals.captionsOn && (agentCaption || voice.partialTranscript) && (
               <div className="absolute left-3.5 bottom-3.5 max-w-[58%] flex flex-col gap-1.5">
                 {voice.active && voice.partialTranscript && (
                   <div className="bg-brand/90 text-white px-[15px] py-[9px] rounded-[11px] text-sm leading-[1.4] self-start">
@@ -241,12 +241,14 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                     {voice.partialTranscript}
                   </div>
                 )}
-                <div className="bg-night/90 text-white px-[15px] py-[11px] rounded-[11px] text-sm leading-[1.4]">
-                  <span className="text-[#a5b4fc] font-bold text-xs font-mono">
-                    {agentName.toUpperCase()}&nbsp;&nbsp;
-                  </span>
-                  {agentCaption}
-                </div>
+                {agentCaption && (
+                  <div className="bg-night/90 text-white px-[15px] py-[11px] rounded-[11px] text-sm leading-[1.4]">
+                    <span className="text-[#a5b4fc] font-bold text-xs font-mono">
+                      {agentName.toUpperCase()}&nbsp;&nbsp;
+                    </span>
+                    {agentCaption}
+                  </div>
+                )}
               </div>
             )}
           </div>

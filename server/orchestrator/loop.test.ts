@@ -61,4 +61,84 @@ describe("LoopOrchestrator", () => {
     expect(text).not.toMatch(/walk you through|show you/i);
     expect((text.match(/\?/g) ?? []).length).toBe(1);
   });
+
+  it("pre-navigates to Overview when the visitor asks about features", async () => {
+    const calls: string[] = [];
+    const exec = {
+      phase: "HOOK",
+      run: async (name: string, input: any) => {
+        calls.push(name);
+        if (name === "navigate") {
+          return { ok: true, content: "URL: https://x/overview\nTitle: Overview" };
+        }
+        return { ok: true, content: "" };
+      },
+    };
+    const orch = new LoopOrchestrator({ executor: exec as any, cfg: cfg as any });
+    (orch as any)._runTurn = async function* () {
+      yield { type: "say", text: "Cloud browsers your agents drive." };
+      yield { type: "done" };
+    };
+
+    const out: any[] = [];
+    for await (const c of orch.runTurn(
+      { text: "what features u guys have", language: "en" },
+      { history: [], buyerNotes: [], agentName: "Messi", learningsContext: "" },
+      new AbortController().signal
+    )) {
+      out.push(c);
+    }
+
+    expect(calls[0]).toBe("navigate");
+    expect(out.some((c) => c.type === "say" && c.text.includes("dashboard"))).toBe(true);
+    expect(out.some((c) => c.type === "navigate")).toBe(true);
+    expect(out.some((c) => c.type === "set_phase" && c.phase === "WALKTHROUGH")).toBe(true);
+  });
+
+  it("speaks an opening line before SEC filing playbook steps", async () => {
+    const calls: Array<{ name: string; input?: any }> = [];
+    const exec = {
+      phase: "HOOK",
+      run: async (name: string, input: any) => {
+        calls.push({ name, input });
+        if (name === "navigate") {
+          return { ok: true, content: "URL: https://x/playground\nTitle: Playground" };
+        }
+        if (name === "click") {
+          return { ok: true, content: `URL: https://x/playground\nTitle: ${input.text}` };
+        }
+        return { ok: true, content: "URL: https://x/playground\nTitle: Playground" };
+      },
+    };
+    const orch = new LoopOrchestrator({ executor: exec as any, cfg: cfg as any });
+    (orch as any)._runTurn = async function* () {
+      yield { type: "say", text: "EDGAR filings pull automatically." };
+      yield { type: "done" };
+    };
+
+    const out: any[] = [];
+    for await (const c of orch.runTurn(
+      { text: "can you extract sec filing", language: "en" },
+      { history: [], buyerNotes: [], agentName: "Messi", learningsContext: "" },
+      new AbortController().signal
+    )) {
+      out.push(c);
+    }
+
+    expect(calls.map((c) => c.name)).toEqual([
+      "navigate",
+      "click",
+      "look",
+      "click",
+      "set_phase",
+    ]);
+    expect(out[0]).toEqual({
+      type: "say",
+      text: "EDGAR filings by ticker or CIK — running in the cloud.",
+    });
+    expect(out.some((c) => c.type === "say" && c.text.includes("replay"))).toBe(true);
+    expect(calls[1].input).toEqual({ text: "Extract SEC filing data" });
+    expect(calls[3].input).toEqual({ text: "Run script" });
+    expect(out.some((c) => c.type === "navigate")).toBe(true);
+  });
 });

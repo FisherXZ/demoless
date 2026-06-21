@@ -14,6 +14,7 @@ import {
   tokenize,
 } from "./bargeIn";
 import { DeepgramStt, type SttTranscript } from "./deepgram/stt";
+import { shouldDropUserTranscript } from "./stt/filter";
 import {
   createOrchestrator as defaultCreateOrchestrator,
   type Orchestrator,
@@ -132,7 +133,7 @@ export class VoiceSession {
   private static readonly MAX_HISTORY_TURNS = 12;
 
   /** Drop stray echo for this long after the agent stops talking (ms). */
-  private static readonly POST_SPEECH_GUARD_MS = 600;
+  private static readonly POST_SPEECH_GUARD_MS = 1200;
 
   /**
    * How (and how readily) the user can interrupt the agent. See {@link readBargeConfig}.
@@ -443,13 +444,23 @@ export class VoiceSession {
       if (Date.now() < this.suppressInputUntil) return;
 
       if (t.isFinal) {
+        if (shouldDropUserTranscript(t.text, t.confidence, true)) return;
         this.finals.push(t.text);
         const full = this.finals.join(" ").trim();
+        if (shouldDropUserTranscript(full, t.confidence, true)) {
+          this.finals = [];
+          this.send({ t: "user_said", text: "", final: false });
+          return;
+        }
         this.send({ t: "user_said", text: full, final: false });
         if (t.speechFinal) this.endUtterance();
       } else {
         const preview = [...this.finals, t.text].join(" ").trim();
-        if (preview) this.send({ t: "user_said", text: preview, final: false });
+        if (!preview || shouldDropUserTranscript(preview, t.confidence, false)) {
+          this.send({ t: "user_said", text: "", final: false });
+          return;
+        }
+        this.send({ t: "user_said", text: preview, final: false });
       }
     });
 
@@ -482,6 +493,10 @@ export class VoiceSession {
   private endUtterance() {
     const text = this.finals.join(" ").trim();
     this.finals = [];
+    if (shouldDropUserTranscript(text, 1, true)) {
+      this.send({ t: "user_said", text: "", final: false });
+      return;
+    }
     // First utterance with auto-detect on: figure out the language (and get an
     // accurate transcript) from the buffered audio before running the turn.
     if (this.autoDetectEnabled && !this.detected) {

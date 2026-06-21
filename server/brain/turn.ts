@@ -5,6 +5,12 @@ import type { ToolName } from "./tools";
 import type { ToolExecutor } from "./executor";
 import { SentenceChunker } from "../util/sentenceChunker";   // REVIEW FIX improvement 2
 import type { Command } from "../../lib/voice/messages";      // REVIEW FIX B1: the ONE shared union
+import { sanitizeSpokenText } from "./spokenText";
+
+function say(text: string): Command | null {
+  const clean = sanitizeSpokenText(text);
+  return clean ? { type: "say", text: clean } : null;
+}
 
 export interface TurnArgs {
   system: string;
@@ -26,13 +32,17 @@ export async function* runTurn(args: TurnArgs): AsyncIterable<Command> {
       if (args.signal.aborted) { yield { type: "done" }; return; }
       if (ev.kind === "text") {
         textForHistory += ev.delta;
-        for (const s of chunker.push(ev.delta)) yield { type: "say", text: s };
+        for (const s of chunker.push(ev.delta)) {
+          const cmd = say(s);
+          if (cmd) yield cmd;
+        }
       } else if (ev.kind === "tool_use") {
         toolCalls.push({ id: ev.id, name: ev.name as ToolName, input: ev.input });
       }
     }
     const tail = chunker.flush();
-    if (tail.trim()) yield { type: "say", text: tail.trim() };
+    const tailCmd = tail.trim() ? say(tail.trim()) : null;
+    if (tailCmd) yield tailCmd;
     if (!toolCalls.length) { yield { type: "done" }; return; }
 
     // record assistant turn (text + tool_use) then execute and feed results back

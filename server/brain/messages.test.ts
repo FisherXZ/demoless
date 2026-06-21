@@ -15,11 +15,11 @@ describe("buildSystem discovery contract", () => {
     const system = buildSystem(cfg, "");
 
     expect(system).toContain("Discovery-first");
-    expect(system).toMatch(/why the buyer is here/i);
-    expect(system).toMatch(/workflow or problem/i);
-    expect(system).toMatch(/background/i);
+    expect(system).toMatch(/still vague/i);
+    expect(system).toMatch(/what features do you have/i);
+    expect(system).toMatch(/do NOT ask why they are here/i);
     expect(system).toMatch(/one short question at a time/i);
-    expect(system).toMatch(/do not ask.*multiple discovery questions/i);
+    expect(system).toMatch(/never a form-like list or multiple discovery questions/i);
   });
 
   it("preserves direct navigation requests with a contextual follow-up", () => {
@@ -48,6 +48,14 @@ describe("buildSystem discovery contract", () => {
     expect(system).toMatch(/do not assign/i);
     expect(system).toMatch(/scores/i);
     expect(system).toMatch(/certainty/i);
+  });
+
+  it("forbids narrating screen-reading or look-it-up filler", () => {
+    const system = buildSystem(cfg, "");
+
+    expect(system).toMatch(/Voice discipline/i);
+    expect(system).toMatch(/never say you're looking/i);
+    expect(system).toMatch(/I'll look it up/i);
   });
 
   it("uses the runtime voice-derived agent name in configured prompts", () => {

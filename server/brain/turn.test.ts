@@ -16,7 +16,7 @@ describe("runTurn", () => {
     for await (const c of runTurn({ system: "s", messages: [{ role: "user", content: "price?" }],
       executor: executor as any, signal: new AbortController().signal, stream })) out.push(c);
     const says = out.filter((c) => c.type === "say").map((c) => c.text);
-    expect(says.join(" ")).toContain("Let me check.");
+    expect(says.join(" ")).not.toContain("Let me check.");
     expect(says.join(" ")).toContain("Here is pricing.");
     expect(executor.run).toHaveBeenCalledWith("navigate", { url: "/p" }, expect.anything()); // signal threaded
     expect(out.at(-1)).toEqual({ type: "done" });

@@ -404,6 +404,36 @@ describe("VoiceSession STT and control paths", () => {
     expect(sent(ws, "user_said")).toHaveLength(0);
   });
 
+  it("drops phantom video outro transcripts and clears the caption", async () => {
+    vi.stubEnv("VOICE_AUTODETECT", "0");
+    const fakeOrchestrator = orchestrator();
+    const { ws } = mount({ fakeOrchestrator });
+    control(ws, { t: "audio_start", language: "en" });
+    await waitForSent(ws, "ready");
+
+    fakes.sttInstances[0].emit("transcript", {
+      text: "Thank you so much for watching!",
+      isFinal: false,
+      speechFinal: false,
+      confidence: 0.95,
+    });
+    await Promise.resolve();
+    expect(sent(ws, "user_said")).toContainEqual({
+      t: "user_said",
+      text: "",
+      final: false,
+    });
+
+    fakes.sttInstances[0].emit("transcript", {
+      text: "Thank you so much for watching!",
+      isFinal: true,
+      speechFinal: true,
+      confidence: 0.95,
+    });
+    await Promise.resolve();
+    expect(fakeOrchestrator.runTurn).not.toHaveBeenCalled();
+  });
+
   it("ignores empty final utterances when auto-detect is disabled", async () => {
     vi.stubEnv("VOICE_AUTODETECT", "0");
     const fakeOrchestrator = orchestrator();

@@ -2,9 +2,12 @@ import type { Orchestrator, TurnInput, TurnContext } from "./types";
 import type { Command, Language } from "../../lib/voice/messages";
 import type { ToolExecutor } from "../brain/executor";
 import type { DemoConfig } from "../config/demoConfig";
+import { SECTIONS } from "../config/demoConfig";
 import type { BuyerMemory } from "../../lib/memory/types";
 import { runTurn } from "../brain/turn";
 import { buildSystem, toMessages } from "../brain/messages";
+import { matchPlaybook } from "./playbooks";
+import { runPlaybook } from "./playbookRunner";
 
 const LANGUAGE_NAMES: Record<Language, string> = {
   en: "English",
@@ -60,10 +63,27 @@ export class LoopOrchestrator implements Orchestrator {
     const memoryContext = [buyerBlock, ctx.learningsContext]
       .filter(Boolean)
       .join("\n\n");
-    const system =
+    const playbook = matchPlaybook(input.text, SECTIONS);
+    let system =
       buildSystem(this.deps.cfg, memoryContext, ctx.role, ctx.agentName) +
       languageDirective(input.language);
+    if (playbook) system += playbook.directive;
+    system +=
+      "\n\nVOICE PACE: Always stay concise — one or two short sentences per turn, never a monologue. Never use generic filler like \"here's how Browserbase handles that\" — every line must be specific to what's on screen or what the visitor asked.";
+
     const messages = [...toMessages(ctx.history), { role: "user" as const, content: input.text }];
+
+    if (playbook?.opening) {
+      yield { type: "say", text: playbook.opening };
+    }
+
+    if (playbook) {
+      yield* runPlaybook(playbook, this.deps.executor, signal);
+      if (playbook.followup) {
+        yield { type: "say", text: playbook.followup };
+      }
+    }
+
     for await (const c of this._runTurn({ system, messages, executor: this.deps.executor, signal })) {
       yield c as Command; // P2 acts on say, forwards navigate/screen_is_on/remember/set_phase
     }
