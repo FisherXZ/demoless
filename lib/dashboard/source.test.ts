@@ -6,8 +6,8 @@ vi.mock("../sessions", () => ({
   listSessions: vi.fn(async () => []),
 }));
 
-import { loadSession, loadRecap } from "../sessions";
-import { getRecapView } from "./source";
+import { loadSession, loadRecap, listSessions } from "../sessions";
+import { getRecapView, listRecapSessions } from "./source";
 
 describe("getRecapView", () => {
   it("returns null when the session is unknown", async () => {
@@ -31,5 +31,14 @@ describe("getRecapView", () => {
     const v = await getRecapView("s1");
     expect(v).toMatchObject({ status: "pending" });
     expect(v!.recap).toBeNull();
+  });
+});
+
+describe("listRecapSessions", () => {
+  it("delegates to the sessions store with the provided limit", async () => {
+    (listSessions as any).mockResolvedValue([{ id: "s1" }]);
+
+    await expect(listRecapSessions(7)).resolves.toEqual([{ id: "s1" }]);
+    expect(listSessions).toHaveBeenCalledWith(7);
   });
 });

@@ -11,7 +11,7 @@ const NAV = [
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const path = usePathname();
+  const path = usePathname() ?? "";
   const isActive = (href: string) =>
     href === "/dashboard" ? path === href : path.startsWith(href);
 

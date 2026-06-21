@@ -22,6 +22,7 @@ const fake = {
 vi.mock("../memory/redis", () => ({ getRedis: () => fake }));
 
 import { saveSession, loadSession, saveRecap, loadRecap, listSessions } from "./store";
+import { SESSIONS_INDEX, sessionKey } from "./keys";
 import type { RecapReport, SessionRecord } from "./types";
 
 const record: SessionRecord = {
@@ -68,5 +69,50 @@ describe("sessions store", () => {
 
   it("returns null for an unknown session", async () => {
     expect(await loadSession("nope")).toBeNull();
+  });
+
+  it("returns null when a stored session record is corrupt", async () => {
+    hashes.set("demoless:session:bad", { record: "not-json" });
+
+    expect(await loadSession("bad")).toBeNull();
+  });
+
+  it("returns pending when a stored recap is corrupt", async () => {
+    hashes.set("demoless:session:bad:recap", { recap: "not-json" });
+
+    expect(await loadRecap("bad")).toEqual({ status: "pending", recap: null });
+  });
+
+  it("skips stale index ids whose session hash is missing", async () => {
+    await saveSession(record);
+    zsets.set(SESSIONS_INDEX, [
+      { member: "missing", score: 10 },
+      { member: "s1", score: 2 },
+    ]);
+
+    expect(await listSessions()).toEqual([
+      {
+        id: "s1",
+        company: "Acme",
+        endedAt: 2,
+        label: undefined,
+        summary: undefined,
+      },
+    ]);
+  });
+
+  it("defaults missing summary fields when an indexed hash is partial", async () => {
+    hashes.set(sessionKey("partial"), { id: "partial" });
+    zsets.set(SESSIONS_INDEX, [{ member: "partial", score: 1 }]);
+
+    expect(await listSessions()).toEqual([
+      {
+        id: "partial",
+        company: "",
+        endedAt: 0,
+        label: undefined,
+        summary: undefined,
+      },
+    ]);
   });
 });

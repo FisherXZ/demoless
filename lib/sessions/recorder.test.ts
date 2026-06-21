@@ -20,7 +20,14 @@ describe("SessionRecorder", () => {
     const r = new SessionRecorder(1000);
     r.recordPage("https://x/pricing", 2, 1150);
     r.recordAction("navigate", "https://x/pricing", 2, 1160);
-    expect(r.events().map((e) => e.kind)).toEqual(["page_visited", "agent_action"]);
+    r.recordPhase("CLOSE", 1170);
+    r.recordRemember("asked for SOC2", undefined, 1180);
+    expect(r.events().map((e) => e.kind)).toEqual([
+      "page_visited",
+      "agent_action",
+      "phase",
+      "remember",
+    ]);
   });
 
   it("builds a SessionRecord with metadata and derived transcript", () => {

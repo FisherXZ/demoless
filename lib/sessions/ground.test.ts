@@ -28,6 +28,22 @@ describe("verifyEvidence", () => {
     expect(ev).toMatchObject({ kind: "quote", speaker: "user", turn: 1, ts: 1 });
   });
 
+  it("corrects the speaker when the quote is real but attributed to the wrong side", () => {
+    const ev = verifyEvidence(
+      { kind: "quote", speaker: "user", text: "Pro is $99 per seat", turn: 0, ts: 0 },
+      record
+    );
+
+    expect(ev).toMatchObject({ kind: "quote", speaker: "agent", turn: 1, ts: 2 });
+  });
+
+  it("rejects empty quote and action evidence", () => {
+    expect(
+      verifyEvidence({ kind: "quote", speaker: "user", text: "   ", turn: 0, ts: 0 }, record)
+    ).toBeNull();
+    expect(verifyEvidence({ kind: "action", label: "   ", ts: 0 }, record)).toBeNull();
+  });
+
   it("rejects a fabricated quote that appears nowhere", () => {
     expect(
       verifyEvidence({ kind: "quote", speaker: "user", text: "we have a $2M budget", turn: 0, ts: 0 }, record)
@@ -38,6 +54,20 @@ describe("verifyEvidence", () => {
     expect(
       verifyEvidence({ kind: "action", label: "pricing", ts: 0 }, record)
     ).not.toBeNull();
+  });
+
+  it("accepts an action that matches a recorded agent action", () => {
+    const withAction: SessionRecord = {
+      ...record,
+      events: [
+        ...record.events,
+        { kind: "agent_action", action: "click", detail: "Opened security settings", turn: 2, ts: 4 },
+      ],
+    };
+
+    expect(
+      verifyEvidence({ kind: "action", label: "security settings", ts: 0 }, withAction)
+    ).toMatchObject({ kind: "action", label: "security settings", ts: 4 });
   });
 
   it("rejects an action with no matching trace event", () => {
@@ -107,9 +137,35 @@ describe("groundInsights", () => {
     );
     expect(out.label).toBe("nurture");
   });
+
+  it("treats missing optional insight arrays as empty", () => {
+    const sparse = {
+      ...baseReport({ label: "nurture" }),
+      whyTheyCame: undefined,
+      buyingSignals: undefined,
+      objectionsQuestions: undefined,
+      gaps: undefined,
+      nextAction: undefined,
+      labelEvidence: undefined,
+    } as unknown as RecapReport;
+
+    const out = groundInsights(sparse, record);
+
+    expect(out.label).toBe("nurture");
+    expect(out.labelEvidence).toEqual([]);
+    expect(out.whyTheyCame).toEqual({ text: "", evidence: [] });
+    expect(out.buyingSignals).toEqual([]);
+    expect(out.objectionsQuestions).toEqual([]);
+    expect(out.gaps).toEqual([]);
+    expect(out.nextAction).toEqual({ text: "", evidence: [] });
+  });
 });
 
 describe("groundEvidenceList", () => {
+  it("treats a missing evidence list as empty", () => {
+    expect(groundEvidenceList(undefined as unknown as [], record)).toEqual([]);
+  });
+
   it("keeps only verifiable evidence and drops the rest", () => {
     const kept = groundEvidenceList(
       [

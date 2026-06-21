@@ -9,6 +9,7 @@ npm-debug.log*
 .env*.local
 next-env.d.ts
 /screenshots
+/coverage
 .vercel
 *.tsbuildinfo
 .env

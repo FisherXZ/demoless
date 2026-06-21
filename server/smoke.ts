@@ -30,6 +30,7 @@ export async function runSmoke(buyerId = "smoke-user") {
   await session(buyerId, []); // greet only — should welcome back
 }
 
+/* v8 ignore next 3 -- CLI entrypoint exits the process; runSmoke is covered directly. */
 if (process.argv[1] && process.argv[1].endsWith("smoke.ts")) {
   runSmoke().then(() => process.exit(0));
 }

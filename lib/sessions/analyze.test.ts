@@ -59,11 +59,30 @@ describe("analyzeSession", () => {
     expect(out).toBeNull();
     expect(chat).not.toHaveBeenCalled();
   });
+
+  it("includes page visits and agent actions in the model prompt", async () => {
+    const chat = vi.fn(async () => reply);
+    const withTrace: SessionRecord = {
+      ...record,
+      events: [
+        ...record.events,
+        { kind: "page_visited", url: "https://acme.com/pricing", turn: 1, ts: 3 },
+        { kind: "agent_action", action: "click", detail: "Opened pricing calculator", turn: 1, ts: 4 },
+      ],
+    };
+
+    await analyzeSession(withTrace, chat, 1);
+
+    const prompt = chat.mock.calls[0][1];
+    expect(prompt).toContain("[PAGE] https://acme.com/pricing");
+    expect(prompt).toContain("[ACTION click] Opened pricing calculator");
+  });
 });
 
 describe("parseRecap", () => {
   it("returns null on unparseable input", () => {
     expect(parseRecap("not json at all", "s1", 0)).toBeNull();
+    expect(parseRecap("{broken}", "s1", 0)).toBeNull();
   });
   it("coerces a missing or invalid label to nurture", () => {
     const r = parseRecap(JSON.stringify({ summary: "x" }), "s1", 7);
@@ -76,5 +95,48 @@ describe("parseRecap", () => {
     const r = parseRecap('Here you go: {"label":"hot","summary":"s"} thanks', "s1", 0);
     expect(r).not.toBeNull();
     expect(r!.label).toBe("hot");
+  });
+  it("coerces objection/question items and keeps valid evidence", () => {
+    const r = parseRecap(
+      JSON.stringify({
+        label: "nurture",
+        objectionsQuestions: [
+          {
+            text: "Needs procurement approval",
+            kind: "objection",
+            evidence: [{ kind: "quote", speaker: "user", text: "procurement", extra: "ignored" }],
+          },
+          { text: "How long does setup take?", kind: "other", evidence: [] },
+          { kind: "question", evidence: [] },
+        ],
+      }),
+      "s1",
+      0
+    );
+
+    expect(r!.objectionsQuestions).toEqual([
+      {
+        text: "Needs procurement approval",
+        kind: "objection",
+        evidence: [{ kind: "quote", speaker: "user", text: "procurement", extra: "ignored" }],
+      },
+      { text: "How long does setup take?", kind: "question", evidence: [] },
+    ]);
+  });
+  it("drops invalid evidence entries while parsing", () => {
+    const r = parseRecap(
+      JSON.stringify({
+        label: "hot",
+        labelEvidence: [
+          null,
+          { kind: "bogus", text: "nope" },
+          { kind: "action", label: "pricing" },
+        ],
+      }),
+      "s1",
+      0
+    );
+
+    expect(r!.labelEvidence).toEqual([{ kind: "action", label: "pricing" }]);
   });
 });

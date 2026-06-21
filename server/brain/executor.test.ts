@@ -23,6 +23,31 @@ describe("ToolExecutor", () => {
     expect(r.ok).toBe(true);
     expect(r.content).toContain("hello world");
   });
+  it("click drives the browser THEN reads pageContext for text", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("click", { text: "Pricing" });
+    expect(f.browser.clickText).toHaveBeenCalledWith("s1", "Pricing");
+    expect(f.browser.pageContext).toHaveBeenCalledWith("s1");
+    expect(r.ok).toBe(true);
+    expect(r.content).toContain("Links: /a");
+  });
+  it("look reads the current page without mutating browser state", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("look", {});
+    expect(f.browser.navigate).not.toHaveBeenCalled();
+    expect(f.browser.clickText).not.toHaveBeenCalled();
+    expect(f.browser.pageContext).toHaveBeenCalledWith("s1");
+    expect(r.content).toContain("Title: X");
+  });
+  it("remember stores the note for the current buyer", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("remember", { type: "interest", note: "security review" });
+    expect(f.memory.remember).toHaveBeenCalledWith("b1", {
+      type: "interest",
+      text: "security review",
+    });
+    expect(r).toEqual({ ok: true, content: "noted" });
+  });
   it("set_phase updates observed phase without touching lanes", async () => {
     const f = fakes(); const ex = makeExecutor(f as any);
     await ex.run("set_phase", { phase: "DISCOVERY" });
@@ -33,6 +58,14 @@ describe("ToolExecutor", () => {
     const ex = makeExecutor(fakes() as any);
     const r = await ex.run("search_knowledge", { query: "price" });
     expect(r.content).toContain("Pricing");
+  });
+  it("search_knowledge reports when no facts match", async () => {
+    const f = fakes();
+    f.knowledge.searchKnowledge.mockResolvedValueOnce([]);
+    const ex = makeExecutor(f as any);
+    const r = await ex.run("search_knowledge", { query: "missing" });
+    expect(r).toEqual({ ok: true, content: "No matching facts." });
+    expect(f.knowledge.buildAnswerContext).not.toHaveBeenCalled();
   });
   it("does not run the tool if already aborted (REVIEW FIX, improvement 3)", async () => {
     const f = fakes(); const ex = makeExecutor(f as any);
