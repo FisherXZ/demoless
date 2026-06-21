@@ -2,9 +2,10 @@ import type { ChangeEvent } from "react";
 
 export type Screen = "landing" | "form" | "room" | "dashboard";
 
-/** Manually-entered pre-call fields. Identity (name/email) now comes from the
- *  verified Google session, not this form. */
+/** Manually-entered pre-call fields. Identity from the form (name/email). */
 export interface FormState {
+  name: string;
+  email: string;
   role: string;
   size: string;
   useCase: string;
@@ -88,22 +89,22 @@ export interface SelectedLead extends Lead {
 export interface DemoVals {
   screen: Screen;
 
+  /** Auth state (NextAuth v5 Google sign-in). */
+  isAuthed: boolean;
+  authName?: string | null;
+  authEmail?: string | null;
+  signInGoogle: () => void;
+
   goLanding: () => void;
   goForm: () => void;
   goDashboard: () => void;
   startDemo: () => void;
 
-  // Google auth (Auth.js). Identity is verified, not typed.
-  authStatus: "loading" | "authenticated" | "unauthenticated";
-  isAuthed: boolean;
-  authEmail?: string;
-  authName?: string;
-  signInGoogle: () => void;
-  signOutGoogle: () => void;
-  canStart: boolean; // gate: demo can only start once signed in
   recallLine?: string; // "welcome back…" for returning buyers
 
   form: FormState;
+  onName: FieldChange;
+  onEmail: FieldChange;
   onRole: FieldChange;
   onSize: FieldChange;
   onUseCase: FieldChange;

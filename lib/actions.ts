@@ -1,10 +1,11 @@
 "use server";
 
-import { auth } from "@/auth";
 import { upsertProfile, loadBuyer } from "@/lib/memory";
 
-/** Manual pre-call form fields (identity comes from the verified session). */
+/** Manual pre-call form fields plus identity from the form. */
 export interface DemoFields {
+  email: string;
+  name?: string;
   role?: string;
   size?: string;
   useCase?: string;
@@ -16,20 +17,19 @@ export interface EnterDemoResult {
 }
 
 /**
- * Called when a signed-in buyer starts a demo. Persists the verified Google
- * account (email + name) plus the manual form fields into the P4 Redis layer
- * and bumps the visit, returning the "welcome back" recall for returning
- * buyers. Identity is read from the server-side session, never from the client,
- * so the buyer key cannot be spoofed. A Redis outage never blocks the demo.
+ * Called when a buyer starts a demo. Persists the form identity plus manual
+ * fields into the P4 Redis layer and bumps the visit, returning the
+ * "welcome back" recall for returning buyers.
+ * Identity comes from the form (email). A Redis outage never blocks the demo.
+ * NOTE: NextAuth/Google sign-in is deferred to a later phase.
  */
 export async function enterDemo(fields: DemoFields): Promise<EnterDemoResult> {
-  const session = await auth();
-  const email = session?.user?.email;
-  if (!email) throw new Error("Not authenticated");
+  const { email } = fields;
+  if (!email) return { isReturning: false };
 
   try {
     await upsertProfile(email, {
-      name: session.user?.name ?? undefined,
+      name: fields.name,
       role: fields.role,
       size: fields.size,
       useCase: fields.useCase,

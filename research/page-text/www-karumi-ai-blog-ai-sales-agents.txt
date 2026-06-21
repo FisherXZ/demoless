@@ -1,0 +1,56 @@
+# AI Sales Agents: types and how they work
+
+- Requested: https://www.karumi.ai/blog/ai-sales-agents
+- Final: https://www.karumi.ai/blog/ai-sales-agents
+- Status: 200
+- Source: seed
+
+## Headings
+
+- h1: AI sales agents: what they are, types, and how they work
+- h2: What is an AI sales agent?
+- h2: How do AI sales agents work?
+- h2: Benefits of using an AI sales agent
+- h2: AI sales agent vs AI sales tool: what makes a tool an agent
+- h2: Types of AI sales agents
+- h3: 1. Outbound and prospecting agents
+- h3: 2. Inbound qualification agents
+- h3: 3. Warm lead and signal agents
+- h3: 4 . Demo agents
+- h3: 5. Calling agents
+- h3: 6. Coaching and forecasting agents
+- h2: How to choose the right AI sales agent?
+- h2: The future of AI sales agents
+- h1: Accelerate your growth with
+- h1: AI-led demos.
+- h1: Launch your demo in 5 minutes!
+- h1: Launch your demo in 5 minutes!
+
+## CTAs And Links
+
+- Customers -> https://www.karumi.ai/customers
+- Blog -> https://www.karumi.ai/blog
+- Research -> https://www.karumi.ai/research
+- Talk To Sales -> https://www.karumi.ai/contact-demo
+- Blog -> https://www.karumi.ai/blog
+- AI sales -> https://www.karumi.ai/blog/category/ai-sales
+- AI sales tool -> https://www.karumi.ai/blog/best-ai-sales-tools
+- Karumi -> https://www.karumi.ai/
+- Watch Now
+- About -> https://www.ycombinator.com/companies/karumi
+- Careers -> https://www.ycombinator.com/companies/karumi/jobs
+- Customers -> https://www.karumi.ai/customers
+- Blog -> https://www.karumi.ai/blog
+- Research -> https://www.karumi.ai/research
+- Privacy Policy -> https://www.karumi.ai/privacy
+- Terms of Service -> https://www.karumi.ai/terms
+- DPA -> https://www.karumi.ai/dpa
+- Security Portal -> https://trust.delve.co/karumi
+- Cookie Trigger
+- Talk To Sales -> https://www.karumi.ai/contact-demo
+- Launch Demo Now -> https://app.karumi.ai/meet/start/d461afa6-f0d8-4bbe-83ac-ee88a7dbc303
+- Cookie Policy -> https://www.karumi.ai/privacy
+
+## Text Stats
+
+- Extracted body characters: 15810

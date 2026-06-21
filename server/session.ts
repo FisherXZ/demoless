@@ -13,10 +13,27 @@ import {
   tokenize,
 } from "./bargeIn";
 import { DeepgramStt, type SttTranscript } from "./deepgram/stt";
-import { createOrchestrator, type Orchestrator } from "./orchestrator";
+import {
+  createOrchestrator as defaultCreateOrchestrator,
+  type Orchestrator,
+} from "./orchestrator";
 import type { ConversationTurn } from "./orchestrator/types";
 import { createTts, type TtsProvider } from "./tts";
 import { ChunkChannel } from "./util/chunkChannel";
+import { getDemoConfig } from "./config/demoConfig";
+import {
+  startSession as defaultStartSession,
+  stopSession as defaultStopSession,
+} from "../lib/browser/session";
+import { loadBuyer } from "../lib/memory/store";
+import { publishPhase } from "../lib/memory/pubsub";
+
+/** Injectable dependencies — real impls used in production; fakes in tests. */
+export interface VoiceSessionDeps {
+  startSession: (url: string) => Promise<{ liveViewUrl: string; sessionId: string; url: string; title: string }>;
+  stopSession: (sessionId: string) => Promise<void>;
+  createOrchestrator: (args: { sessionId: string; buyerId: string; company: string }) => Orchestrator;
+}
 
 /**
  * One live voice conversation: bridges the browser <-> Deepgram STT <->
@@ -108,12 +125,29 @@ export class VoiceSession {
     return override || this.tts.voiceName(this.language);
   }
 
+  /** Browserbase session id, set once startSession resolves. */
+  private browserSessionId: string | null = null;
+
+  /** Memoized one-time startup (browser + orchestrator), shared by the
+   *  audio_start (mic) and text_input (typed) entry points so it runs once. */
+  private startPromise: Promise<void> | null = null;
+  private readonly deps: VoiceSessionDeps;
+
   constructor(
     private ws: WebSocket,
-    private deepgramKey: string
+    private deepgramKey: string,
+    deps?: Partial<VoiceSessionDeps>
   ) {
     this.tts = createTts();
-    this.orchestrator = createOrchestrator();
+    // Orchestrator is created lazily in startListening once we have a sessionId.
+    // Set a placeholder so the field is never uninitialized.
+    this.orchestrator = null as unknown as Orchestrator;
+
+    this.deps = {
+      startSession: deps?.startSession ?? defaultStartSession,
+      stopSession: deps?.stopSession ?? defaultStopSession,
+      createOrchestrator: deps?.createOrchestrator ?? defaultCreateOrchestrator,
+    };
 
     ws.on("message", (data, isBinary) => {
       if (isBinary) {
@@ -134,7 +168,7 @@ export class VoiceSession {
     if (!msg) return;
     switch (msg.t) {
       case "audio_start":
-        void this.startListening(msg.language);
+        void this.ensureStarted(msg.language);
         break;
       case "audio_stop":
         void this.stopListening();
@@ -146,21 +180,55 @@ export class VoiceSession {
         this.bargeIn();
         break;
       case "text_input":
+        // A text-only visitor may type before enabling the mic; make sure the
+        // browser session + orchestrator are started before running a turn
+        // (otherwise this.orchestrator is null and runTurn crashes).
         this.send({ t: "user_said", text: msg.text, final: true });
-        void this.runTurn(msg.text);
+        void this.ensureStarted(this.language).then(() => this.runTurn(msg.text));
         break;
     }
   }
 
+  /** Start the browser session + orchestrator exactly once, regardless of
+   *  whether the first client message is audio_start or text_input. */
+  private ensureStarted(language: Language): Promise<void> {
+    if (!this.startPromise) this.startPromise = this.startListening(language);
+    return this.startPromise;
+  }
+
   private async startListening(language: Language) {
     this.language = language ?? DEFAULT_LANGUAGE;
+
+    // Start the cloud browser and wire the orchestrator to its session.
+    const cfg = getDemoConfig();
+    const { liveViewUrl, sessionId } = await this.deps.startSession(cfg.browseTargetUrl);
+    this.browserSessionId = sessionId;
+    this.send({ t: "live_view", url: liveViewUrl });
+
+    this.orchestrator = this.deps.createOrchestrator({
+      sessionId,
+      buyerId: "anonymous",
+      company: cfg.company,
+    });
+
+    // Load buyer memory; populate buyerNotes for turn context; ignore errors
+    // so a Redis outage never blocks the session from starting.
+    let buyer;
+    try {
+      buyer = await loadBuyer("anonymous");
+      this.buyerNotes = buyer.notes.map((n) => n.text);
+    } catch {
+      // Degrade gracefully: no notes injected.
+    }
+
     await this.openStt();
     this.send({ t: "ready", language: this.language, agentName: this.agentName });
     this.setState("listening");
     // GREET: the agent opens the conversation so the user hears the loop working.
     const greeting = await this.orchestrator.greeting?.(
       this.language,
-      this.agentName
+      this.agentName,
+      buyer
     );
     if (greeting) {
       await this.speakTurn(greeting, /* recordAsUser */ null);
@@ -254,10 +322,13 @@ export class VoiceSession {
       }
     }
 
+    // Record whatever sentences were actually spoken, even on barge-in abort.
+    // Never record unspoken / intended text.
+    if (spoken.length > 0) {
+      this.history.push({ role: "agent", text: spoken.join(" ") });
+    }
+
     if (!abort.signal.aborted) {
-      if (spoken.length > 0) {
-        this.history.push({ role: "agent", text: spoken.join(" ") });
-      }
       this.send({ t: "tts_end", turn });
       this.endSpeaking();
       this.setState("listening");
@@ -266,13 +337,14 @@ export class VoiceSession {
   }
 
   /**
-   * Drive the orchestrator and yield only the spoken (`say`) fragments. Other
-   * commands (P3/P4 team contract) are forwarded to the client as side effects.
+   * Drive the orchestrator and yield spoken fragments with a filler flag.
+   * `filler` fragments are synthesized and spoken but NOT pushed to `spoken[]`,
+   * so scripted bridge phrases never appear in conversation history.
    */
   private async *orchestratorSay(
     userText: string,
     signal: AbortSignal
-  ): AsyncIterable<string> {
+  ): AsyncIterable<{ text: string; filler: boolean }> {
     // Send only the most recent turns (excluding the just-pushed user turn) to
     // keep the prompt small so time-to-first-token stays low as the demo runs.
     const priorHistory = this.history.slice(0, -1);
@@ -292,7 +364,10 @@ export class VoiceSession {
       if (signal.aborted) return;
       switch (cmd.type) {
         case "say":
-          yield cmd.text;
+          yield { text: cmd.text, filler: false };
+          break;
+        case "filler":
+          yield { text: cmd.text, filler: true };
           break;
         case "screen_is_on":
           this.send({ t: "screen_is_on", page: cmd.page });
@@ -308,6 +383,12 @@ export class VoiceSession {
             notes: cmd.notes,
           });
           break;
+        case "set_phase":
+          this.send({ t: "set_phase", phase: cmd.phase });
+          // Also publish to the dashboard SSE channel so the live dashboard
+          // panel receives phase transitions (spec §4.2 / §6).
+          void publishPhase("anonymous", cmd.phase);
+          break;
         default:
           break;
       }
@@ -321,14 +402,15 @@ export class VoiceSession {
    * arrives, so the *next* sentence's TTS request is already in flight while the
    * current one is still streaming to the client. A single consumer drains the
    * channels in order, so audio reaches the browser sequentially with no gaps
-   * between sentences. Returns the sentences actually spoken (for history).
+   * between sentences. Returns the sentences actually spoken (for history);
+   * filler fragments are spoken aloud but excluded from the returned list.
    */
   private async pipelineSpeak(
-    texts: AsyncIterable<string>,
+    texts: AsyncIterable<{ text: string; filler: boolean }>,
     turn: number,
     signal: AbortSignal
   ): Promise<string[]> {
-    const jobs: { text: string; channel: ChunkChannel }[] = [];
+    const jobs: { text: string; filler: boolean; channel: ChunkChannel }[] = [];
     const spoken: string[] = [];
     let producerDone = false;
     let wake: (() => void) | null = null;
@@ -343,10 +425,10 @@ export class VoiceSession {
     // Producer: pull sentences and kick off their synthesis immediately.
     const producer = (async () => {
       try {
-        for await (const text of texts) {
+        for await (const { text, filler } of texts) {
           if (signal.aborted) break;
           const channel = new ChunkChannel();
-          jobs.push({ text, channel });
+          jobs.push({ text, filler, channel });
           wakeConsumer();
           void (async () => {
             try {
@@ -399,7 +481,8 @@ export class VoiceSession {
       this.noteAgentWords(job.text);
       this.agentSpeaking = true;
       this.setState("speaking");
-      spoken.push(job.text);
+      // Filler lines are spoken aloud but excluded from history.
+      if (!job.filler) spoken.push(job.text);
 
       for await (const chunk of job.channel) {
         if (signal.aborted) break;
@@ -517,5 +600,8 @@ export class VoiceSession {
   dispose() {
     this.cancelActive();
     void this.stopStt();
+    if (this.browserSessionId) {
+      void this.deps.stopSession(this.browserSessionId);
+    }
   }
 }

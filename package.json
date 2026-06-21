@@ -9,6 +9,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "server": "node --env-file-if-exists=.env.local --env-file-if-exists=.env --import tsx server/index.ts",
+    "smoke": "tsx server/smoke.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "memory:smoke": "tsx scripts/memory-smoke.ts",
     "knowledge:seed": "tsx scripts/knowledge-seed.ts",
     "knowledge:smoke": "tsx scripts/knowledge-smoke.ts"
@@ -23,7 +27,8 @@
     "playwright-core": "^1.61.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "ws": "^8.21.0"
+    "ws": "^8.21.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -36,6 +41,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.6"
   }
 }

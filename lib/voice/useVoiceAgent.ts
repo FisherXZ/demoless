@@ -29,6 +29,12 @@ export interface VoiceAgent {
   agentName: string;
   language: Language;
   error: string | null;
+  /** Send a text message to the agent over the existing socket. */
+  sendText: (text: string) => void;
+  /** Embeddable live-view URL for the server-driven cloud browser; null before connect. */
+  liveViewUrl: string | null;
+  /** Most recent screen page label from the agent; null until first screen_is_on event. */
+  lastScreen: { page: string } | null;
   start: () => Promise<void>;
   stop: () => void;
   setLanguage: (language: Language) => void;
@@ -45,6 +51,8 @@ export function useVoiceAgent(): VoiceAgent {
   const [agentName, setAgentName] = useState("");
   const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
   const [error, setError] = useState<string | null>(null);
+  const [liveViewUrl, setLiveViewUrl] = useState<string | null>(null);
+  const [lastScreen, setLastScreen] = useState<{ page: string } | null>(null);
 
   const ws = useRef<WebSocket | null>(null);
   const ctx = useRef<AudioContext | null>(null);
@@ -118,11 +126,23 @@ export function useVoiceAgent(): VoiceAgent {
         player.current?.stop();
         setAgentSpeaking(false);
         break;
+      case "live_view":
+        setLiveViewUrl(ev.url);
+        break;
+      case "screen_is_on":
+        setLastScreen({ page: ev.page });
+        break;
       case "error":
         setError(ev.message);
         break;
       default:
         break;
+    }
+  }, []);
+
+  const sendText = useCallback((text: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ t: "text_input", text }));
     }
   }, []);
 
@@ -214,6 +234,9 @@ export function useVoiceAgent(): VoiceAgent {
     agentName,
     language,
     error,
+    sendText,
+    liveViewUrl,
+    lastScreen,
     start,
     stop,
     setLanguage,

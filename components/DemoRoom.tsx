@@ -14,34 +14,6 @@ const SUGGESTIONS = [
   "What is Browserbase?",
 ];
 
-const GREETING =
-  "Hi! I'm Maya. This is Browserbase, the headless-browser platform that gives AI agents reliable access to the whole web. Ask me to show you anything: your sessions, the playground, pricing, or how it works.";
-
-// Mirrors the server fast path (lib/demoConfig.ts) so the chat can answer
-// instantly for obvious sections while the browser catches up.
-const SECTION_WORDS: { label: string; words: string[] }[] = [
-  { label: "Overview", words: ["overview", "dashboard", "home", "main", "analytics", "usage"] },
-  { label: "Sessions", words: ["sessions", "session", "runs", "run history", "history", "recent"] },
-  { label: "Functions", words: ["functions", "function"] },
-  { label: "Playground", words: ["playground", "try it", "try out", "sandbox", "test it"] },
-  { label: "Pricing", words: ["pricing", "price", "cost", "plan", "plans", "how much"] },
-  { label: "Docs", words: ["docs", "documentation", "reference", "api docs", "guide"] },
-];
-const QUESTION_STARTS = [
-  "what", "which", "how", "why", "who", "where", "when",
-  "is ", "are ", "do ", "does ", "can ", "could ", "would ", "should ",
-  "tell me", "explain",
-];
-function isQuestion(message: string): boolean {
-  const m = message.trim().toLowerCase();
-  return m.includes("?") || QUESTION_STARTS.some((q) => m.startsWith(q));
-}
-function matchSection(message: string): string | null {
-  if (isQuestion(message)) return null; // questions get a real answer from Claude
-  const m = message.toLowerCase();
-  for (const s of SECTION_WORDS) if (s.words.some((w) => m.includes(w))) return s.label;
-  return null;
-}
 
 function statusLabel(status: string, name: string): string {
   switch (status) {
@@ -69,17 +41,12 @@ interface ChatMsg {
 
 export default function DemoRoom({ vals }: { vals: DemoVals }) {
   const voice = useVoiceAgent();
-  const configuredName = useAgentName();
+  useAgentName(); // side-effect: syncs agent name from server
 
-  // Browser-share session state (Maya drives a real cloud browser).
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [liveViewUrl, setLiveViewUrl] = useState<string | null>(null);
-  const [connecting, setConnecting] = useState(false);
-  const [screen, setScreen] = useState<{ url: string; title: string } | null>(null);
+  // Browser session state is now owned by the voice WS server — liveViewUrl
+  // arrives via the live_view event; screen page comes via screen_is_on.
   const [messages, setMessages] = useState<ChatMsg[]>([]);
-  const [caption, setCaption] = useState(GREETING);
   const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -87,89 +54,30 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
   // voice session reports its name.
   const agentName = voice.active && voice.agentName ? voice.agentName : "Maya";
 
-  // The rep tile pulses while Maya speaks (voice) or is navigating (text chat).
-  const mayaSpeaking = voice.active ? voice.agentSpeaking : sending;
+  const mayaSpeaking = voice.agentSpeaking;
 
   // Captions: prefer real spoken text once the voice loop is running. Swap any
-  // "Maya" in the mock caption for the configured name so it stays consistent.
-  const rawCaption = voice.active && voice.lastCaption ? voice.lastCaption : vals.caption;
+  // "Maya" in the caption for the configured name so it stays consistent.
+  const rawCaption = voice.lastCaption || vals.caption;
   const mayaCaption = rawCaption.replace(/Maya/g, agentName);
 
   const otherLang: Language = voice.language === "en" ? "es" : "en";
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [messages, sending]);
+  }, [messages]);
 
-  async function start() {
-    setConnecting(true);
-    setError(null);
-    try {
-      const r = await fetch("/api/browser", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action: "start", url: TARGET }),
-      });
-      const d = await r.json();
-      if (!d.ok) throw new Error(d.error || "failed to start");
-      setSessionId(d.sessionId);
-      setLiveViewUrl(d.liveViewUrl);
-      setScreen({ url: d.url, title: d.title });
-      setMessages([{ role: "maya", text: GREETING }]);
-      setCaption(GREETING);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setConnecting(false);
-    }
-  }
-
-  async function send(text: string) {
+  function send(text: string) {
     const msg = text.trim();
-    if (!msg || !sessionId || sending) return;
+    if (!msg || !voice.active) return;
     setInput("");
     setMessages((m) => [...m, { role: "you", text: msg }]);
-
-    // Optimistic: for an obvious section, show Maya's reply immediately so the
-    // chat feels live; the browser navigation lands a beat later.
-    const optimistic = matchSection(msg);
-    if (optimistic) {
-      const line = `Sure, here's ${optimistic.toLowerCase()}.`;
-      setMessages((m) => [...m, { role: "maya", text: line }]);
-      setCaption(line);
-    }
-
-    setSending(true);
-    try {
-      const r = await fetch("/api/agent", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ sessionId, message: msg }),
-      });
-      const d = await r.json();
-      if (!d.ok) throw new Error(d.error || "agent failed");
-      if (!optimistic) {
-        setMessages((m) => [...m, { role: "maya", text: d.reply }]);
-        setCaption(d.reply);
-      }
-      if (d.url) setScreen({ url: d.url, title: d.title });
-    } catch (e) {
-      const text = e instanceof Error ? e.message : String(e);
-      setMessages((m) => [...m, { role: "maya", text: `(error: ${text})` }]);
-    } finally {
-      setSending(false);
-    }
+    // Route text through the voice WS so the server brain handles it.
+    voice.sendText(msg);
   }
 
-  async function end() {
+  function end() {
     if (voice.active) voice.stop();
-    if (sessionId) {
-      await fetch("/api/browser", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action: "stop", sessionId }),
-      }).catch(() => {});
-    }
     vals.goDashboard();
   }
 
@@ -221,7 +129,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
             className="w-[7px] h-[7px] rounded-full bg-danger"
             style={{ animation: "dlBlink 1.4s infinite" }}
           />
-          {sessionId ? "LIVE" : "offline"}
+          {voice.liveViewUrl ? "LIVE" : "offline"}
         </span>
       </div>
 
@@ -238,18 +146,18 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               </div>
               <div className="flex-1 min-w-0 h-7 rounded-md bg-wash2 flex items-center px-3">
                 <span className="text-xs text-muted2 truncate">
-                  {screen?.url || TARGET}
+                  {voice.lastScreen?.page || TARGET}
                 </span>
               </div>
               <span className="text-[11px] text-faint font-mono truncate max-w-[200px]">
-                {screen?.title || ""}
+                {voice.lastScreen?.page || ""}
               </span>
             </div>
 
             <div className="absolute top-11 left-0 right-0 bottom-0 bg-night">
-              {liveViewUrl ? (
+              {voice.liveViewUrl ? (
                 <iframe
-                  src={liveViewUrl}
+                  src={voice.liveViewUrl}
                   title="Browserbase (live)"
                   className="w-full h-full"
                   sandbox="allow-same-origin allow-scripts allow-forms"
@@ -258,13 +166,13 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-4">
                   <div className="text-stone350 text-sm">
-                    {connecting
+                    {voice.status === "connecting"
                       ? "Connecting to the live product…"
-                      : "Maya is ready to walk you through Browserbase."}
+                      : `${agentName} is ready to walk you through the product.`}
                   </div>
-                  {!connecting && (
+                  {voice.status !== "connecting" && (
                     <button
-                      onClick={start}
+                      onClick={() => void voice.start()}
                       className="bg-brand text-white rounded-xl px-6 py-3.5 text-base font-bold inline-flex items-center gap-2.5 shadow-[0_4px_16px_rgba(79,70,229,0.3)]"
                     >
                       <span
@@ -274,15 +182,15 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                       Start live demo
                     </button>
                   )}
-                  {connecting && (
+                  {voice.status === "connecting" && (
                     <div
                       className="w-8 h-8 rounded-full border-2 border-coalline border-t-brand"
                       style={{ animation: "dlBlink 1s infinite" }}
                     />
                   )}
-                  {error && (
+                  {(error || voice.error) && (
                     <div className="text-danger text-xs font-mono max-w-[420px] text-center">
-                      {error}
+                      {error ?? voice.error}
                     </div>
                   )}
                 </div>
@@ -341,7 +249,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               Talk to {agentName}
             </div>
             <div className="text-[11px] text-faint2 mt-0.5">
-              {sessionId ? "she drives the live product" : "start the demo to chat"}
+              {voice.active ? "she drives the live product" : "start the demo to chat"}
             </div>
           </div>
 
@@ -358,12 +266,12 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                 {m.text}
               </div>
             ))}
-            {sending && (
+            {voice.active && voice.status === "thinking" && (
               <div className="self-start text-faint2 text-[12px] font-mono px-1">
-                {agentName} is navigating…
+                {agentName} is thinking…
               </div>
             )}
-            {sessionId && messages.length <= 1 && (
+            {voice.active && messages.length <= 1 && (
               <div className="flex flex-col gap-1.5 mt-1">
                 {SUGGESTIONS.map((s) => (
                   <button
@@ -385,13 +293,13 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") send(input);
               }}
-              disabled={!sessionId || sending}
-              placeholder={sessionId ? "Ask Maya to show you…" : "Start the demo first"}
+              disabled={!voice.active}
+              placeholder={voice.active ? "Ask Maya to show you…" : "Start the demo first"}
               className="flex-1 min-w-0 bg-night3 border border-coalline rounded-lg px-3 py-2 text-sm text-white placeholder:text-dim disabled:opacity-50"
             />
             <button
               onClick={() => send(input)}
-              disabled={!sessionId || sending || !input.trim()}
+              disabled={!voice.active || !input.trim()}
               className="bg-brand text-white rounded-lg px-3 text-sm font-semibold disabled:opacity-40"
             >
               Send
@@ -445,9 +353,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
             <span className="text-dim">
               {voice.active
                 ? statusLabel(voice.status, agentName)
-                : sending
-                  ? `${agentName} is navigating…`
-                  : `${agentName} is presenting`}
+                : `${agentName} is presenting`}
             </span>
           )}
         </div>

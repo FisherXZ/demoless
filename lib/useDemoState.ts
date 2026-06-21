@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { enterDemo } from "./actions";
 import {
   SECTIONS,
@@ -44,6 +44,8 @@ const initialState: DemoState = {
   selectedId: null,
   elapsed: 0,
   form: {
+    name: "",
+    email: "",
     role: "VP of Sales",
     size: "51–200",
     useCase: "Outbound sales",
@@ -53,8 +55,7 @@ const initialState: DemoState = {
 
 export function useDemoState(): DemoVals {
   const [s, set] = useState<DemoState>(initialState);
-  const { data: session, status } = useSession();
-  const isAuthed = status === "authenticated";
+  const { data: session } = useSession();
 
   const patch = (p: Partial<DemoState>) => set((prev) => ({ ...prev, ...p }));
   const setF = (k: keyof FormState, v: string) =>
@@ -127,13 +128,20 @@ export function useDemoState(): DemoVals {
   return {
     screen: s.screen,
 
+    isAuthed: !!session?.user,
+    authName: session?.user?.name,
+    authEmail: session?.user?.email,
+    signInGoogle: () => void signIn("google"),
+
     goLanding: () => patch({ screen: "landing" }),
     goForm: () => patch({ screen: "form" }),
     goDashboard: () => patch({ screen: "dashboard", selectedId: null }),
     startDemo: async () => {
-      if (!isAuthed) return;
-      // Persist the verified buyer into P4 Redis and pull recall before entering.
+      // Persist the buyer into P4 Redis and pull recall before entering.
+      // Identity comes from the form email (NextAuth deferred to later phase).
       const { recallLine } = await enterDemo({
+        email: form.email,
+        name: form.name,
         role: form.role,
         size: form.size,
         useCase: form.useCase,
@@ -147,16 +155,11 @@ export function useDemoState(): DemoVals {
       });
     },
 
-    authStatus: status,
-    isAuthed,
-    authEmail: session?.user?.email ?? undefined,
-    authName: session?.user?.name ?? undefined,
-    signInGoogle: () => signIn("google"),
-    signOutGoogle: () => signOut(),
-    canStart: isAuthed,
     recallLine: s.recallLine,
 
     form,
+    onName: (e) => setF("name", e.target.value),
+    onEmail: (e) => setF("email", e.target.value),
     onRole: (e) => setF("role", e.target.value),
     onSize: (e) => setF("size", e.target.value),
     onUseCase: (e) => setF("useCase", e.target.value),
