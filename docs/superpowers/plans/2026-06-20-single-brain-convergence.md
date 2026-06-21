@@ -672,7 +672,7 @@ export async function* runTurn(args: TurnArgs): AsyncIterable<Command> {
 import { describe, it, expect } from "vitest";
 import { LoopOrchestrator } from "./loop";
 
-const cfg = { company: "browserbase", productName: "Browserbase", persona: "Maya", browseTargetUrl: "https://x", corpusSeed: "" };
+const cfg = { company: "browserbase", productName: "Browserbase", persona: "Messi", browseTargetUrl: "https://x", corpusSeed: "" };
 const executor = { phase: "HOOK", run: async () => ({ ok: true, content: "" }) };
 
 describe("LoopOrchestrator", () => {
@@ -680,12 +680,12 @@ describe("LoopOrchestrator", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
     (orch as any)._runTurn = async function* () { yield { type: "say", text: "Hello." }; yield { type: "done" }; };
     const out: any[] = [];
-    for await (const c of orch.runTurn({ text: "hi", language: "en" }, { history: [], buyerNotes: [], agentName: "Maya" }, new AbortController().signal)) out.push(c);
+    for await (const c of orch.runTurn({ text: "hi", language: "en" }, { history: [], buyerNotes: [], agentName: "Messi" }, new AbortController().signal)) out.push(c);
     expect(out.some((c) => c.type === "say" && c.text === "Hello.")).toBe(true);
   });
   it("greeting uses persona + recall", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
-    expect(orch.greeting("en", "Maya")).toContain("Maya");
+    expect(orch.greeting("en", "Messi")).toContain("Messi");
   });
 });
 ```
@@ -786,7 +786,7 @@ export interface DemoConfig {
 const BROWSERBASE: DemoConfig = {
   company: "browserbase",
   productName: "Browserbase",
-  persona: process.env.DEMO_PERSONA ?? "Maya",
+  persona: process.env.DEMO_PERSONA ?? "Messi",
   browseTargetUrl: process.env.DEMO_BROWSE_URL ?? "https://www.browserbase.com",
   corpusSeed: "browserbase",
 };
@@ -911,7 +911,7 @@ export function createOrchestrator(args: { sessionId: string; buyerId: string; c
 
 - [ ] **Step 1:** Start Redis Stack: `docker run -d -p 6379:6379 redis/redis-stack:latest`
 - [ ] **Step 2:** Seed knowledge: `npm run knowledge:seed` (Browserbase corpus). Expected: ">0 chunks indexed".
-- [ ] **Step 3:** Start the agent server + Next dev; open the room; speak "show me pricing". Expected: Maya says a filler line, the watched browser navigates, Maya answers grounded; a note appears in the dashboard.
+- [ ] **Step 3:** Start the agent server + Next dev; open the room; speak "show me pricing". Expected: Messi says a filler line, the watched browser navigates, Messi answers grounded; a note appears in the dashboard.
 - [ ] **Step 4: Commit any fixups** with `fix(room): ...` messages.
 
 ---

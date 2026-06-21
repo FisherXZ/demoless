@@ -53,7 +53,7 @@ The pain recurs because **there is no unified feed**. Federal opportunities live
 - **Setup:** Use only **public** sources and a **throwaway** Google account for the tracking-Sheet writes. Do NOT log into any real foundation portal or use a real nonprofit's credentials. For the login-wall probe, use a funder portal you're willing to *stop at* — never enter real creds. No real org PII.
 - **Intent you bring in (in character):** "I'm the grants manager at a small food-security nonprofit. Every Monday I check grants.gov and about fifteen foundation sites for new RFPs and deadlines in my area, and I'm sure I'm missing things. Show me what's *new since last week* that fits us, with deadlines, and don't let me miss an open window."
 - **Session script (beats):**
-  1. Say the intent above; watch Maya restate your focus profile (cause, geography, org type) back for confirmation.
+  1. Say the intent above; watch Messi restate your focus profile (cause, geography, org type) back for confirmation.
   2. Ask "what new federal opportunities match us?" — watch it hit grants.gov (API or the search UI scroll) and read back posted/forecasted hits with close dates.
   3. Give it a "last week's list" of 2–3 opportunity numbers; ask "what's *new or changed* vs this?" — watch it diff and surface only the delta.
   4. Point it at one **public** foundation grants page; ask "is their cycle open and when's the deadline?" — watch it navigate and read the apply-state + date.

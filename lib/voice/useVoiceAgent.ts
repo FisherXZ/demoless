@@ -112,7 +112,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
         break;
       case "user_said":
         setPartialTranscript(ev.text);
-        // Local barge-in: the prospect started talking over Maya.
+        // Local barge-in: the prospect started talking over the agent.
         if (player.current?.isPlaying) {
           player.current.stop();
           setAgentSpeaking(false);

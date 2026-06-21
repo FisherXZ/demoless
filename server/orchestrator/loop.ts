@@ -12,7 +12,7 @@ const LANGUAGE_NAMES: Record<Language, string> = {
   zh: "Mandarin Chinese",
 };
 
-/** Instruction appended to the system prompt so Maya replies in the visitor's
+/** Instruction appended to the system prompt so the agent replies in the visitor's
  *  language (the persona prompt is English; without this she'd often reply in
  *  English even to Chinese/Spanish input). */
 function languageDirective(language: Language): string {
@@ -47,7 +47,7 @@ export class LoopOrchestrator implements Orchestrator {
       .filter(Boolean)
       .join("\n\n");
     const system =
-      buildSystem(this.deps.cfg, memoryContext, ctx.role) +
+      buildSystem(this.deps.cfg, memoryContext, ctx.role, ctx.agentName) +
       languageDirective(input.language);
     const messages = [...toMessages(ctx.history), { role: "user" as const, content: input.text }];
     for await (const c of this._runTurn({ system, messages, executor: this.deps.executor, signal })) {

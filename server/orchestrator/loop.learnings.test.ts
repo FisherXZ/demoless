@@ -6,7 +6,7 @@ import type { DemoConfig } from "../config/demoConfig";
 const cfg = {
   company: "browserbase",
   productName: "Browserbase",
-  persona: "Maya",
+  persona: "Messi",
   browseTargetUrl: "x",
   corpusSeed: "",
 } as DemoConfig;
@@ -26,7 +26,7 @@ describe("LoopOrchestrator learnings injection", () => {
       {
         history: [],
         buyerNotes: [],
-        agentName: "Maya",
+        agentName: "Messi",
         learningsContext:
           "Past demo learnings (apply what's relevant, ignore what isn't):\n- Show ROI before features",
       },
@@ -47,7 +47,7 @@ describe("LoopOrchestrator learnings injection", () => {
     };
     for await (const _ of orch.runTurn(
       { text: "hi", language: "en" },
-      { history: [], buyerNotes: [], agentName: "Maya", learningsContext: "" },
+      { history: [], buyerNotes: [], agentName: "Messi", learningsContext: "" },
       new AbortController().signal
     )) {
       /* drain */

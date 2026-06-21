@@ -51,7 +51,7 @@
 - **Setup:** A throwaway Amazon buyer account for public-PDP reads (no real seller creds needed to exercise the public-PDP path); if testing the logged-in path, use a sandbox/secondary Seller Central + Shopify dev store — **never** the real business account, real bank creds, or real PII. Pick 2–3 real public ASINs to act as "your" hero products and 2–3 as competitors.
 - **Intent you bring in:** *"I'm an Amazon seller — every morning I check whether I still own the Buy Box on my top products, whether anyone's hijacked or undercut my listings, and whether I got any bad reviews overnight. Do that sweep for me and give me one digest."*
 - **Session script (beats):**
-  1. "Start with my hero ASIN <ASIN> — are we winning the Buy Box right now?" → watch Maya open the PDP and read the Buy Box seller + price.
+  1. "Start with my hero ASIN <ASIN> — are we winning the Buy Box right now?" → watch Messi open the PDP and read the Buy Box seller + price.
   2. "Who else is selling on that listing, and at what price?" → watch her open "Other Sellers on Amazon."
   3. "Flag anyone who isn't on my authorized list <names>." → watch her compare against the allowlist.
   4. "Any new 1–2 star reviews on it since yesterday?" → watch her open reviews, sort by recent, extract.

@@ -13,7 +13,7 @@ export interface DemoConfig {
   company: string;
   /** Human-readable product name for the agent's preamble. */
   productName: string;
-  /** Agent persona name (e.g. "Maya"). */
+  /** Agent persona name (e.g. "Messi"). */
   persona: string;
   /** Starting URL the browser session lands on. */
   browseTargetUrl: string;
@@ -28,7 +28,7 @@ export interface DemoConfig {
 const BROWSERBASE: DemoConfig = {
   company: "browserbase",
   productName: PRODUCT_NAME,
-  persona: process.env.DEMO_PERSONA ?? "Maya",
+  persona: process.env.DEMO_PERSONA ?? "Messi",
   browseTargetUrl: process.env.DEMO_TARGET_URL ?? "https://www.browserbase.com/",
   corpusSeed: "browserbase",
   systemPrompt: SYSTEM_PROMPT,

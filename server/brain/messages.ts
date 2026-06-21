@@ -7,15 +7,20 @@ import { personaBlock } from "./persona";
 export function buildSystem(
   cfg: DemoConfig,
   memoryContext: string,
-  role?: string
+  role?: string,
+  agentName = cfg.persona
 ): string {
   const deeplinks = SECTIONS.map((s) => `${s.label} → ${s.url}`).join("\n");
-  const persona =
+  const basePersona =
     cfg.systemPrompt ??
     [
       `You are ${cfg.persona}, a friendly AI sales rep giving a LIVE, screen-shared demo of ${cfg.productName}.`,
       `You drive a real web browser the visitor is watching. Use the navigate/click/look tools to show pages.`,
     ].join("\n");
+  const persona =
+    agentName && agentName !== cfg.persona
+      ? basePersona.replaceAll(cfg.persona, agentName)
+      : basePersona;
   const discoveryFirst = [
     "Discovery-first behavior:",
     "- Open with discovery, not a generic tour. Before giving a generic walkthrough, learn why the buyer is here, the workflow or problem they care about, and the background they bring.",

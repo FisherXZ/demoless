@@ -5,7 +5,7 @@ import type { BuyerMemory } from "../../lib/memory/types";
 const cfg = {
   company: "browserbase",
   productName: "Browserbase",
-  persona: "Maya",
+  persona: "Messi",
   browseTargetUrl: "https://x",
   corpusSeed: "",
 };
@@ -35,13 +35,13 @@ const returningBuyer: BuyerMemory = {
 describe("LoopOrchestrator recall", () => {
   it("greeting includes recall line for returning buyer", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
-    const text = orch.greeting("en", "Maya", returningBuyer);
+    const text = orch.greeting("en", "Messi", returningBuyer);
     expect(text).toContain("parallel browser sessions");
   });
 
   it("returning-buyer greeting references recall and asks today's goal", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
-    const text = orch.greeting("en", "Maya", returningBuyer);
+    const text = orch.greeting("en", "Messi", returningBuyer);
 
     expect(text).toContain("parallel browser sessions");
     expect(text).toMatch(/today/i);
@@ -51,8 +51,8 @@ describe("LoopOrchestrator recall", () => {
 
   it("greeting for new buyer has no recall fragment", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
-    const text = orch.greeting("en", "Maya");
-    expect(text).toContain("Maya");
+    const text = orch.greeting("en", "Messi");
+    expect(text).toContain("Messi");
     expect(text).not.toContain("Welcome back");
   });
 
@@ -68,7 +68,7 @@ describe("LoopOrchestrator recall", () => {
     const out: any[] = [];
     for await (const c of orch.runTurn(
       { text: "hi", language: "en" },
-      { history: [], buyerNotes: ["parallel browser sessions"], agentName: "Maya", learningsContext: "" },
+      { history: [], buyerNotes: ["parallel browser sessions"], agentName: "Messi", learningsContext: "" },
       new AbortController().signal
     )) {
       out.push(c);

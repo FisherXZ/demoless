@@ -120,7 +120,7 @@ irreversible / identity-binding actions.
   Compare Browserbase, OpenAI, and Anthropic for me on pricing, SOC 2, and uptime — I need a
   table I can paste to my team, and flag anyone without a public SOC 2."
 - **Session script (~8 beats):**
-  1. *"Start with Browserbase — pull the pricing tiers and what each tier limits."* → watch Maya
+  1. *"Start with Browserbase — pull the pricing tiers and what each tier limits."* → watch Messi
      open the pricing page and read tier names/prices/limits.
   2. *"Now their security — do they have SOC 2 Type II and ISO 27001?"* → watch her find the
      trust/security link and read the public badges.
