@@ -117,4 +117,98 @@ describe("demo session speech streaming", () => {
       ac.signal
     );
   });
+
+  it("does not enqueue text when the signal is already aborted", async () => {
+    const ac = new AbortController();
+    ac.abort();
+    const tts: TtsProvider = {
+      voiceName: vi.fn().mockReturnValue("Maya"),
+      synthesize: vi.fn(async function* () {
+        yield Buffer.from("never");
+      }),
+    };
+
+    async function* texts() {
+      yield { text: "Too late.", filler: false };
+    }
+
+    const events = await collect(
+      streamSpeechTurn({
+        texts: texts(),
+        tts,
+        language: "en",
+        turn: 6,
+        signal: ac.signal,
+      })
+    );
+
+    expect(events).toEqual([]);
+    expect(tts.synthesize).not.toHaveBeenCalled();
+  });
+
+  it("drops queued audio if the signal aborts before the consumer drains it", async () => {
+    const ac = new AbortController();
+    const tts: TtsProvider = {
+      voiceName: vi.fn().mockReturnValue("Maya"),
+      synthesize: vi.fn(async function* () {
+        yield Buffer.from("late audio");
+        ac.abort();
+      }),
+    };
+
+    async function* texts() {
+      yield { text: "One last thing.", filler: false };
+    }
+
+    const events = await collect(
+      streamSpeechTurn({
+        texts: texts(),
+        tts,
+        language: "en",
+        turn: 7,
+        signal: ac.signal,
+      })
+    );
+
+    expect(events).toEqual([
+      { type: "say", text: "One last thing.", filler: false, turn: 7 },
+    ]);
+  });
+
+  it("drops a TTS chunk that arrives after the signal is aborted", async () => {
+    const ac = new AbortController();
+    const tts: TtsProvider = {
+      voiceName: vi.fn().mockReturnValue("Maya"),
+      synthesize: vi.fn(() => ({
+        [Symbol.asyncIterator]() {
+          let sent = false;
+          return {
+            async next() {
+              if (sent) return { done: true, value: undefined };
+              sent = true;
+              ac.abort();
+              return { done: false, value: Buffer.from("late audio") };
+            },
+          };
+        },
+      })),
+    };
+
+    async function* texts() {
+      yield { text: "This may stop.", filler: false };
+    }
+
+    const events = await collect(
+      streamSpeechTurn({
+        texts: texts(),
+        tts,
+        language: "en",
+        turn: 8,
+        signal: ac.signal,
+      })
+    );
+
+    expect(events.filter((event) => event.type === "audio")).toEqual([]);
+    expect(events.filter((event) => event.type === "error")).toEqual([]);
+  });
 });
