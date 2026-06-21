@@ -40,7 +40,7 @@ interface ChatMsg {
 }
 
 export default function DemoRoom({ vals }: { vals: DemoVals }) {
-  const voice = useVoiceAgent();
+  const voice = useVoiceAgent({ role: vals.form.role });
   useAgentName(); // side-effect: syncs agent name from server
 
   // Browser session state is now owned by the voice WS server — liveViewUrl

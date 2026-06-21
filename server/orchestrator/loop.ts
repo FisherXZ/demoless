@@ -20,7 +20,7 @@ export class LoopOrchestrator implements Orchestrator {
 
   async *runTurn(input: TurnInput, ctx: TurnContext, signal: AbortSignal): AsyncIterable<Command> {
     const memoryContext = ctx.buyerNotes.length ? `Known buyer notes:\n- ${ctx.buyerNotes.join("\n- ")}` : "";
-    const system = buildSystem(this.deps.cfg, memoryContext);
+    const system = buildSystem(this.deps.cfg, memoryContext, ctx.role);
     const messages = [...toMessages(ctx.history), { role: "user" as const, content: input.text }];
     for await (const c of this._runTurn({ system, messages, executor: this.deps.executor, signal })) {
       yield c as Command; // P2 acts on say, forwards navigate/screen_is_on/remember/set_phase

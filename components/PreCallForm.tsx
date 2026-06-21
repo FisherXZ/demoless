@@ -122,6 +122,11 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
               <option>Sales / RevOps</option>
               <option>Founder / CEO</option>
               <option>Marketing</option>
+              <option>Operations</option>
+              <option>Product Manager</option>
+              <option>Engineering / Developer</option>
+              <option>Data / ML</option>
+              <option>DevOps / Platform</option>
               <option>IT / Security</option>
               <option>Other</option>
             </select>
