@@ -54,7 +54,7 @@ async function screen(sessionId: string, page: Page): Promise<ScreenState> {
 }
 
 // Short, bounded settle after navigation. We intentionally do NOT wait for
-// networkidle: live-polling targets (like worldcuparena) never go idle, so it
+// networkidle: some live-polling targets never go idle, so it
 // would block for the full timeout on every move and make the demo feel frozen.
 async function settle(page: Page, ms = 350): Promise<void> {
   await page.waitForTimeout(ms);
@@ -73,7 +73,7 @@ export async function startSession(
     projectId: projectId()!,
     keepAlive: true,
     timeout: 900,
-    // worldcuparena.live (Fly.io) drops Browserbase's datacenter IPs, so the
+    // Some target hosts drop Browserbase's datacenter IPs, so the
     // cloud browser hangs on page.goto. Route through residential proxies.
     proxies: true,
     browserSettings: {

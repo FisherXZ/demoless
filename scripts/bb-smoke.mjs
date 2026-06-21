@@ -6,7 +6,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 
 const apiKey = process.env.BROWSERBASE_API_KEY;
 const projectId = process.env.BROWSERBASE_PROJECT_ID;
-const target = process.env.DEMO_TARGET_URL || "https://worldcuparena.live/";
+const target = process.env.DEMO_TARGET_URL || "https://www.browserbase.com/";
 
 if (!apiKey || !projectId) {
   console.error(
@@ -38,8 +38,8 @@ console.log("  url   :", page.url());
 
 await mkdir("screenshots", { recursive: true });
 const buf = await page.screenshot({ fullPage: false });
-await writeFile("screenshots/worldcuparena.png", buf);
-console.log("  shot  : screenshots/worldcuparena.png");
+await writeFile("screenshots/smoke.png", buf);
+console.log("  shot  : screenshots/smoke.png");
 
 await browser.close();
 console.log("done — session released.");

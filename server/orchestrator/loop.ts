@@ -46,7 +46,9 @@ export class LoopOrchestrator implements Orchestrator {
     const memoryContext = [buyerBlock, ctx.learningsContext]
       .filter(Boolean)
       .join("\n\n");
-    const system = buildSystem(this.deps.cfg, memoryContext) + languageDirective(input.language);
+    const system =
+      buildSystem(this.deps.cfg, memoryContext, ctx.role) +
+      languageDirective(input.language);
     const messages = [...toMessages(ctx.history), { role: "user" as const, content: input.text }];
     for await (const c of this._runTurn({ system, messages, executor: this.deps.executor, signal })) {
       yield c as Command; // P2 acts on say, forwards navigate/screen_is_on/remember/set_phase

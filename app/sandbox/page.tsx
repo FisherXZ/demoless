@@ -13,7 +13,7 @@ export default function SandboxPage() {
   const [liveViewUrl, setLiveViewUrl] = useState<string | null>(null);
   const [screen, setScreen] = useState<Screen | null>(null);
   const [busy, setBusy] = useState(false);
-  const [navUrl, setNavUrl] = useState("https://worldcuparena.live/");
+  const [navUrl, setNavUrl] = useState("https://www.browserbase.com/");
   const [clickStr, setClickStr] = useState("");
   const [log, setLog] = useState<string[]>([]);
 

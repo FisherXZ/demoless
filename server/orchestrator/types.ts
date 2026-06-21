@@ -27,6 +27,11 @@ export interface TurnContext {
   agentName: string;
   /** Cross-session demo learnings, preformatted for the prompt ("" if none). */
   learningsContext: string;
+  /**
+   * Visitor's self-reported role from the pre-call form, used to pick an
+   * audience persona (technical vs non-technical) for the system prompt.
+   */
+  role?: string;
 }
 
 export interface ConversationTurn {
