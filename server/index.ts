@@ -41,6 +41,15 @@ const httpServer = createServer((req, res) => {
   res.end();
 });
 
+// Backstop: a single session's stray async error must never take down the
+// whole gateway (and with it every other live demo). Log loudly, stay up.
+process.on("unhandledRejection", (reason) => {
+  console.error("[voice] unhandledRejection (kept alive):", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[voice] uncaughtException (kept alive):", err);
+});
+
 const wss = new WebSocketServer({ server: httpServer });
 
 wss.on("connection", (ws) => {

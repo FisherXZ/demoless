@@ -285,7 +285,7 @@ export class VoiceSession {
       case "audio_start":
         if (!this.acceptBuyer(msg.buyer)) return;
         if (msg.role) this.role = msg.role;
-        void this.ensureStarted(msg.language);
+        this.ensureStarted(msg.language).catch((e) => this.onStartupError(e));
         break;
       case "audio_stop":
         void this.stopListening();
@@ -306,7 +306,9 @@ export class VoiceSession {
         if (!this.acceptBuyer(msg.buyer)) return;
         if (msg.role) this.role = msg.role;
         this.send({ t: "user_said", text: msg.text, final: true });
-        void this.ensureStarted(this.language).then(() => this.runTurn(msg.text));
+        this.ensureStarted(this.language)
+          .then(() => this.runTurn(msg.text))
+          .catch((e) => this.onStartupError(e));
         break;
     }
   }
@@ -375,6 +377,19 @@ export class VoiceSession {
   private ensureStarted(language: Language): Promise<void> {
     if (!this.startPromise) this.startPromise = this.startListening(language);
     return this.startPromise;
+  }
+
+  /**
+   * Handle a failure from the fire-and-forget startup chain. If the client
+   * already disconnected (the common case: they left mid-startup, so dispose()
+   * tore down the browser and the in-flight startSession rejected), the error is
+   * an expected teardown race — swallow it. Otherwise surface it. Either way the
+   * rejection is caught here so it can never crash the gateway process.
+   */
+  private onStartupError(err: unknown) {
+    if (this.disposed) return;
+    console.error("[voice] startup failed:", err);
+    this.send({ t: "error", message: "Could not start the demo session." });
   }
 
   private async prewarm() {
