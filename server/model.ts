@@ -91,8 +91,19 @@ export type ModelEvent =
 const MODEL = () => process.env.ANTHROPIC_MODEL ?? "claude-opus-4-8";
 
 export async function* streamWithTools(req: StreamRequest): AsyncIterable<ModelEvent> {
+  // Cache the static prefix (tools + system prompt) so neither is reprocessed on
+  // every turn — or every tool hop within a turn (the voice loop runs up to 8).
+  // This is the main latency lever for the live loop and prevents the slowdown
+  // that compounds mid-session as history grows. The structured path
+  // (buildParams) already caches the same way.
+  const system = [
+    { type: "text" as const, text: req.system, cache_control: { type: "ephemeral" as const } },
+  ];
+  const tools = req.tools.map((t, i) =>
+    i === req.tools.length - 1 ? { ...t, cache_control: { type: "ephemeral" as const } } : t
+  );
   const stream = getClient().messages.stream({
-    model: MODEL(), max_tokens: 2048, system: req.system, messages: req.messages, tools: req.tools,
+    model: MODEL(), max_tokens: 2048, system, messages: req.messages, tools,
     // 2048: matches main (e167048), avoids mid-output truncation
   }, { signal: req.signal });
   const toolBuf: Record<string, { name: string; json: string }> = {};
