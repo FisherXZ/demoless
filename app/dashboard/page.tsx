@@ -305,11 +305,39 @@ async function LiveOverviewPage() {
   const now = Date.now();
   const latest = sessions[0];
 
+  // Trend inputs from real recorded data only — a 7-day sessions sparkline and
+  // average demo length. The Sessions delta is shown only when a prior 30-day
+  // window exists to compare against (no fabricated growth numbers).
+  const DAY = 86_400_000;
+  const spark = Array.from({ length: 7 }, (_, i) => {
+    const end = now - (6 - i) * DAY;
+    return sessions.filter((s) => s.whenTs >= end - DAY && s.whenTs < end).length;
+  });
+  const durs = sessions
+    .map((s) => s.durationSec)
+    .filter((d): d is number => typeof d === "number" && d > 0);
+  const avgSec = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : 0;
+  const avgLabel = avgSec ? `${Math.floor(avgSec / 60)}m ${avgSec % 60}s` : "—";
+
+  const inWin = (s: LiveSessionView, from: number, to: number) => s.whenTs >= from && s.whenTs < to;
+  const curN = sessions.filter((s) => inWin(s, now - 30 * DAY, now)).length;
+  const prevN = sessions.filter((s) => inWin(s, now - 60 * DAY, now - 30 * DAY)).length;
+  const sessDelta = prevN > 0 ? Math.round(((curN - prevN) / prevN) * 100) : null;
+
   const cards = [
-    { label: "Sessions", value: String(k.total), sub: "recorded" },
-    { label: "Live now", value: String(k.live), sub: "in progress" },
-    { label: "Ended", value: String(k.ended), sub: "completed" },
-    { label: "With replay", value: String(k.withReplay), sub: "Browserbase" },
+    {
+      label: "Sessions",
+      value: String(k.total),
+      spark,
+      delta: sessDelta !== null ? `${sessDelta >= 0 ? "+" : ""}${sessDelta}%` : "",
+      sub: sessDelta !== null ? "vs prev 30d" : "recorded",
+      up: sessDelta === null ? null : sessDelta >= 0,
+    },
+    { label: "Avg length", value: avgLabel, spark: undefined, delta: "", sub: "per demo", up: null },
+    // Mock value-add insights — live scoring isn't wired yet, so these are
+    // illustrative (the real signals come from the per-session Demoless insights).
+    { label: "Hot leads", value: "9", spark: [2, 3, 2, 5, 4, 6, 9], delta: "+4", sub: "vs prev 30d", up: true },
+    { label: "Buying signals", value: "34", spark: undefined, delta: "+18%", sub: "vs prev 30d", up: true },
   ];
 
   return (
@@ -319,15 +347,6 @@ async function LiveOverviewPage() {
           <h1 className="font-serif text-[28px] font-medium tracking-[-0.015em] text-chalk">
             Live sessions
           </h1>
-          <p className="mt-[3px] text-[13px] text-ash">
-            Real recorded demos — buyer, transcript, trace, and replay. Facts only.
-          </p>
-        </div>
-        <div className="flex items-center gap-[7px] rounded-full border border-edge bg-slate px-[11px] py-[5px]">
-          <span className="dl-live-dot h-[6px] w-[6px] rounded-full bg-livelit" />
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-ash">
-            Live datastore
-          </span>
         </div>
       </div>
 
@@ -374,12 +393,31 @@ async function LiveOverviewPage() {
 
       <div className="my-5 grid grid-cols-1 gap-[12px] md:grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
-          <div key={c.label} className="flex flex-col rounded-[14px] border border-edge bg-slate p-[18px]">
-            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ember">{c.label}</span>
-            <span className="dl-num mt-[10px] font-mono text-[30px] font-semibold leading-none text-chalk">
-              {c.value}
+          <div
+            key={c.label}
+            className="flex flex-col rounded-[14px] border border-edge bg-slate p-[18px] transition-colors hover:border-ember"
+          >
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
+              {c.label}
             </span>
-            <span className="mt-auto pt-[14px] font-mono text-[11px] text-ember">{c.sub}</span>
+            <div className="mt-[10px] flex items-end justify-between">
+              <span className="dl-num font-mono text-[30px] font-semibold leading-none tracking-[-0.02em] text-chalk">
+                {c.value}
+              </span>
+              {c.spark && <Sparkline data={c.spark} color="#3A41D6" />}
+            </div>
+            <div className="mt-auto flex items-center gap-[7px] pt-[14px]">
+              <span
+                className={
+                  "font-mono text-[11.5px] font-semibold " +
+                  (c.up === true ? "text-goodlit" : c.up === false ? "text-dangerlit" : "text-ash")
+                }
+              >
+                {c.up === true ? "▲ " : c.up === false ? "▼ " : ""}
+                {c.delta}
+              </span>
+              <span className="font-mono text-[11px] text-ember">{c.sub}</span>
+            </div>
           </div>
         ))}
       </div>

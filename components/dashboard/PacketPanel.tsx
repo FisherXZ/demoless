@@ -27,6 +27,17 @@ const LABEL_TEXT: Record<SessionLabel, string> = {
   no_clear_next_step: "No clear next step",
 };
 
+// Headline categories shown as the empty scaffold while extraction is pending.
+const PENDING_SECTIONS = [
+  "Recommended next action",
+  "Summary",
+  "Why they came",
+  "Buying signals",
+  "Pain points",
+  "Objections",
+  "Questions",
+];
+
 function EvidenceChips({ evidence }: { evidence: EvidenceRef[] }) {
   if (!evidence.length) return null;
   return (
@@ -46,34 +57,48 @@ function EvidenceChips({ evidence }: { evidence: EvidenceRef[] }) {
   );
 }
 
-function Section({ label, children }: { label: string; children: React.ReactNode }) {
+// One Granola-style block: a heading + tight bullet list, inline in the document.
+function Heading({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-4 rounded-[12px] border border-edge bg-slate p-4">
-      <span className="mb-[8px] block font-mono text-[11px] uppercase tracking-[0.1em] text-ember">{label}</span>
+    <h4 className="mb-[7px] flex items-center gap-[7px] text-[13px] font-semibold text-chalk">
+      <span className="h-[10px] w-[2px] flex-none rounded-full bg-brandlit/50" />
       {children}
+    </h4>
+  );
+}
+
+function Bullet({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex gap-[9px] text-[14px] leading-[1.5]">
+      <span className="mt-[8px] h-[4px] w-[4px] flex-none rounded-full bg-stone300" />
+      <div className="min-w-0">{children}</div>
+    </li>
+  );
+}
+
+function InsightBlock({ heading, items }: { heading: string; items: EvidenceInsight[] }) {
+  if (!items.length) return null;
+  return (
+    <div className="mb-5 last:mb-0">
+      <Heading>{heading}</Heading>
+      <ul className="m-0 flex list-none flex-col gap-[7px] p-0">
+        {items.map((it) => (
+          <Bullet key={it.id}>
+            <span className="font-medium text-chalk">{it.title}</span>
+            {it.detail && <span className="text-ash"> — {it.detail}</span>}
+            <EvidenceChips evidence={it.evidence} />
+          </Bullet>
+        ))}
+      </ul>
     </div>
   );
 }
 
-function InsightSection({ label, items }: { label: string; items: EvidenceInsight[] }) {
-  if (!items.length) return null;
-  return (
-    <Section label={label}>
-      {items.map((it) => (
-        <div key={it.id} className="mb-2 last:mb-0">
-          <p className="m-0 text-[14px] font-semibold text-chalk">{it.title}</p>
-          {it.detail && <p className="m-0 text-[13px] leading-[1.5] text-ash">{it.detail}</p>}
-          <EvidenceChips evidence={it.evidence} />
-        </div>
-      ))}
-    </Section>
-  );
-}
-
 /**
- * Renders the evidence-backed post-demo packet (issue #21). Every insight shown
- * here survived the grounding gate; labels are derived in code. Falls through to
- * a factual status line while extraction is processing / failed / insufficient.
+ * Renders the evidence-backed Demoless insights (issue #21) as a single
+ * Granola-style structured document. Every insight shown survived the grounding
+ * gate; labels are derived in code. While extraction is pending / failed /
+ * insufficient, the same categories render as an empty scaffold.
  */
 export default function PacketPanel({
   status,
@@ -82,25 +107,44 @@ export default function PacketPanel({
   status?: ExtractionStatus;
   packet?: SessionPacket | null;
 }) {
-  if (!packet || status !== "ready") {
-    const msg =
-      status === "failed"
-        ? "Packet extraction failed. The transcript and trace below are the captured evidence."
-        : status === "insufficient_evidence"
-          ? "Not enough conversation to generate a packet. Showing raw captured evidence only."
-          : "Generating the post-demo packet… refresh in a moment.";
-    return (
-      <Section label="Post-demo packet">
-        <p className="m-0 text-[14px] text-ash">{msg}</p>
-      </Section>
-    );
-  }
+  const ready = Boolean(packet) && status === "ready";
+  const pending = !ready && status !== "failed" && status !== "insufficient_evidence";
 
-  const p = packet;
+  return (
+    <div className="mb-4 rounded-[12px] border border-edge bg-slate p-5">
+      <div className="mb-4 flex items-center gap-2">
+        <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
+          Demoless insights
+        </span>
+        {pending && <span className="dl-live-dot h-[6px] w-[6px] rounded-full bg-livelit" />}
+      </div>
+
+      {ready && packet ? (
+        <ReadyDoc packet={packet} />
+      ) : (
+        <PendingDoc pending={pending} status={status} />
+      )}
+    </div>
+  );
+}
+
+function ReadyDoc({ packet: p }: { packet: SessionPacket }) {
+  const nextAction: EvidenceInsight[] = p.recommendedNextAction?.text
+    ? [
+        {
+          id: "next-action",
+          type: "buying_signal",
+          title: p.recommendedNextAction.text,
+          detail: "",
+          evidence: p.recommendedNextAction.evidence,
+        },
+      ]
+    : [];
+
   return (
     <div>
       {p.labels.length > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="mb-5 flex flex-wrap items-center gap-2">
           {p.labels.map((l) => (
             <span key={l} className={`rounded px-2 py-1 text-[12px] font-semibold ${LABEL_STYLE[l]}`}>
               {LABEL_TEXT[l]}
@@ -109,45 +153,76 @@ export default function PacketPanel({
         </div>
       )}
 
-      {p.recommendedNextAction?.text && (
-        <Section label="Recommended next action">
-          <p className="m-0 text-[14px] text-ash">{p.recommendedNextAction.text}</p>
-          <EvidenceChips evidence={p.recommendedNextAction.evidence} />
-        </Section>
-      )}
+      <InsightBlock heading="Recommended next action" items={nextAction} />
 
       {p.summary && (
-        <Section label="Summary">
-          <p className="m-0 text-[14px] leading-[1.6] text-ash">{p.summary}</p>
-        </Section>
+        <div className="mb-5 last:mb-0">
+          <Heading>Summary</Heading>
+          <p className="m-0 pl-[13px] text-[14px] leading-[1.6] text-ash">{p.summary}</p>
+        </div>
       )}
 
-      <InsightSection label="Why they came" items={p.whyTheyCame} />
-      <InsightSection label="Buying signals" items={p.buyingSignals} />
-      <InsightSection label="Pain points" items={p.painPoints} />
-      <InsightSection label="Buyer background" items={p.buyerBackground} />
-      <InsightSection label="Workflow gaps" items={p.workflowGaps} />
-      <InsightSection label="Product gaps" items={p.productGaps} />
-      <InsightSection label="Objections" items={p.objections} />
-      <InsightSection label="Questions" items={p.questions} />
+      <InsightBlock heading="Why they came" items={p.whyTheyCame} />
+      <InsightBlock heading="Buying signals" items={p.buyingSignals} />
+      <InsightBlock heading="Pain points" items={p.painPoints} />
+      <InsightBlock heading="Buyer background" items={p.buyerBackground} />
+      <InsightBlock heading="Workflow gaps" items={p.workflowGaps} />
+      <InsightBlock heading="Product gaps" items={p.productGaps} />
+      <InsightBlock heading="Objections" items={p.objections} />
+      <InsightBlock heading="Questions" items={p.questions} />
 
       {p.productMoments.length > 0 && (
-        <Section label="Product moments">
-          {p.productMoments.map((m) => (
-            <div key={m.id} className="mb-2 last:mb-0">
-              <p className="m-0 text-[14px] text-ash">{m.label}</p>
-              <EvidenceChips evidence={m.evidence} />
-            </div>
-          ))}
-        </Section>
+        <div className="mb-5 last:mb-0">
+          <Heading>Product moments</Heading>
+          <ul className="m-0 flex list-none flex-col gap-[7px] p-0">
+            {p.productMoments.map((m) => (
+              <Bullet key={m.id}>
+                <span className="text-ash">{m.label}</span>
+                <EvidenceChips evidence={m.evidence} />
+              </Bullet>
+            ))}
+          </ul>
+        </div>
       )}
 
       {p.followUpEmail && (
-        <Section label="Draft follow-up email">
-          <p className="m-0 text-[13px] font-semibold text-chalk">{p.followUpEmail.subject}</p>
-          <pre className="mt-2 whitespace-pre-wrap font-sans text-[13px] leading-[1.6] text-ash">{p.followUpEmail.body}</pre>
-        </Section>
+        <div className="last:mb-0">
+          <Heading>Draft follow-up email</Heading>
+          <div className="pl-[13px]">
+            <p className="m-0 text-[13px] font-semibold text-chalk">{p.followUpEmail.subject}</p>
+            <pre className="mt-2 whitespace-pre-wrap font-sans text-[13px] leading-[1.6] text-ash">
+              {p.followUpEmail.body}
+            </pre>
+          </div>
+        </div>
       )}
+    </div>
+  );
+}
+
+function PendingDoc({ pending, status }: { pending: boolean; status?: ExtractionStatus }) {
+  const note =
+    status === "failed"
+      ? "Insight extraction failed — the transcript and trace below are the captured evidence."
+      : status === "insufficient_evidence"
+        ? "Not enough conversation yet to fill these in. The transcript and trace below are the captured evidence."
+        : "Pulling Demoless insights from this demo… these fill in shortly.";
+  return (
+    <div>
+      <p className="mb-5 mt-0 text-[13px] text-ash">{note}</p>
+      {PENDING_SECTIONS.map((label) => (
+        <div key={label} className="mb-[18px] last:mb-0">
+          <Heading>{label}</Heading>
+          {pending ? (
+            <div className="flex flex-col gap-2 pl-[13px]">
+              <div className="h-[9px] w-3/4 animate-pulse rounded bg-slate2" />
+              <div className="h-[9px] w-1/2 animate-pulse rounded bg-slate2" />
+            </div>
+          ) : (
+            <p className="m-0 pl-[13px] text-[13px] text-ember">—</p>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
