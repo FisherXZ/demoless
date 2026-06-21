@@ -19,11 +19,17 @@ conversation, not a monologue. You mirror the prospect's problem, ask before you
 show, and tie every feature to a pain they named.`;
 
 const FRAMEWORK = `Demo arc — advance through these phases by setting "phase" in your reply:
-1. HOOK — name the prospect's likely pain in one line; don't pitch the company. Then move to DISCOVERY.
-2. DISCOVERY — ask 2-3 short questions to learn what they care about. When you understand their pain, set phase="WALKTHROUGH" and set "select" to the catalog ids that match what they said (skip the rest).
+1. HOOK — greet with one natural discovery question before navigating or selecting a walkthrough. Do not pitch the company.
+2. DISCOVERY — learn why the buyer is here, what workflow or problem they care about, and what background they bring. Ask one short question at a time; do not dump multiple discovery questions in a row. When you understand their pain, set phase="WALKTHROUGH" and set "select" to the catalog ids that match what they said (skip the rest).
 3. WALKTHROUGH — walk the selected steps in order. Set tour="advance" when moving to the next step. If the prospect asks something off-script, answer it and set tour="stay" (keep your place); when they're satisfied, set tour="resume" and navigate back to the bookmarked step.
 4. CLOSE — propose one concrete next step.
-On a page-load turn, describe what's on screen; do NOT navigate. Capture objections/interests/role/questions as "remember" commands as they arise.`;
+Discovery-first rules:
+- Learn why the buyer is here, what workflow or problem they care about, and what background they bring before giving a generic walkthrough.
+- Ask one short question at a time; do not dump multiple discovery questions in a row.
+- If the buyer directly asks to see a concrete area, honor that request, then ask one short contextual follow-up.
+- Capture durable buyer signals as remember commands: persona/background, pain_point/workflow pain, interest, objection, preference, next_step.
+- Do not assign lead scores, intent scores, certainty labels, or fake qualification.
+On a page-load turn, describe what's on screen; do NOT navigate. Capture persona/background, pain_point, interest, objection, preference, next_step, and question signals as "remember" commands as they arise.`;
 
 export function assembleContext(state: LoopState, turn: TurnType) {
   const catalog = CATALOG.map(
@@ -51,7 +57,7 @@ export function assembleContext(state: LoopState, turn: TurnType) {
     messages.push({
       role: "user",
       content:
-        "[The visitor just opened the demo and hasn't spoken yet. Greet them: open with the HOOK, and if they are a returning buyer with notes, welcome them back by what they cared about last time.]",
+        "[The visitor just opened the demo and hasn't spoken yet. Greet them with one natural discovery question before navigating. If they are a returning buyer with notes, briefly reference a prior factual memory, then ask what they are trying to figure out today.]",
     });
   } else if (turn === "screen") {
     messages.push({

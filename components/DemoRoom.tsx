@@ -181,7 +181,9 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
                   <div className="text-stone350 text-sm">
                     {voice.error
                       ? `${agentName} couldn't connect.`
-                      : `Connecting ${agentName} to the live product…`}
+                      : voice.status === "connecting"
+                        ? `Connecting ${agentName} to the live product…`
+                        : `${agentName} is ready to learn what you want to figure out.`}
                   </div>
                   {!voice.error && (
                     <div

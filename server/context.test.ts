@@ -34,6 +34,23 @@ describe("assembleContext", () => {
     expect(messages[0].role).toBe("user"); // API requires the first message be a user turn
   });
 
+  it("tells the harness agent to run discovery before generic walkthroughs", () => {
+    const { system, messages } = assembleContext({ ...base, history: [] }, "greet");
+
+    expect(system).toMatch(/discovery-first/i);
+    expect(system).toMatch(/why the buyer is here/i);
+    expect(system).toMatch(/workflow or problem/i);
+    expect(system).toMatch(/background/i);
+    expect(system).toMatch(/one short question at a time/i);
+    expect(system).toMatch(/pain_point/i);
+    expect(system).toMatch(/next_step/i);
+    expect(system).not.toMatch(/objections\/interests\/role\/questions/i);
+    expect(system).toMatch(/do not assign/i);
+    expect(system).toMatch(/scores/i);
+    expect(messages.at(-1)?.content).toMatch(/one natural discovery question/i);
+    expect(messages.at(-1)?.content).not.toMatch(/HOOK/i);
+  });
+
   it("ends with a user turn on a screen turn (history ending in assistant would 400 as a prefill)", () => {
     // After a navigate, history ends with the agent's say; a screen/narrate turn
     // must not send a trailing assistant message (prefill → 400 on Opus 4.8).
