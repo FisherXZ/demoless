@@ -31,6 +31,7 @@ interface DemoState {
   selectedId: string | null;
   elapsed: number;
   recallLine?: string;
+  demoSessionId?: string;
   form: FormState;
 }
 
@@ -46,10 +47,6 @@ const initialState: DemoState = {
   form: {
     name: "",
     email: "",
-    role: "VP of Sales",
-    size: "51–200",
-    useCase: "Outbound sales",
-    pain: "",
   },
 };
 
@@ -63,8 +60,15 @@ export function useDemoState(): DemoVals {
 
   const m = s.moment;
   const form = s.form;
-  const tailoredFor =
-    (form.role || "Growth team") + " · " + (form.useCase || "Outbound");
+  const tailoredFor = form.email || form.name || "your demo";
+  const buyerIdentity =
+    s.demoSessionId && form.email
+      ? {
+          demoSessionId: s.demoSessionId,
+          buyerEmail: form.email,
+          buyerName: form.name || undefined,
+        }
+      : undefined;
 
   const sectionItems: SectionItem[] = SECTIONS.map((label, i) => {
     const done = i < m;
@@ -137,33 +141,29 @@ export function useDemoState(): DemoVals {
     goForm: () => patch({ screen: "form" }),
     goDashboard: () => patch({ screen: "dashboard", selectedId: null }),
     startDemo: async () => {
-      // Persist the buyer into P4 Redis and pull recall before entering.
-      // Identity comes from the form email (NextAuth deferred to later phase).
-      const { recallLine } = await enterDemo({
+      // Persist the buyer into P4 Redis, create a demo session up-front, and pull
+      // recall before entering. Identity comes from the form email (NextAuth
+      // deferred to later phase).
+      const { demoSessionId, recallLine } = await enterDemo({
         email: form.email,
         name: form.name,
-        role: form.role,
-        size: form.size,
-        useCase: form.useCase,
       });
       patch({
         screen: "room",
         moment: 0,
         elapsed: 0,
         paused: false,
+        demoSessionId,
         recallLine,
       });
     },
 
     recallLine: s.recallLine,
+    buyerIdentity,
 
     form,
     onName: (e) => setF("name", e.target.value),
     onEmail: (e) => setF("email", e.target.value),
-    onRole: (e) => setF("role", e.target.value),
-    onSize: (e) => setF("size", e.target.value),
-    onUseCase: (e) => setF("useCase", e.target.value),
-    onPain: (e) => setF("pain", e.target.value),
 
     tailoredFor,
     clock:

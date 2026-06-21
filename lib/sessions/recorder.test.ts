@@ -26,8 +26,16 @@ describe("SessionRecorder", () => {
   it("builds a SessionRecord with metadata and derived transcript", () => {
     const r = new SessionRecorder(1000);
     r.recordUser("we want to buy", 1, 1100);
-    const rec = r.build({ id: "s1", company: "Acme", role: "Engineer", phaseReached: "CLOSE", replayUrl: "u", endedAt: 2000 });
-    expect(rec).toMatchObject({ id: "s1", company: "Acme", role: "Engineer", startedAt: 1000, endedAt: 2000, phaseReached: "CLOSE", replayUrl: "u" });
+    const rec = r.build({
+      id: "s1", company: "Acme", status: "ended", buyerEmail: "a@b.com",
+      role: "Engineer", createdAt: 900, phaseReached: "CLOSE",
+      browserbaseSessionId: "bb1", replayUrl: "u", endedAt: 2000,
+    });
+    expect(rec).toMatchObject({
+      id: "s1", company: "Acme", status: "ended", buyerEmail: "a@b.com",
+      role: "Engineer", createdAt: 900, startedAt: 1000, endedAt: 2000,
+      phaseReached: "CLOSE", browserbaseSessionId: "bb1", replayUrl: "u",
+    });
     expect(rec.transcript).toHaveLength(1);
     expect(rec.events).toHaveLength(1);
   });
