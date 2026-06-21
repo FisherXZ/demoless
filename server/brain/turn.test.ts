@@ -22,10 +22,10 @@ describe("runTurn", () => {
     expect(out.at(-1)).toEqual({ type: "done" });
   });
 
-  it("filler commands are yielded as type=filler, not type=say, so they are excluded from history", async () => {
-    // Regression for principal review finding #4: filler lines ("Let me pull that up.")
-    // must not contaminate conversation history. They are yielded as {type:"filler"}
-    // so session.ts speaks them but does not push them to spoken[].
+  it("emits no spoken filler for tool calls — only the model's real reply is spoken", async () => {
+    // We removed the hardcoded tool fillers ("Let me pull that up.", "One sec.",
+    // "Let me take a look."): the agent must lead with real value and never
+    // narrate its own clicks. A tool call should produce no filler command.
     const stream = (() => {
       let i = 0;
       const scripts = [
@@ -42,15 +42,11 @@ describe("runTurn", () => {
     const fillerCmds = out.filter((c) => c.type === "filler");
     const sayCmds = out.filter((c) => c.type === "say");
 
-    // The navigate filler must be a filler command, not a say.
-    expect(fillerCmds.length).toBeGreaterThan(0);
-    expect(fillerCmds[0].text).toBe("Let me pull that up.");
+    // No filler commands at all — the agent does not narrate tool calls.
+    expect(fillerCmds.length).toBe(0);
 
-    // The model's real reply is a say command.
+    // The model's real reply is still spoken.
     expect(sayCmds.map((c: any) => c.text).join(" ")).toContain("Here is pricing.");
-
-    // No filler text appears as a say command.
-    expect(sayCmds.map((c: any) => c.text)).not.toContain("Let me pull that up.");
   });
 
   it("stops immediately when aborted before streaming", async () => {
@@ -133,7 +129,6 @@ describe("runTurn", () => {
       note: "security",
       noteType: "interest",
     });
-    expect(out).toContainEqual({ type: "filler", text: "One sec." });
     expect(out).toContainEqual({ type: "screen_is_on", page: "/security" });
   });
 

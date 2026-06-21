@@ -34,6 +34,13 @@ export interface DemoSessionStartupDeps {
   loadBuyer?: (buyerId: string) => Promise<BuyerMemory>;
   getLearnings?: (company: string) => Promise<Learning[]>;
   buildLearningsContext?: (learnings: Learning[]) => string;
+  /**
+   * Inject cross-session demo learnings into the prompt. Defaults to the
+   * DEMO_LEARNINGS env flag (off unless set to on/1/true) — kept off by default
+   * while learning quality is unproven. When off, the connect-time Redis read
+   * and the per-turn prompt tokens are both skipped.
+   */
+  learningsEnabled?: boolean;
   getDemoConfig?: (company?: string) => DemoConfig;
   now?: () => number;
   log?: (message: string) => void;
@@ -76,6 +83,9 @@ export function createDemoSessionStartup(
   const getLearnings = deps.getLearnings ?? defaultGetLearnings;
   const buildLearningsContext =
     deps.buildLearningsContext ?? defaultBuildLearningsContext;
+  const learningsEnabled =
+    deps.learningsEnabled ??
+    /^(on|1|true)$/i.test(process.env.DEMO_LEARNINGS ?? "");
   const getDemoConfig = deps.getDemoConfig ?? defaultGetDemoConfig;
   const now = deps.now ?? Date.now;
   const log = deps.log ?? console.log;
@@ -140,16 +150,18 @@ export function createDemoSessionStartup(
       }
 
       let learningsContext = "";
-      try {
-        learningsContext = buildLearningsContext(await getLearnings(cfg.company));
-        if (learningsContext) {
-          const count = learningsContext.split("\n").length - 1;
-          log(
-            `[learnings] loaded ${count} past-demo learning(s) for ${cfg.company} into this session's prompt`
-          );
+      if (learningsEnabled) {
+        try {
+          learningsContext = buildLearningsContext(await getLearnings(cfg.company));
+          if (learningsContext) {
+            const count = learningsContext.split("\n").length - 1;
+            log(
+              `[learnings] loaded ${count} past-demo learning(s) for ${cfg.company} into this session's prompt`
+            );
+          }
+        } catch {
+          // Degrade gracefully: no cross-session learnings injected.
         }
-      } catch {
-        // Degrade gracefully: no cross-session learnings injected.
       }
 
       return {

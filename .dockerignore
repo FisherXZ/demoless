@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+build
+.git
+coverage
+.vercel
+*.tsbuildinfo
+# Large research corpus is only read by the local knowledge:seed script, never at runtime.
+research
+# Tests aren't run in the runtime image.
+**/*.test.ts
+.env
+.env*.local
