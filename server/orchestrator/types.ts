@@ -25,6 +25,8 @@ export interface TurnContext {
   buyerNotes: string[];
   /** The agent's display name, derived from the selected voice model. */
   agentName: string;
+  /** Cross-session demo learnings, preformatted for the prompt ("" if none). */
+  learningsContext: string;
 }
 
 export interface ConversationTurn {

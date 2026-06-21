@@ -58,7 +58,7 @@ describe("LoopOrchestrator recall", () => {
     const out: any[] = [];
     for await (const c of orch.runTurn(
       { text: "hi", language: "en" },
-      { history: [], buyerNotes: ["parallel browser sessions"], agentName: "Maya" },
+      { history: [], buyerNotes: ["parallel browser sessions"], agentName: "Maya", learningsContext: "" },
       new AbortController().signal
     )) {
       out.push(c);

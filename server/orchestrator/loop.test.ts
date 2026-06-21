@@ -9,7 +9,7 @@ describe("LoopOrchestrator", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
     (orch as any)._runTurn = async function* () { yield { type: "say", text: "Hello." }; yield { type: "done" }; };
     const out: any[] = [];
-    for await (const c of orch.runTurn({ text: "hi", language: "en" }, { history: [], buyerNotes: [], agentName: "Maya" }, new AbortController().signal)) out.push(c);
+    for await (const c of orch.runTurn({ text: "hi", language: "en" }, { history: [], buyerNotes: [], agentName: "Maya", learningsContext: "" }, new AbortController().signal)) out.push(c);
     expect(out.some((c) => c.type === "say" && c.text === "Hello.")).toBe(true);
   });
   it("greeting uses persona + recall", () => {
