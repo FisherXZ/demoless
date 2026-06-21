@@ -12,7 +12,7 @@
  */
 
 export { getRedis, closeRedis } from "../memory/redis";
-export { KB_INDEX, KB_PREFIX, companySlug, chunkKey } from "./keys";
+export { KB_INDEX, KB_PREFIX, KB_SOURCE_PREFIX, companySlug, chunkKey, sourceKey } from "./keys";
 export { embed, toFloat32Buffer, EMBED_MODEL, EMBED_DIM } from "./embed";
 export { chunkText } from "./chunk";
 export {
@@ -22,4 +22,11 @@ export {
   clearKnowledge,
 } from "./store";
 export { buildAnswerContext } from "./answer";
-export type { KnowledgeDoc, Chunk, SearchHit } from "./types";
+export {
+  putSourceDoc,
+  getSourceDoc,
+  listSourceDocs,
+  deleteSourceDoc,
+  reindexFromSource,
+} from "./source";
+export type { KnowledgeDoc, Chunk, SearchHit, SourceDoc } from "./types";

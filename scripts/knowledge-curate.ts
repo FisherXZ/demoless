@@ -1,22 +1,21 @@
 /**
- * Seed the Browserbase product knowledge base from scratch.
+ * Curate the Browserbase product knowledge base for the demo agent.
  *
  * Reads research/browserbase-kb/full-docs/documents.jsonl, selects the
  * demo-relevant subset (BROWSERBASE_ALLOWLIST), writes them to the Redis
- * source-of-record (demoless:kb-source:browserbase:*), then rebuilds the
- * vector index. This is a one-stop "fresh setup" that subsumes
- * `knowledge:curate` + `knowledge:reindex`.
+ * store-of-record (demoless:kb-source:browserbase:*), and writes the authored
+ * app-navigation guide. The curation spec lives in lib/knowledge/curation.ts
+ * so it can be unit-tested; this script is just the file IO + Redis writes.
  *
- *   docker run -p 6379:6379 redis/redis-stack:latest
- *   OPENAI_API_KEY=sk-...  npm run knowledge:seed
+ * Run after changes to the allowlist or the authored navigation guide:
+ *   OPENAI_API_KEY=sk-...  npm run knowledge:curate
  *
- * For incremental updates (e.g. after editing a source doc):
- *   npm run knowledge:curate   # re-write source-of-record from documents.jsonl
- *   npm run knowledge:reindex  # rebuild vectors from source-of-record
+ * Then rebuild vectors:
+ *   OPENAI_API_KEY=sk-...  npm run knowledge:reindex
  */
 import * as fs from "fs";
 import * as path from "path";
-import { putSourceDoc, reindexFromSource, closeRedis } from "../lib/knowledge";
+import { putSourceDoc, closeRedis } from "../lib/knowledge";
 import {
   BROWSERBASE_ALLOWLIST,
   APP_NAVIGATION_DOC,
@@ -46,27 +45,32 @@ async function main() {
     `Curating ${selected.length} of ${allDocs.length} docs for "${COMPANY}"...`
   );
 
+  // Warn if any allowlisted id is missing from the corpus (catches typos/renames).
   const foundIds = new Set(selected.map((d) => d.id));
   const missing = BROWSERBASE_ALLOWLIST.filter((id) => !foundIds.has(id));
   if (missing.length) {
     console.warn(`  ⚠ ${missing.length} allowlisted id(s) not found: ${missing.join(", ")}`);
   }
 
+  let written = 0;
   const now = new Date().toISOString();
   for (const raw of selected) {
     await putSourceDoc(COMPANY, toCuratedDoc(raw, now));
+    written++;
     process.stdout.write(`  ✓ ${raw.id}\n`);
   }
 
+  // Write the authored app-navigation guide.
   await putSourceDoc(COMPANY, { ...APP_NAVIGATION_DOC, updatedAt: now });
+  written++;
   console.log(`  ✓ app-navigation (authored)`);
 
-  console.log(`\nRebuilding vector index from source-of-record...`);
-  const n = await reindexFromSource(COMPANY);
-  console.log(`  indexed ${n} chunk(s) from ${selected.length + 1} source doc(s)`);
+  console.log(`\nWrote ${written} source docs to kb-source:${COMPANY}:*`);
+  console.log(
+    "Next: run `npm run knowledge:reindex` to rebuild the vector index."
+  );
 
   await closeRedis();
-  console.log("Done. Run `npm run knowledge:smoke` to verify retrieval.");
 }
 
 main().catch((err) => {

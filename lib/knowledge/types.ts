@@ -30,3 +30,16 @@ export interface SearchHit {
   text: string;
   score: number;
 }
+
+/**
+ * A curated source document stored in `demoless:kb-source:{company}:{id}`.
+ * This is the authoritative prose; vectors in `kb:*` are derived from it.
+ */
+export interface SourceDoc {
+  id: string;
+  title: string;
+  source?: string;
+  group?: string;
+  text: string;
+  updatedAt: string;
+}
