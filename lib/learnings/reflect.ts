@@ -75,7 +75,10 @@ export async function reflectAndStore(args: {
   chat?: ChatFn;
 }): Promise<void> {
   try {
-    if (args.turns.length === 0) return; // nothing said → nothing to learn
+    // Nothing to learn unless the visitor actually spoke. A greeting-only
+    // session pushes one agent turn to history, so gate on a real user turn
+    // (not just non-empty history) to avoid spending an LLM call on it.
+    if (!args.turns.some((t) => t.role === "user")) return;
     const learnings = await reflectOnSession(
       args.turns,
       args.phaseReached,

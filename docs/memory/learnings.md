@@ -7,7 +7,9 @@ about how to run the demo better. Global across all buyers — NOT per-buyer.
 ## Write path (on every socket close)
 1. `VoiceSession.dispose()` fires `reflectAndStore({ company, turns, phaseReached })`
    fire-and-forget (never blocks teardown, never throws). `dispose()` is
-   idempotent, so an error-then-close only reflects once.
+   idempotent, so an error-then-close only reflects once. `reflectAndStore`
+   no-ops unless the visitor actually spoke (≥1 user turn), so greeting-only
+   /abandoned sessions cost no LLM call.
 2. `reflectOnSession()` makes ONE LLM call: transcript + phase reached →
    ≤3 generalizable rules `{ text, confidence }` (returns `[]` if nothing
    generalizes or the session was empty).

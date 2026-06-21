@@ -37,7 +37,13 @@ function fakeWs() {
 describe("VoiceSession learnings", () => {
   it("calls reflectAndStore once on socket close", () => {
     const ws = fakeWs();
-    const reflectAndStore = vi.fn(async () => {});
+    const reflectAndStore = vi.fn(
+      async (_args: {
+        company: string;
+        turns: { role: "user" | "agent"; text: string }[];
+        phaseReached?: string;
+      }) => {}
+    );
     new VoiceSession(ws, "dg-key", {
       startSession: vi.fn(),
       stopSession: vi.fn(async () => {}),
@@ -52,7 +58,13 @@ describe("VoiceSession learnings", () => {
 
   it("does not call reflectAndStore twice when error then close both fire", () => {
     const ws = fakeWs();
-    const reflectAndStore = vi.fn(async () => {});
+    const reflectAndStore = vi.fn(
+      async (_args: {
+        company: string;
+        turns: { role: "user" | "agent"; text: string }[];
+        phaseReached?: string;
+      }) => {}
+    );
     new VoiceSession(ws, "dg-key", {
       startSession: vi.fn(),
       stopSession: vi.fn(async () => {}),

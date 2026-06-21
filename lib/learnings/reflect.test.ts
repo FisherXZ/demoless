@@ -30,7 +30,7 @@ describe("parseLearnings", () => {
 describe("reflectOnSession", () => {
   it("passes the transcript to the chat fn and parses its output", async () => {
     const chat = vi.fn(
-      async () =>
+      async (_system: string, _user: string) =>
         '[{"text":"Answer objections by opening the relevant page","confidence":0.7}]'
     );
     const out = await reflectOnSession(
