@@ -150,7 +150,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
       <div className="flex-1 flex gap-3.5 px-5 pb-3.5 min-h-0">
         {/* Product share — the real cloud browser Maya drives */}
         <div className="flex-1 min-w-0 flex flex-col">
-          <div className="flex-1 relative bg-white rounded-[14px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.35)] border border-coal min-h-0">
+          <div className="relative flex-1 min-h-0 overflow-hidden rounded-[14px] border border-coal bg-white shadow-[0_1px_2px_rgba(0,0,0,0.35)]">
             <div className="h-11 border-b border-hair flex items-center gap-3.5 px-4 flex-none">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#f0efed]" />
@@ -209,7 +209,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
             </div>
 
             {/* Maya avatar tile */}
-            <div className="absolute right-3.5 bottom-3.5 w-[168px] h-[116px] rounded-xl overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.4)] border-2 border-brand bg-gradient-to-br from-coal to-brand">
+            <div className="absolute bottom-3.5 right-3.5 h-[116px] w-[168px] overflow-hidden rounded-[12px] border border-coalline bg-coal shadow-[0_1px_2px_rgba(0,0,0,0.35)]">
               <div className="absolute inset-0 flex items-center justify-center text-white/90 text-3xl font-bold">
                 {agentName.charAt(0).toUpperCase()}
               </div>

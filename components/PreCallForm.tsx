@@ -32,7 +32,7 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
         <div>
           <div className="flex items-center gap-[14px] mb-[26px]">
             <div className="relative w-16 h-16">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-coal to-brand flex items-center justify-center text-white text-2xl font-bold">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-coalline bg-coal text-2xl font-bold text-white">
                 {agentName.charAt(0)}
               </div>
               <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-live border-[3px] border-night" />
@@ -188,7 +188,7 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
 
         <button
           onClick={vals.startDemo}
-          className="mt-[26px] bg-brand text-white border-none p-4 rounded-xl text-[17px] font-bold cursor-pointer shadow-[0_4px_16px_rgba(79,70,229,.3)] flex items-center justify-center gap-2.5"
+          className="mt-[26px] flex cursor-pointer items-center justify-center gap-2.5 rounded-[10px] border-none bg-brand p-4 text-[17px] font-bold text-white transition-colors hover:bg-branddeep"
         >
           <span
             className="w-[9px] h-[9px] rounded-full bg-white"
