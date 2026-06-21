@@ -159,7 +159,9 @@ export function useDemoState(): DemoVals {
       });
     },
 
-    recallLine: s.recallLine,
+    // The recall line is English-only (composed from stored notes). Hide it for
+    // non-English sessions so it matches the greeting, which omits it too.
+    recallLine: form.language === "en" ? s.recallLine : undefined,
     buyerIdentity,
 
     form,

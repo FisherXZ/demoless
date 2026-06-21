@@ -200,6 +200,22 @@ export async function listLiveSessions(limit = 50): Promise<LiveSessionView[]> {
   return summaries.map(viewFromSummary);
 }
 
+/**
+ * The most recent buyer — the person who last filled out the pre-call form.
+ * Used to personalize the dashboard (greeting + operator badge) instead of a
+ * hardcoded name. Returns null when there are no sessions / the store is down.
+ */
+export async function latestLiveBuyer(): Promise<LiveBuyer | null> {
+  const [latest] = await listLiveSessions(1);
+  return latest?.buyer ?? null;
+}
+
+/** First name for a greeting; falls back to the company when name is just an email. */
+export function firstNameOf(buyer: LiveBuyer): string {
+  if (buyer.name && !buyer.name.includes("@")) return buyer.name.trim().split(/\s+/)[0];
+  return buyer.company;
+}
+
 /** A single live session with full transcript + trace, or null. */
 export async function getLiveSession(id: string): Promise<LiveSessionView | null> {
   const r = await loadSession(id);

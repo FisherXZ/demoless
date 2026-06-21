@@ -4,8 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import type { DemoVals } from "@/lib/types";
 import { useVoiceAgent } from "@/lib/voice/useVoiceAgent";
 import { useAgentName } from "@/lib/voice/useAgentName";
-import { LANGUAGES, type Language } from "@/lib/voice/messages";
-
 const TARGET = process.env.NEXT_PUBLIC_DEMO_TARGET_URL || "https://www.browserbase.com/";
 
 const SUGGESTIONS = [
@@ -63,11 +61,6 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
   // default agent-name mentions in the caption for the configured name.
   const rawCaption = voice.lastCaption || vals.caption;
   const agentCaption = rawCaption.replace(/Messi/g, agentName);
-
-  // Cycle through every configured language (EN -> ES -> 中文 -> EN).
-  const langCodes = Object.keys(LANGUAGES) as Language[];
-  const otherLang: Language =
-    langCodes[(langCodes.indexOf(voice.language) + 1) % langCodes.length];
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -326,30 +319,16 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
         </div>
       </div>
 
-      {/* Controls — lifted above the fixed PROTOTYPE nav (bottom-left) so it
-          can't cover the mic / language buttons. */}
+      {/* Controls — lifted above the fixed PROTOTYPE nav (bottom-left). */}
       <div className="flex-none flex items-center justify-center gap-3 px-5 pt-1 pb-[18px] mb-14 relative">
         <button
-          onClick={() => (voice.active ? voice.stop() : void voice.start())}
-          title={voice.active ? `Stop talking to ${agentName}` : `Talk to ${agentName}`}
-          className="w-[50px] h-[50px] rounded-full border-none cursor-pointer text-[19px] flex items-center justify-center"
-          style={{ background: voice.active ? "#4f46e5" : "#dc2626", color: "#fff" }}
+          onClick={() => voice.toggleMute()}
+          disabled={!voice.active}
+          title={voice.muted ? "Unmute microphone" : "Mute microphone"}
+          className="w-[50px] h-[50px] rounded-full border-none cursor-pointer text-[19px] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ background: voice.muted ? "#dc2626" : "#4f46e5", color: "#fff" }}
         >
-          {voice.active ? "\u{1F399}" : "\u{1F507}"}
-        </button>
-        <button
-          onClick={() => voice.setLanguage(otherLang)}
-          title={`Switch to ${LANGUAGES[otherLang].label}`}
-          className="h-[50px] px-4 rounded-[25px] border-none cursor-pointer bg-coal text-line text-[13px] font-bold flex items-center justify-center font-mono"
-        >
-          {voice.language.toUpperCase()}
-        </button>
-        <button
-          onClick={vals.toggleCam}
-          className="w-[50px] h-[50px] rounded-full border-none cursor-pointer text-[19px] flex items-center justify-center"
-          style={{ background: vals.camBg, color: vals.camColor }}
-        >
-          {vals.camIcon}
+          {voice.muted ? "\u{1F507}" : "\u{1F399}"}
         </button>
         <button
           onClick={vals.toggleCaptions}

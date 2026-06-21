@@ -21,19 +21,33 @@ function languageDirective(language: Language): string {
   return `\n\nIMPORTANT: The visitor is speaking ${name}. Always reply in ${name}, naturally and conversationally.`;
 }
 
+/** First name to address the visitor by in the greeting; "" when unknown or
+ *  when the form left only an email (we don't want to read an address aloud). */
+function firstName(name?: string): string {
+  const trimmed = name?.trim() ?? "";
+  if (!trimmed || trimmed.includes("@")) return "";
+  return trimmed.split(/\s+/)[0];
+}
+
 export class LoopOrchestrator implements Orchestrator {
   private _runTurn = runTurn; // seam for tests
   constructor(private deps: { executor: ToolExecutor; cfg: DemoConfig }) {}
 
   greeting(lang: Language, agentName: string, buyer?: BuyerMemory): string {
     const product = this.deps.cfg.productName;
+    const first = firstName(buyer?.profile.name);
     const base =
       lang === "zh"
-        ? `你好，我是${agentName}。你今天想了解${product}的哪件事？`
+        ? `你好${first ? `，${first}` : ""}，我是${agentName}。你今天想了解${product}的哪件事？`
         : lang === "es"
-          ? `Hola, soy ${agentName}. ¿Qué estás tratando de entender sobre ${product} hoy?`
-          : `Hi, I'm ${agentName}. What are you trying to figure out about ${product} today?`;
-    if (buyer?.isReturning && buyer.recall.line) {
+          ? `Hola${first ? `, ${first}` : ""}, soy ${agentName}. ¿Qué estás tratando de entender sobre ${product} hoy?`
+          : `Hi${first ? ` ${first}` : ""}, I'm ${agentName}. What are you trying to figure out about ${product} today?`;
+    // The recall line is composed in English from stored notes. Speaking it in a
+    // non-English session mixes scripts in one TTS utterance (the Mandarin voice
+    // muffling English) and reads wrong, so only prepend it for English. The
+    // buyer memory is still in the brain's system prompt, so the agent references
+    // it naturally in the visitor's language on the first turn.
+    if (lang === "en" && buyer?.isReturning && buyer.recall.line) {
       return `${buyer.recall.line} ${base}`;
     }
     return base;

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
+import { useOperator } from "@/lib/dashboard/useOperator";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", glyph: "▸" },
@@ -28,6 +29,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 function DashboardShell({ children }: { children: ReactNode }) {
   const path = usePathname() ?? "";
   const searchParams = useSearchParams();
+  const operator = useOperator();
   const mode = searchParams?.get("mode") === "live" ? "live" : "demo";
   const isActive = (href: string) =>
     href === "/dashboard" ? path === href : path.startsWith(href);
@@ -113,11 +115,11 @@ function DashboardShell({ children }: { children: ReactNode }) {
 
         <div className="mt-auto flex items-center gap-[9px] rounded-[10px] px-2 py-2 transition-colors hover:bg-slate">
           <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full bg-brand text-[11px] font-bold text-white">
-            AR
+            {operator.initials}
           </span>
           <div className="min-w-0">
-            <div className="truncate text-[13px] font-semibold text-chalk">Alex Rivera</div>
-            <div className="truncate font-mono text-[10.5px] text-ember">Browserbase · GTM</div>
+            <div className="truncate text-[13px] font-semibold text-chalk">{operator.name}</div>
+            <div className="truncate font-mono text-[10.5px] text-ember">{operator.company}</div>
           </div>
         </div>
       </aside>

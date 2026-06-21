@@ -49,11 +49,41 @@ describe("LoopOrchestrator recall", () => {
     expect(text).not.toMatch(/pick up there|walk you through/i);
   });
 
+  it("omits the English recall line for a non-English session", () => {
+    const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
+    const text = orch.greeting("zh", "Maya", returningBuyer);
+    expect(text).not.toContain("Welcome back");
+    expect(text).not.toContain("parallel browser sessions");
+    expect(text).toContain("你好，Alice，我是Maya");
+  });
+
   it("greeting for new buyer has no recall fragment", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
     const text = orch.greeting("en", "Messi");
     expect(text).toContain("Messi");
     expect(text).not.toContain("Welcome back");
+  });
+
+  it("greeting addresses the buyer by first name when known", () => {
+    const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
+    const newBuyer: BuyerMemory = {
+      profile: { email: "bob@acme.com", name: "Bob Lee", firstSeen: 1, lastSeen: 1, visitCount: 1 },
+      notes: [],
+      isReturning: false,
+      recall: { line: "", topInterests: [], painPoints: [], objections: [] },
+    };
+    expect(orch.greeting("en", "Messi", newBuyer)).toContain("Hi Bob, I'm Messi");
+  });
+
+  it("greeting omits the name when only an email is on file", () => {
+    const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
+    const noName: BuyerMemory = {
+      profile: { email: "x@y.com", name: "x@y.com", firstSeen: 1, lastSeen: 1, visitCount: 1 },
+      notes: [],
+      isReturning: false,
+      recall: { line: "", topInterests: [], painPoints: [], objections: [] },
+    };
+    expect(orch.greeting("en", "Messi", noName)).toContain("Hi, I'm Messi");
   });
 
   it("buildSystem includes memory context block when buyer notes present", async () => {

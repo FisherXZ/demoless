@@ -8,6 +8,8 @@ import {
   listLiveSessions,
   listLivePeople,
   liveKpis,
+  latestLiveBuyer,
+  firstNameOf,
   type LiveSessionView,
   type LivePersonView,
 } from "@/lib/dashboard/source";
@@ -460,11 +462,13 @@ async function DemoOverviewPage() {
   // Real recorded sessions (newest first). Falls back to the mock "Latest" hero
   // when Redis is empty or unavailable, so the prototype still renders.
   let recent: SessionSummary[] = [];
+  let buyer = null;
   try {
-    recent = await listRecapSessions(8);
+    [recent, buyer] = await Promise.all([listRecapSessions(8), latestLiveBuyer()]);
   } catch {
     // Redis down — keep recent empty and render the mock hero below.
   }
+  const greetingName = buyer ? firstNameOf(buyer) : "Alex";
   const now = Date.now();
 
   const cards = [
@@ -479,7 +483,7 @@ async function DemoOverviewPage() {
       <div className="flex items-end justify-between">
         <div>
           <h1 className="font-serif text-[28px] font-medium tracking-[-0.015em] text-chalk">
-            Good evening, Alex
+            Good evening, {greetingName}
           </h1>
           <p className="mt-[3px] text-[13px] text-ash">
             Every demo, scored and summarized — automatically.

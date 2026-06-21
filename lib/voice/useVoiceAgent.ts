@@ -36,6 +36,9 @@ export interface VoiceAgent {
   liveViewUrl: string | null;
   /** Most recent screen page label from the agent; null until first screen_is_on event. */
   lastScreen: { page: string } | null;
+  /** Mic is gated off — session stays connected. */
+  muted: boolean;
+  toggleMute: () => void;
   start: () => Promise<void>;
   stop: () => void;
   setLanguage: (language: Language) => void;
@@ -66,6 +69,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const [error, setError] = useState<string | null>(null);
   const [liveViewUrl, setLiveViewUrl] = useState<string | null>(null);
   const [lastScreen, setLastScreen] = useState<{ page: string } | null>(null);
+  const [muted, setMutedState] = useState(false);
 
   const ws = useRef<WebSocket | null>(null);
   const ctx = useRef<AudioContext | null>(null);
@@ -74,6 +78,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const player = useRef<PcmPlayer | null>(null);
   const languageRef = useRef<Language>(language);
   const buyerRef = useRef<BuyerIdentity | undefined>(options.buyer);
+  const mutedRef = useRef(false);
 
   languageRef.current = language;
   buyerRef.current = options.buyer;
@@ -155,6 +160,18 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
     }
   }, []);
 
+  const applyMuted = useCallback((next: boolean) => {
+    mutedRef.current = next;
+    setMutedState(next);
+    stream.current?.getAudioTracks().forEach((t) => {
+      t.enabled = !next;
+    });
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    applyMuted(!mutedRef.current);
+  }, [applyMuted]);
+
   const sendText = useCallback((text: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
@@ -201,6 +218,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
       ws.current = socket;
 
       worklet.port.onmessage = (e: MessageEvent<ArrayBuffer>) => {
+        if (mutedRef.current) return;
         if (socket.readyState === WebSocket.OPEN) socket.send(e.data);
       };
 
@@ -237,7 +255,8 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
     setAgentSpeaking(false);
     setStatus("idle");
     setPartialTranscript("");
-  }, [teardown]);
+    applyMuted(false);
+  }, [applyMuted, teardown]);
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
@@ -260,6 +279,8 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
     sendText,
     liveViewUrl,
     lastScreen,
+    muted,
+    toggleMute,
     start,
     stop,
     setLanguage,
