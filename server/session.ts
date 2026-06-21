@@ -13,10 +13,25 @@ import {
   tokenize,
 } from "./bargeIn";
 import { DeepgramStt, type SttTranscript } from "./deepgram/stt";
-import { createOrchestrator, type Orchestrator } from "./orchestrator";
+import {
+  createOrchestrator as defaultCreateOrchestrator,
+  type Orchestrator,
+} from "./orchestrator";
 import type { ConversationTurn } from "./orchestrator/types";
 import { createTts, type TtsProvider } from "./tts";
 import { ChunkChannel } from "./util/chunkChannel";
+import { getDemoConfig } from "./config/demoConfig";
+import {
+  startSession as defaultStartSession,
+  stopSession as defaultStopSession,
+} from "../lib/browser/session";
+
+/** Injectable dependencies — real impls used in production; fakes in tests. */
+export interface VoiceSessionDeps {
+  startSession: (url: string) => Promise<{ liveViewUrl: string; sessionId: string; url: string; title: string }>;
+  stopSession: (sessionId: string) => Promise<void>;
+  createOrchestrator: (args: { sessionId: string; buyerId: string; company: string }) => Orchestrator;
+}
 
 /**
  * One live voice conversation: bridges the browser <-> Deepgram STT <->
@@ -108,12 +123,25 @@ export class VoiceSession {
     return override || this.tts.voiceName(this.language);
   }
 
+  /** Browserbase session id, set once startSession resolves. */
+  private browserSessionId: string | null = null;
+  private readonly deps: VoiceSessionDeps;
+
   constructor(
     private ws: WebSocket,
-    private deepgramKey: string
+    private deepgramKey: string,
+    deps?: Partial<VoiceSessionDeps>
   ) {
     this.tts = createTts();
-    this.orchestrator = createOrchestrator();
+    // Orchestrator is created lazily in startListening once we have a sessionId.
+    // Set a placeholder so the field is never uninitialized.
+    this.orchestrator = null as unknown as Orchestrator;
+
+    this.deps = {
+      startSession: deps?.startSession ?? defaultStartSession,
+      stopSession: deps?.stopSession ?? defaultStopSession,
+      createOrchestrator: deps?.createOrchestrator ?? defaultCreateOrchestrator,
+    };
 
     ws.on("message", (data, isBinary) => {
       if (isBinary) {
@@ -154,6 +182,19 @@ export class VoiceSession {
 
   private async startListening(language: Language) {
     this.language = language ?? DEFAULT_LANGUAGE;
+
+    // Start the cloud browser and wire the orchestrator to its session.
+    const cfg = getDemoConfig();
+    const { liveViewUrl, sessionId } = await this.deps.startSession(cfg.browseTargetUrl);
+    this.browserSessionId = sessionId;
+    this.send({ t: "live_view", url: liveViewUrl });
+
+    this.orchestrator = this.deps.createOrchestrator({
+      sessionId,
+      buyerId: "anonymous",
+      company: cfg.company,
+    });
+
     await this.openStt();
     this.send({ t: "ready", language: this.language, agentName: this.agentName });
     this.setState("listening");
@@ -520,5 +561,8 @@ export class VoiceSession {
   dispose() {
     this.cancelActive();
     void this.stopStt();
+    if (this.browserSessionId) {
+      void this.deps.stopSession(this.browserSessionId);
+    }
   }
 }
