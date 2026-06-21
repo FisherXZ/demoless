@@ -26,6 +26,7 @@ import {
   stopSession as defaultStopSession,
 } from "../lib/browser/session";
 import { loadBuyer } from "../lib/memory/store";
+import { publishPhase } from "../lib/memory/pubsub";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
@@ -322,13 +323,14 @@ export class VoiceSession {
   }
 
   /**
-   * Drive the orchestrator and yield only the spoken (`say`) fragments. Other
-   * commands (P3/P4 team contract) are forwarded to the client as side effects.
+   * Drive the orchestrator and yield spoken fragments with a filler flag.
+   * `filler` fragments are synthesized and spoken but NOT pushed to `spoken[]`,
+   * so scripted bridge phrases never appear in conversation history.
    */
   private async *orchestratorSay(
     userText: string,
     signal: AbortSignal
-  ): AsyncIterable<string> {
+  ): AsyncIterable<{ text: string; filler: boolean }> {
     // Send only the most recent turns (excluding the just-pushed user turn) to
     // keep the prompt small so time-to-first-token stays low as the demo runs.
     const priorHistory = this.history.slice(0, -1);
@@ -348,7 +350,10 @@ export class VoiceSession {
       if (signal.aborted) return;
       switch (cmd.type) {
         case "say":
-          yield cmd.text;
+          yield { text: cmd.text, filler: false };
+          break;
+        case "filler":
+          yield { text: cmd.text, filler: true };
           break;
         case "screen_is_on":
           this.send({ t: "screen_is_on", page: cmd.page });
@@ -366,6 +371,9 @@ export class VoiceSession {
           break;
         case "set_phase":
           this.send({ t: "set_phase", phase: cmd.phase });
+          // Also publish to the dashboard SSE channel so the live dashboard
+          // panel receives phase transitions (spec §4.2 / §6).
+          void publishPhase("anonymous", cmd.phase);
           break;
         default:
           break;
@@ -380,14 +388,15 @@ export class VoiceSession {
    * arrives, so the *next* sentence's TTS request is already in flight while the
    * current one is still streaming to the client. A single consumer drains the
    * channels in order, so audio reaches the browser sequentially with no gaps
-   * between sentences. Returns the sentences actually spoken (for history).
+   * between sentences. Returns the sentences actually spoken (for history);
+   * filler fragments are spoken aloud but excluded from the returned list.
    */
   private async pipelineSpeak(
-    texts: AsyncIterable<string>,
+    texts: AsyncIterable<{ text: string; filler: boolean }>,
     turn: number,
     signal: AbortSignal
   ): Promise<string[]> {
-    const jobs: { text: string; channel: ChunkChannel }[] = [];
+    const jobs: { text: string; filler: boolean; channel: ChunkChannel }[] = [];
     const spoken: string[] = [];
     let producerDone = false;
     let wake: (() => void) | null = null;
@@ -402,10 +411,10 @@ export class VoiceSession {
     // Producer: pull sentences and kick off their synthesis immediately.
     const producer = (async () => {
       try {
-        for await (const text of texts) {
+        for await (const { text, filler } of texts) {
           if (signal.aborted) break;
           const channel = new ChunkChannel();
-          jobs.push({ text, channel });
+          jobs.push({ text, filler, channel });
           wakeConsumer();
           void (async () => {
             try {
@@ -458,7 +467,8 @@ export class VoiceSession {
       this.noteAgentWords(job.text);
       this.agentSpeaking = true;
       this.setState("speaking");
-      spoken.push(job.text);
+      // Filler lines are spoken aloud but excluded from history.
+      if (!job.filler) spoken.push(job.text);
 
       for await (const chunk of job.channel) {
         if (signal.aborted) break;

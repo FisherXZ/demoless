@@ -89,3 +89,10 @@ export interface NoteAddedEvent {
   buyerKey: string;
   note: Note;
 }
+
+/** Live push: published on NOTES_CHANNEL when the brain advances the demo phase. */
+export interface PhaseChangedEvent {
+  type: "phase_changed";
+  phase: string;
+  buyerId: string;
+}

@@ -22,6 +22,37 @@ describe("runTurn", () => {
     expect(out.at(-1)).toEqual({ type: "done" });
   });
 
+  it("filler commands are yielded as type=filler, not type=say, so they are excluded from history", async () => {
+    // Regression for principal review finding #4: filler lines ("Let me pull that up.")
+    // must not contaminate conversation history. They are yielded as {type:"filler"}
+    // so session.ts speaks them but does not push them to spoken[].
+    const stream = (() => {
+      let i = 0;
+      const scripts = [
+        [{ kind: "tool_use", id: "0", name: "navigate", input: { url: "/pricing" } }, { kind: "end" }],
+        [{ kind: "text", delta: "Here is pricing." }, { kind: "end" }],
+      ];
+      return async function* () { yield* scripts[i++]; } as any;
+    })();
+    const executor = { phase: "HOOK", run: vi.fn(async () => ({ ok: true, content: "URL: /pricing\nTitle: Pricing\n\ntext" })) };
+    const out: any[] = [];
+    for await (const c of runTurn({ system: "s", messages: [{ role: "user", content: "show pricing" }],
+      executor: executor as any, signal: new AbortController().signal, stream })) out.push(c);
+
+    const fillerCmds = out.filter((c) => c.type === "filler");
+    const sayCmds = out.filter((c) => c.type === "say");
+
+    // The navigate filler must be a filler command, not a say.
+    expect(fillerCmds.length).toBeGreaterThan(0);
+    expect(fillerCmds[0].text).toBe("Let me pull that up.");
+
+    // The model's real reply is a say command.
+    expect(sayCmds.map((c: any) => c.text).join(" ")).toContain("Here is pricing.");
+
+    // No filler text appears as a say command.
+    expect(sayCmds.map((c: any) => c.text)).not.toContain("Let me pull that up.");
+  });
+
   it("stops immediately when aborted before streaming", async () => {
     const ac = new AbortController(); ac.abort();
     const stream = (async function* () { yield { kind: "text", delta: "x" }; }) as any;

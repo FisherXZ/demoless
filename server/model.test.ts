@@ -1,6 +1,18 @@
 // server/model.test.ts
-import { describe, it, expect } from "vitest";
-import { buildParams, complete, coerceReply } from "./model";
+import { describe, it, expect, vi } from "vitest";
+
+// Mock @anthropic-ai/sdk so streamWithTools tests don't need a real key.
+const mockStream = vi.fn();
+vi.mock("@anthropic-ai/sdk", () => {
+  return {
+    default: class Anthropic {
+      messages = { stream: mockStream, create: vi.fn() };
+    },
+  };
+});
+vi.mock("@anthropic-ai/sdk/helpers/zod", () => ({ zodOutputFormat: vi.fn(() => ({})) }));
+
+import { buildParams, complete, coerceReply, streamWithTools } from "./model";
 import type { LoopState } from "./state";
 
 const state: LoopState = {
@@ -63,4 +75,30 @@ describe("complete (live — skipped without ANTHROPIC_API_KEY)", () => {
       expect(r.commands.length).toBeGreaterThan(0);
     }
   );
+});
+
+describe("streamWithTools abort propagation", () => {
+  it("passes the AbortSignal to the SDK stream call", async () => {
+    // The mock stream must return an async iterable that ends immediately.
+    mockStream.mockReturnValue({
+      [Symbol.asyncIterator]: async function* () { /* empty stream */ },
+    });
+
+    const ac = new AbortController();
+    const req = {
+      system: "s",
+      messages: [{ role: "user" as const, content: "hi" }],
+      tools: [] as any[],
+      signal: ac.signal,
+    };
+
+    // Consume the stream so the call completes.
+    for await (const _ of streamWithTools(req)) { /* drain */ }
+
+    // Assert the SDK received our signal as a request option.
+    expect(mockStream).toHaveBeenCalledWith(
+      expect.objectContaining({ model: expect.any(String) }),
+      expect.objectContaining({ signal: ac.signal })
+    );
+  });
 });

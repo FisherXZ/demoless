@@ -1,13 +1,15 @@
 import { createNotesSubscriber } from "@/lib/memory/pubsub";
-import type { NoteAddedEvent } from "@/lib/memory/types";
+import type { NoteAddedEvent, PhaseChangedEvent } from "@/lib/memory/types";
 
 export const dynamic = "force-dynamic";
 
+type LiveEvent = NoteAddedEvent | PhaseChangedEvent;
+
 /**
- * SSE endpoint — bridges Redis pub/sub live notes to the browser.
+ * SSE endpoint — bridges Redis pub/sub live notes and phase changes to the browser.
  * GET /api/notes/stream
  *
- * Emits `data: <JSON NoteAddedEvent>\n\n` for every note saved by any buyer.
+ * Emits `data: <JSON LiveEvent>\n\n` for every note saved or phase change.
  * The client closes the connection to stop receiving events.
  */
 export async function GET() {
@@ -16,7 +18,7 @@ export async function GET() {
   const stream = new ReadableStream({
     async start(controller) {
       const enc = new TextEncoder();
-      const send = (event: NoteAddedEvent) => {
+      const send = (event: LiveEvent) => {
         try {
           controller.enqueue(enc.encode(`data: ${JSON.stringify(event)}\n\n`));
         } catch {

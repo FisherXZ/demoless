@@ -65,6 +65,8 @@ export type AgentState = "idle" | "listening" | "thinking" | "speaking";
  */
 export type Command =
   | { type: "say"; text: string }
+  /** Spoken aloud like `say` but excluded from conversation history. */
+  | { type: "filler"; text: string }
   | { type: "navigate"; url: string }
   | { type: "click_or_type"; instruction: string }
   | { type: "screen_is_on"; page: string }

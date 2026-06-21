@@ -71,7 +71,7 @@ export function coerceReply(raw: unknown): Reply {
   return out;
 }
 
-export interface StreamRequest { system: string; messages: Anthropic.MessageParam[]; tools: Anthropic.Tool[] }
+export interface StreamRequest { system: string; messages: Anthropic.MessageParam[]; tools: Anthropic.Tool[]; signal?: AbortSignal }
 export type ModelEvent =
   | { kind: "text"; delta: string }
   | { kind: "tool_use"; id: string; name: string; input: any }
@@ -83,7 +83,7 @@ export async function* streamWithTools(req: StreamRequest): AsyncIterable<ModelE
   const stream = getClient().messages.stream({
     model: MODEL(), max_tokens: 2048, system: req.system, messages: req.messages, tools: req.tools,
     // 2048: matches main (e167048), avoids mid-output truncation
-  });
+  }, { signal: req.signal });
   const toolBuf: Record<string, { name: string; json: string }> = {};
   for await (const ev of stream as any) {
     if (ev.type === "content_block_start" && ev.content_block?.type === "tool_use")
