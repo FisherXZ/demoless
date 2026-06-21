@@ -129,12 +129,19 @@ export interface TextInputMessage {
   role?: string;
 }
 
+/** Ask the server to pre-create the cloud browser before the mic is enabled,
+ *  so the real session can adopt it (opt-in warm-up). */
+export interface PrewarmMessage {
+  t: "prewarm";
+}
+
 export type ClientMessage =
   | AudioStartMessage
   | AudioStopMessage
   | SetLanguageMessage
   | BargeInMessage
-  | TextInputMessage;
+  | TextInputMessage
+  | PrewarmMessage;
 
 /* ----------------------------------------------------------------------- *
  * Server -> Client

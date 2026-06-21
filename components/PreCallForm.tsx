@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import type { DemoVals } from "@/lib/types";
 import { useAgentName } from "@/lib/voice/useAgentName";
+import { requestBrowserWarmup } from "@/lib/voice/warmBrowser";
 
 const fieldClass =
   "border border-line3 rounded-[10px] px-[14px] py-3 text-[15px] bg-white transition-colors focus:border-brand focus:shadow-[0_0_0_3px_#eef0ff]";
@@ -9,6 +11,11 @@ const selectClass = `${fieldClass} appearance-none cursor-pointer`;
 
 export default function PreCallForm({ vals }: { vals: DemoVals }) {
   const agentName = useAgentName();
+  // Warm up the cloud browser while the visitor fills the form, so the room
+  // opens faster. No-op unless NEXT_PUBLIC_VOICE_PREWARM=1.
+  useEffect(() => {
+    requestBrowserWarmup();
+  }, []);
   return (
     <div className="min-h-screen grid grid-cols-[0.85fr_1fr]">
       {/* Left dark panel */}

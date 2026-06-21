@@ -70,6 +70,16 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages]);
 
+  // Auto-start the moment the room mounts: the visitor already clicked
+  // "Join AI Demo", so Maya connects + greets immediately with no extra click.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStarted.current) return;
+    autoStarted.current = true;
+    void voice.start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function send(text: string) {
     const msg = text.trim();
     if (!msg || !voice.active) return;
@@ -169,27 +179,25 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-4">
                   <div className="text-stone350 text-sm">
-                    {voice.status === "connecting"
-                      ? "Connecting to the live product…"
-                      : `${agentName} is ready to walk you through the product.`}
+                    {voice.error
+                      ? `${agentName} couldn't connect.`
+                      : `Connecting ${agentName} to the live product…`}
                   </div>
-                  {voice.status !== "connecting" && (
-                    <button
-                      onClick={() => void voice.start()}
-                      className="bg-brand text-white rounded-xl px-6 py-3.5 text-base font-bold inline-flex items-center gap-2.5 shadow-[0_4px_16px_rgba(79,70,229,0.3)]"
-                    >
-                      <span
-                        className="w-[9px] h-[9px] rounded-full bg-white"
-                        style={{ animation: "dlBlink 1.4s infinite" }}
-                      />
-                      Start live demo
-                    </button>
-                  )}
-                  {voice.status === "connecting" && (
+                  {!voice.error && (
                     <div
                       className="w-8 h-8 rounded-full border-2 border-coalline border-t-brand"
                       style={{ animation: "dlBlink 1s infinite" }}
                     />
+                  )}
+                  {/* Auto-start handles the happy path; this is only a retry. */}
+                  {voice.error && (
+                    <button
+                      onClick={() => void voice.start()}
+                      className="bg-brand text-white rounded-xl px-6 py-3.5 text-base font-bold inline-flex items-center gap-2.5 shadow-[0_4px_16px_rgba(79,70,229,0.3)]"
+                    >
+                      <span className="w-[9px] h-[9px] rounded-full bg-white" />
+                      Retry
+                    </button>
                   )}
                   {(error || voice.error) && (
                     <div className="text-danger text-xs font-mono max-w-[420px] text-center">
