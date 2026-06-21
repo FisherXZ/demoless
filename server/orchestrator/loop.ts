@@ -40,7 +40,12 @@ export class LoopOrchestrator implements Orchestrator {
   }
 
   async *runTurn(input: TurnInput, ctx: TurnContext, signal: AbortSignal): AsyncIterable<Command> {
-    const memoryContext = ctx.buyerNotes.length ? `Known buyer notes:\n- ${ctx.buyerNotes.join("\n- ")}` : "";
+    const buyerBlock = ctx.buyerNotes.length
+      ? `Known buyer notes:\n- ${ctx.buyerNotes.join("\n- ")}`
+      : "";
+    const memoryContext = [buyerBlock, ctx.learningsContext]
+      .filter(Boolean)
+      .join("\n\n");
     const system =
       buildSystem(this.deps.cfg, memoryContext, ctx.role) +
       languageDirective(input.language);
