@@ -14,11 +14,6 @@ export interface TurnArgs {
   stream?: (req: any) => AsyncIterable<ModelEvent>;
 }
 
-const FILLER: Record<string, string> = {
-  navigate: "Let me pull that up.", click: "One sec.", look: "Let me take a look.",
-  search_knowledge: "Let me check that.", remember: "", set_phase: "",
-};
-
 export async function* runTurn(args: TurnArgs): AsyncIterable<Command> {
   const stream = args.stream ?? defaultStream;
   const messages = [...args.messages];
@@ -48,9 +43,9 @@ export async function* runTurn(args: TurnArgs): AsyncIterable<Command> {
 
     const results: any[] = [];
     for (const t of toolCalls) {
-      // Yield filler as a distinct type so session.ts speaks it but does NOT
-      // record it in conversation history (fix for principal review finding #4).
-      if (FILLER[t.name]) yield { type: "filler" as const, text: FILLER[t.name] };
+      // No spoken filler while tools run — the agent must lead with real value,
+      // not stage directions ("let me take a look", "one sec"). Silence during a
+      // click is fine; a sharp rep narrates the payoff, not the mechanics.
       const r = await args.executor.run(t.name, t.input, args.signal); // REVIEW FIX improvement 3: thread signal
       if (t.name === "navigate") yield { type: "navigate", url: t.input.url };
       if (t.name === "set_phase") yield { type: "set_phase", phase: t.input.phase };
