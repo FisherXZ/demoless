@@ -1,4 +1,5 @@
 import type { Command, Language } from "../../lib/voice/messages";
+import type { BuyerMemory } from "../../lib/memory/types";
 
 /**
  * The orchestrator is the boundary with P1's LLM loop.
@@ -44,5 +45,5 @@ export interface Orchestrator {
   ): AsyncIterable<Command>;
 
   /** Optional opening line when a session starts (GREET phase). */
-  greeting?(language: Language, agentName: string): Promise<string> | string;
+  greeting?(language: Language, agentName: string, buyer?: BuyerMemory): Promise<string> | string;
 }

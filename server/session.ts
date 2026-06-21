@@ -25,6 +25,7 @@ import {
   startSession as defaultStartSession,
   stopSession as defaultStopSession,
 } from "../lib/browser/session";
+import { loadBuyer } from "../lib/memory/store";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
@@ -195,13 +196,24 @@ export class VoiceSession {
       company: cfg.company,
     });
 
+    // Load buyer memory; populate buyerNotes for turn context; ignore errors
+    // so a Redis outage never blocks the session from starting.
+    let buyer;
+    try {
+      buyer = await loadBuyer("anonymous");
+      this.buyerNotes = buyer.notes.map((n) => n.text);
+    } catch {
+      // Degrade gracefully: no notes injected.
+    }
+
     await this.openStt();
     this.send({ t: "ready", language: this.language, agentName: this.agentName });
     this.setState("listening");
     // GREET: the agent opens the conversation so the user hears the loop working.
     const greeting = await this.orchestrator.greeting?.(
       this.language,
-      this.agentName
+      this.agentName,
+      buyer
     );
     if (greeting) {
       await this.speakTurn(greeting, /* recordAsUser */ null);

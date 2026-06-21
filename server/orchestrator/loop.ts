@@ -2,6 +2,7 @@ import type { Orchestrator, TurnInput, TurnContext } from "./types";
 import type { Command, Language } from "../../lib/voice/messages";
 import type { ToolExecutor } from "../brain/executor";
 import type { DemoConfig } from "../config/demoConfig";
+import type { BuyerMemory } from "../../lib/memory/types";
 import { runTurn } from "../brain/turn";
 import { buildSystem, toMessages } from "../brain/messages";
 
@@ -9,8 +10,12 @@ export class LoopOrchestrator implements Orchestrator {
   private _runTurn = runTurn; // seam for tests
   constructor(private deps: { executor: ToolExecutor; cfg: DemoConfig }) {}
 
-  greeting(_lang: Language, agentName: string): string {
-    return `Hi, I'm ${agentName}. Want me to walk you through ${this.deps.cfg.productName}?`;
+  greeting(_lang: Language, agentName: string, buyer?: BuyerMemory): string {
+    const base = `Hi, I'm ${agentName}. Want me to walk you through ${this.deps.cfg.productName}?`;
+    if (buyer?.isReturning && buyer.recall.line) {
+      return `${buyer.recall.line} ${base}`;
+    }
+    return base;
   }
 
   async *runTurn(input: TurnInput, ctx: TurnContext, signal: AbortSignal): AsyncIterable<Command> {
