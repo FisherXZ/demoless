@@ -242,6 +242,12 @@ export class VoiceSession {
     try {
       const learnings = await getLearnings(cfg.company);
       this.learningsContext = buildLearningsContext(learnings);
+      if (this.learningsContext) {
+        const n = this.learningsContext.split("\n").length - 1;
+        console.log(
+          `[learnings] loaded ${n} past-demo learning(s) for ${cfg.company} into this session's prompt`
+        );
+      }
     } catch {
       // Degrade gracefully: no learnings injected.
     }

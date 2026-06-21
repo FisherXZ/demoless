@@ -85,6 +85,9 @@ export async function reflectAndStore(args: {
       args.chat
     );
     await writeLearnings(args.company, learnings);
+    console.log(
+      `[learnings] reflection wrote ${learnings.length} learning(s) for ${args.company}`
+    );
   } catch (err) {
     console.error("[learnings] reflectAndStore failed:", err);
   }
