@@ -4,7 +4,7 @@ import type { SessionRecord } from "../types";
 import type { EvidenceInsight, SessionPacket } from "./types";
 
 const record: SessionRecord = {
-  id: "s1", company: "Acme", startedAt: 0, endedAt: 10,
+  id: "s1", company: "Acme", status: "ended", createdAt: 0, startedAt: 0, endedAt: 10,
   events: [
     { kind: "user_said", text: "How much does the Pro plan cost?", turn: 1, ts: 1 },
     { kind: "page_visited", url: "https://x.com/pricing", turn: 2, ts: 3 },

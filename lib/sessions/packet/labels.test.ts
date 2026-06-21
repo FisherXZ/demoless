@@ -3,7 +3,7 @@ import { deriveLabels } from "./labels";
 import type { SessionRecord } from "../types";
 import type { EvidenceInsight, SessionPacket } from "./types";
 
-const emptyRecord: SessionRecord = { id: "s1", company: "Acme", startedAt: 0, endedAt: 1, events: [], transcript: [] };
+const emptyRecord: SessionRecord = { id: "s1", company: "Acme", status: "ended", createdAt: 0, startedAt: 0, endedAt: 1, events: [], transcript: [] };
 
 const insight = (type: EvidenceInsight["type"], quote: string): EvidenceInsight => ({
   id: "x", type, title: quote, detail: "",

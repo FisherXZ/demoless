@@ -3,7 +3,7 @@ import { extractPacket, parsePacket } from "./extract";
 import type { SessionRecord } from "../types";
 
 const record: SessionRecord = {
-  id: "s1", company: "Acme", startedAt: 0, endedAt: 10,
+  id: "s1", company: "Acme", status: "ended", createdAt: 0, startedAt: 0, endedAt: 10,
   events: [
     { kind: "user_said", text: "We waste hours on manual onboarding. How do we get started?", turn: 1, ts: 1 },
     { kind: "agent_said", text: "Browserbase automates that.", turn: 1, ts: 2 },

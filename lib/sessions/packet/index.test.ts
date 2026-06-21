@@ -13,11 +13,11 @@ import { extractAndStorePacket, loadPacket } from "./index";
 import type { SessionRecord } from "../types";
 
 const withUser: SessionRecord = {
-  id: "s1", company: "Acme", startedAt: 0, endedAt: 1,
+  id: "s1", company: "Acme", status: "ended", createdAt: 0, startedAt: 0, endedAt: 1,
   events: [{ kind: "user_said", text: "we waste hours on manual onboarding", turn: 1, ts: 1 }],
   transcript: [{ role: "user", text: "we waste hours on manual onboarding", turn: 1, ts: 1 }],
 };
-const noUser: SessionRecord = { id: "s2", company: "Acme", startedAt: 0, endedAt: 1, events: [], transcript: [] };
+const noUser: SessionRecord = { id: "s2", company: "Acme", status: "ended", createdAt: 0, startedAt: 0, endedAt: 1, events: [], transcript: [] };
 
 const reply = JSON.stringify({
   summary: "manual onboarding pain",
