@@ -16,7 +16,7 @@ const BROWSERBASE: DemoConfig = {
   company: "browserbase",
   productName: "Browserbase",
   persona: process.env.DEMO_PERSONA ?? "Maya",
-  browseTargetUrl: process.env.DEMO_BROWSE_URL ?? "https://www.browserbase.com",
+  browseTargetUrl: process.env.DEMO_TARGET_URL ?? "https://worldcuparena.live/",
   corpusSeed: "browserbase",
 };
 
