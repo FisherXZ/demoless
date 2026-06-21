@@ -1,0 +1,188 @@
+[
+  {
+    "title": "Docs index",
+    "url": "https://docs.browserbase.com/llms.txt",
+    "fetchedAt": "2026-06-20T22:33:01.353Z",
+    "characters": 27251
+  },
+  {
+    "title": "Introduction",
+    "url": "https://docs.browserbase.com/welcome/introduction.md",
+    "fetchedAt": "2026-06-20T22:33:01.688Z",
+    "characters": 6363
+  },
+  {
+    "title": "What is Browserbase",
+    "url": "https://docs.browserbase.com/welcome/what-is-browserbase.md",
+    "fetchedAt": "2026-06-20T22:33:01.917Z",
+    "characters": 3996
+  },
+  {
+    "title": "Create a browser session",
+    "url": "https://docs.browserbase.com/platform/browser/getting-started/create-browser-session.md",
+    "fetchedAt": "2026-06-20T22:33:02.347Z",
+    "characters": 5195
+  },
+  {
+    "title": "Using a browser session",
+    "url": "https://docs.browserbase.com/platform/browser/getting-started/using-browser-session.md",
+    "fetchedAt": "2026-06-20T22:33:02.568Z",
+    "characters": 10409
+  },
+  {
+    "title": "Manage a browser session",
+    "url": "https://docs.browserbase.com/platform/browser/getting-started/manage-browser-session.md",
+    "fetchedAt": "2026-06-20T22:33:02.797Z",
+    "characters": 4357
+  },
+  {
+    "title": "Core browser features",
+    "url": "https://docs.browserbase.com/platform/browser/core-features/overview.md",
+    "fetchedAt": "2026-06-20T22:33:03.173Z",
+    "characters": 3037
+  },
+  {
+    "title": "Contexts",
+    "url": "https://docs.browserbase.com/platform/browser/core-features/contexts.md",
+    "fetchedAt": "2026-06-20T22:33:03.384Z",
+    "characters": 10571
+  },
+  {
+    "title": "Long sessions",
+    "url": "https://docs.browserbase.com/platform/browser/long-sessions/overview.md",
+    "fetchedAt": "2026-06-20T22:33:03.696Z",
+    "characters": 11067
+  },
+  {
+    "title": "Observability",
+    "url": "https://docs.browserbase.com/platform/browser/observability/observability.md",
+    "fetchedAt": "2026-06-20T22:33:04.093Z",
+    "characters": 13887
+  },
+  {
+    "title": "Session live view",
+    "url": "https://docs.browserbase.com/platform/browser/observability/session-live-view.md",
+    "fetchedAt": "2026-06-20T22:33:04.318Z",
+    "characters": 9917
+  },
+  {
+    "title": "Session recording",
+    "url": "https://docs.browserbase.com/platform/browser/observability/session-recording.md",
+    "fetchedAt": "2026-06-20T22:33:04.539Z",
+    "characters": 7472
+  },
+  {
+    "title": "Session replay",
+    "url": "https://docs.browserbase.com/platform/browser/observability/session-replay.md",
+    "fetchedAt": "2026-06-20T22:33:04.746Z",
+    "characters": 12877
+  },
+  {
+    "title": "Fetch",
+    "url": "https://docs.browserbase.com/platform/fetch/overview.md",
+    "fetchedAt": "2026-06-20T22:33:04.978Z",
+    "characters": 16867
+  },
+  {
+    "title": "Search",
+    "url": "https://docs.browserbase.com/platform/search/overview.md",
+    "fetchedAt": "2026-06-20T22:33:05.266Z",
+    "characters": 9760
+  },
+  {
+    "title": "Agent identity",
+    "url": "https://docs.browserbase.com/platform/identity/overview.md",
+    "fetchedAt": "2026-06-20T22:33:05.498Z",
+    "characters": 13260
+  },
+  {
+    "title": "Website authentication",
+    "url": "https://docs.browserbase.com/platform/identity/authentication.md",
+    "fetchedAt": "2026-06-20T22:33:05.722Z",
+    "characters": 16502
+  },
+  {
+    "title": "Allowed domains",
+    "url": "https://docs.browserbase.com/platform/identity/allowed-domains.md",
+    "fetchedAt": "2026-06-20T22:33:05.971Z",
+    "characters": 2690
+  },
+  {
+    "title": "Proxies",
+    "url": "https://docs.browserbase.com/platform/identity/proxies.md",
+    "fetchedAt": "2026-06-20T22:33:06.186Z",
+    "characters": 22797
+  },
+  {
+    "title": "Functions",
+    "url": "https://docs.browserbase.com/platform/runtime/overview.md",
+    "fetchedAt": "2026-06-20T22:33:06.449Z",
+    "characters": 18357
+  },
+  {
+    "title": "Model Gateway",
+    "url": "https://docs.browserbase.com/platform/model-gateway/overview.md",
+    "fetchedAt": "2026-06-20T22:33:06.756Z",
+    "characters": 4339
+  },
+  {
+    "title": "Enterprise security",
+    "url": "https://docs.browserbase.com/account/enterprise/security.md",
+    "fetchedAt": "2026-06-20T22:33:07.091Z",
+    "characters": 4473
+  },
+  {
+    "title": "Zero data retention",
+    "url": "https://docs.browserbase.com/account/enterprise/zero-data-retention.md",
+    "fetchedAt": "2026-06-20T22:33:07.354Z",
+    "characters": 7757
+  },
+  {
+    "title": "Concurrency management",
+    "url": "https://docs.browserbase.com/optimizations/concurrency/overview.md",
+    "fetchedAt": "2026-06-20T22:33:07.558Z",
+    "characters": 10237
+  },
+  {
+    "title": "Browser regions",
+    "url": "https://docs.browserbase.com/optimizations/latency/multi-region.md",
+    "fetchedAt": "2026-06-20T22:33:07.981Z",
+    "characters": 1610
+  },
+  {
+    "title": "Node SDK",
+    "url": "https://docs.browserbase.com/reference/sdk/nodejs.md",
+    "fetchedAt": "2026-06-20T22:33:08.380Z",
+    "characters": 5559
+  },
+  {
+    "title": "Stagehand quickstart",
+    "url": "https://docs.browserbase.com/welcome/quickstarts/stagehand.md",
+    "fetchedAt": "2026-06-20T22:33:08.639Z",
+    "characters": 5520
+  },
+  {
+    "title": "Playwright quickstart",
+    "url": "https://docs.browserbase.com/welcome/quickstarts/playwright.md",
+    "fetchedAt": "2026-06-20T22:33:08.964Z",
+    "characters": 5687
+  },
+  {
+    "title": "Use case: browser agents",
+    "url": "https://docs.browserbase.com/use-cases/agents.md",
+    "fetchedAt": "2026-06-20T22:33:09.236Z",
+    "characters": 10500
+  },
+  {
+    "title": "Use case: web data retrieval",
+    "url": "https://docs.browserbase.com/use-cases/web-data-retrieval.md",
+    "fetchedAt": "2026-06-20T22:33:09.441Z",
+    "characters": 10619
+  },
+  {
+    "title": "Use case: automated testing",
+    "url": "https://docs.browserbase.com/use-cases/building-automated-tests.md",
+    "fetchedAt": "2026-06-20T22:33:09.845Z",
+    "characters": 12457
+  }
+]

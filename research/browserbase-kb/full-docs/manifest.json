@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-06-21T00:49:52.634Z",
+  "sourceInventory": "research/browserbase-kb/docs-inventory.json",
+  "docsExpected": 174,
+  "docsFetched": 174,
+  "failures": [],
+  "chunks": 1496,
+  "files": {
+    "documentsJsonl": "documents.jsonl",
+    "chunksJsonl": "chunks.jsonl",
+    "documentsMarkdown": "documents.md",
+    "manifest": "manifest.json"
+  }
+}

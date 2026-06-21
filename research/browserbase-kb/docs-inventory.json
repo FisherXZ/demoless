@@ -1,0 +1,3938 @@
+{
+  "fetchedAt": "2026-06-20T22:38:05.053Z",
+  "docsIndexUrl": "https://docs.browserbase.com/llms.txt",
+  "entries": [
+    {
+      "order": 0,
+      "section": "Docs",
+      "group": "internal / cursor",
+      "title": "BUGBOT",
+      "url": "https://docs.browserbase.com/.cursor/BUGBOT.md",
+      "path": ".cursor/BUGBOT.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 1,
+      "section": "Docs",
+      "group": "account / billing",
+      "title": "Billing",
+      "url": "https://docs.browserbase.com/account/billing/plan-management.md",
+      "path": "account/billing/plan-management.md",
+      "type": "docs-page",
+      "description": "Manage your subscription, invoices, and payment details"
+    },
+    {
+      "order": 2,
+      "section": "Docs",
+      "group": "account / billing",
+      "title": "Plans",
+      "url": "https://docs.browserbase.com/account/billing/plans.md",
+      "path": "account/billing/plans.md",
+      "type": "docs-page",
+      "description": "Your guide to Browserbase plans, pricing, and usage limits"
+    },
+    {
+      "order": 3,
+      "section": "Docs",
+      "group": "account / enterprise",
+      "title": "Bring your own storage (BYOS)",
+      "url": "https://docs.browserbase.com/account/enterprise/byos-setup-guide.md",
+      "path": "account/enterprise/byos-setup-guide.md",
+      "type": "docs-page",
+      "description": "Configure your own AWS S3 buckets for storing Browserbase artifacts"
+    },
+    {
+      "order": 4,
+      "section": "Docs",
+      "group": "account / enterprise",
+      "title": "Enterprise security",
+      "url": "https://docs.browserbase.com/account/enterprise/security.md",
+      "path": "account/enterprise/security.md",
+      "type": "docs-page",
+      "description": "SOC 2 Type II, HIPAA compliance, zero-trust browser isolation, and enterprise-grade security for Browserbase infrastructure."
+    },
+    {
+      "order": 5,
+      "section": "Docs",
+      "group": "account / enterprise",
+      "title": "Zero data retention (ZDR)",
+      "url": "https://docs.browserbase.com/account/enterprise/zero-data-retention.md",
+      "path": "account/enterprise/zero-data-retention.md",
+      "type": "docs-page",
+      "description": "Run Browserbase sessions for regulated workloads without persisting logs, recordings, or replay data."
+    },
+    {
+      "order": 6,
+      "section": "Docs",
+      "group": "account / team",
+      "title": "Teams",
+      "url": "https://docs.browserbase.com/account/team/roles.md",
+      "path": "account/team/roles.md",
+      "type": "docs-page",
+      "description": "Manage team members, roles, and project access"
+    },
+    {
+      "order": 7,
+      "section": "Docs",
+      "group": "account / team",
+      "title": "SSO (single sign-on) with SAML",
+      "url": "https://docs.browserbase.com/account/team/sso.md",
+      "path": "account/team/sso.md",
+      "type": "docs-page",
+      "description": "Learn how to enable SAML 2.0-based Single Sign-On for your Browserbase organization"
+    },
+    {
+      "order": 8,
+      "section": "Docs",
+      "group": "integrations / 1password",
+      "title": "Set up 1Password Nightly Autofill for Director",
+      "url": "https://docs.browserbase.com/integrations/1password/director.md",
+      "path": "integrations/1password/director.md",
+      "type": "docs-page",
+      "description": "Enable agentic autofill in 1Password to securely authenticate with Director AI."
+    },
+    {
+      "order": 9,
+      "section": "Docs",
+      "group": "integrations / 1password",
+      "title": "Introduction",
+      "url": "https://docs.browserbase.com/integrations/1password/introduction.md",
+      "path": "integrations/1password/introduction.md",
+      "type": "docs-page",
+      "description": "Securely log into websites in a Browserbase session using 1Password."
+    },
+    {
+      "order": 10,
+      "section": "Docs",
+      "group": "integrations / 1password",
+      "title": "Use 1Password to log in with Browserbase",
+      "url": "https://docs.browserbase.com/integrations/1password/quickstart.md",
+      "path": "integrations/1password/quickstart.md",
+      "type": "docs-page",
+      "description": "Securely retrieve credentials from your 1Password vault and use them to log into websites."
+    },
+    {
+      "order": 11,
+      "section": "Docs",
+      "group": "integrations / agent-browser",
+      "title": "Agent Browser integration",
+      "url": "https://docs.browserbase.com/integrations/agent-browser/introduction.md",
+      "path": "integrations/agent-browser/introduction.md",
+      "type": "docs-page",
+      "description": "Use Agent Browser with Browserbase for fast, CLI-driven browser control optimized for AI agents."
+    },
+    {
+      "order": 12,
+      "section": "Docs",
+      "group": "integrations / agent-browser",
+      "title": "Add cloud browsers to Agent Browser",
+      "url": "https://docs.browserbase.com/integrations/agent-browser/quickstart.md",
+      "path": "integrations/agent-browser/quickstart.md",
+      "type": "docs-page",
+      "description": "Integrate Browserbase with Agent Browser for cloud-hosted browser automation."
+    },
+    {
+      "order": 13,
+      "section": "Docs",
+      "group": "integrations / agentkit",
+      "title": "AgentKit by Tools for Humanity",
+      "url": "https://docs.browserbase.com/integrations/agentkit/introduction.md",
+      "path": "integrations/agentkit/introduction.md",
+      "type": "docs-page",
+      "description": "Use AgentKit to prove your AI agent is backed by a real human with cryptographic proof-of-humanity."
+    },
+    {
+      "order": 14,
+      "section": "Docs",
+      "group": "integrations / agentkit",
+      "title": "AgentKit quickstart",
+      "url": "https://docs.browserbase.com/integrations/agentkit/quickstart.md",
+      "path": "integrations/agentkit/quickstart.md",
+      "type": "docs-page",
+      "description": "Set up AgentKit human verification and create your first verified browser session via x402."
+    },
+    {
+      "order": 15,
+      "section": "Docs",
+      "group": "integrations / agno",
+      "title": "Agno integration",
+      "url": "https://docs.browserbase.com/integrations/agno/introduction.md",
+      "path": "integrations/agno/introduction.md",
+      "type": "docs-page",
+      "description": "Utilize Browserbase with Agno to give your AI agents Browser Tools."
+    },
+    {
+      "order": 16,
+      "section": "Docs",
+      "group": "integrations / agno",
+      "title": "Add web browsing capabilities to Agno",
+      "url": "https://docs.browserbase.com/integrations/agno/quickstart.md",
+      "path": "integrations/agno/quickstart.md",
+      "type": "docs-page",
+      "description": "Integrate Browserbase with Agno"
+    },
+    {
+      "order": 17,
+      "section": "Docs",
+      "group": "integrations / anthropic",
+      "title": "Anthropic Managed Agents",
+      "url": "https://docs.browserbase.com/integrations/anthropic/managed-agents/introduction.md",
+      "path": "integrations/anthropic/managed-agents/introduction.md",
+      "type": "docs-page",
+      "description": "Run Claude agents in Anthropic's managed runtime and give them a Browserbase session to drive the web."
+    },
+    {
+      "order": 18,
+      "section": "Docs",
+      "group": "integrations / anthropic",
+      "title": "Browsers for Managed Agents",
+      "url": "https://docs.browserbase.com/integrations/anthropic/managed-agents/quickstart.md",
+      "path": "integrations/anthropic/managed-agents/quickstart.md",
+      "type": "docs-page",
+      "description": "Hand your Anthropic Managed Agents a full cloud browser"
+    },
+    {
+      "order": 19,
+      "section": "Docs",
+      "group": "integrations / braintrust",
+      "title": "Braintrust integration",
+      "url": "https://docs.browserbase.com/integrations/braintrust/introduction.md",
+      "path": "integrations/braintrust/introduction.md",
+      "type": "docs-page",
+      "description": "Utilize Browserbase with Braintrust for browser agent capabilities."
+    },
+    {
+      "order": 20,
+      "section": "Docs",
+      "group": "integrations / braintrust",
+      "title": "Add web browsing capabilities to Braintrust",
+      "url": "https://docs.browserbase.com/integrations/braintrust/typescript.md",
+      "path": "integrations/braintrust/typescript.md",
+      "type": "docs-page",
+      "description": "Integrate Browserbase with Braintrust"
+    },
+    {
+      "order": 21,
+      "section": "Docs",
+      "group": "integrations / browseruse",
+      "title": "Browser Use integration",
+      "url": "https://docs.browserbase.com/integrations/browseruse/introduction.md",
+      "path": "integrations/browseruse/introduction.md",
+      "type": "docs-page",
+      "description": "Utilize Browserbase with Browser Use for browser agent capabilities."
+    },
+    {
+      "order": 22,
+      "section": "Docs",
+      "group": "integrations / browseruse",
+      "title": "Add web browsing capabilities to Browser Use",
+      "url": "https://docs.browserbase.com/integrations/browseruse/python.md",
+      "path": "integrations/browseruse/python.md",
+      "type": "docs-page",
+      "description": "Integrate Browserbase with Browser Use"
+    },
+    {
+      "order": 23,
+      "section": "Docs",
+      "group": "integrations / crew-ai",
+      "title": "Tutorial: build a flight booking Crew",
+      "url": "https://docs.browserbase.com/integrations/crew-ai/build-a-flight-booker.md",
+      "path": "integrations/crew-ai/build-a-flight-booker.md",
+      "type": "docs-page",
+      "description": "Build a Crew that finds the best roundtrip flights on the given dates."
+    },
+    {
+      "order": 24,
+      "section": "Docs",
+      "group": "integrations / crew-ai",
+      "title": "crewAI integration",
+      "url": "https://docs.browserbase.com/integrations/crew-ai/introduction.md",
+      "path": "integrations/crew-ai/introduction.md",
+      "type": "docs-page",
+      "description": "Let your crewAI Agent browse the web like a human."
+    },
+    {
+      "order": 25,
+      "section": "Docs",
+      "group": "integrations / crew-ai",
+      "title": "Add web browsing capabilities to your agent",
+      "url": "https://docs.browserbase.com/integrations/crew-ai/python.md",
+      "path": "integrations/crew-ai/python.md",
+      "type": "docs-page",
+      "description": "Let your crewAI Agent browse the web like a human."
+    },
+    {
+      "order": 26,
+      "section": "Docs",
+      "group": "integrations",
+      "title": "Get started with integrations",
+      "url": "https://docs.browserbase.com/integrations/get-started.md",
+      "path": "integrations/get-started.md",
+      "type": "docs-page",
+      "description": "Use your favorite technologies seamlessly with Browserbase."
+    },
+    {
+      "order": 27,
+      "section": "Docs",
+      "group": "integrations / google-adk",
+      "title": "Google ADK integration",
+      "url": "https://docs.browserbase.com/integrations/google-adk/introduction.md",
+      "path": "integrations/google-adk/introduction.md",
+      "type": "docs-page",
+      "description": "Give Google ADK agents a browser with Browserbase and Stagehand"
+    },
+    {
+      "order": 28,
+      "section": "Docs",
+      "group": "integrations / google-adk",
+      "title": "Google ADK setup",
+      "url": "https://docs.browserbase.com/integrations/google-adk/setup.md",
+      "path": "integrations/google-adk/setup.md",
+      "type": "docs-page",
+      "description": "Configure Browserbase MCP Server for Google Agent Development Kit"
+    },
+    {
+      "order": 29,
+      "section": "Docs",
+      "group": "integrations / hermes-agent",
+      "title": "Hermes Agent integration",
+      "url": "https://docs.browserbase.com/integrations/hermes-agent/introduction.md",
+      "path": "integrations/hermes-agent/introduction.md",
+      "type": "docs-page",
+      "description": "Connect Browserbase to Hermes Agent using Hermes' built-in Browserbase cloud mode or the Browse CLI."
+    },
+    {
+      "order": 30,
+      "section": "Docs",
+      "group": "integrations / hermes-agent",
+      "title": "Hermes Agent setup",
+      "url": "https://docs.browserbase.com/integrations/hermes-agent/setup.md",
+      "path": "integrations/hermes-agent/setup.md",
+      "type": "docs-page",
+      "description": "Set up Hermes Agent with Browserbase, starting with Hermes' built-in Browserbase cloud mode and then the Browse CLI."
+    },
+    {
+      "order": 31,
+      "section": "Docs",
+      "group": "integrations / ibm",
+      "title": "Introduction",
+      "url": "https://docs.browserbase.com/integrations/ibm/introduction.md",
+      "path": "integrations/ibm/introduction.md",
+      "type": "docs-page",
+      "description": "Track real-time mortgage rates using IBM watsonx.ai"
+    },
+    {
+      "order": 32,
+      "section": "Docs",
+      "group": "integrations / ibm",
+      "title": "Mortgage rate capture",
+      "url": "https://docs.browserbase.com/integrations/ibm/quickstart.md",
+      "path": "integrations/ibm/quickstart.md",
+      "type": "docs-page",
+      "description": "This guide shows how to use Browserbase with IBM watsonx.ai to create a mortgage rate analysis tool. The integration captures screenshots of mortgage rate data from Freddie Mac's website and uses a vision model to analyze and summarize the rates."
+    },
+    {
+      "order": 33,
+      "section": "Docs",
+      "group": "integrations / inngest",
+      "title": "Using Inngest with Browserbase",
+      "url": "https://docs.browserbase.com/integrations/inngest/introduction.md",
+      "path": "integrations/inngest/introduction.md",
+      "type": "docs-page",
+      "description": "Develop AI agents that can browse the web autonomously using Browserbase and Inngest AgentKit."
+    },
+    {
+      "order": 34,
+      "section": "Docs",
+      "group": "integrations / inngest",
+      "title": "Reddit search agent",
+      "url": "https://docs.browserbase.com/integrations/inngest/quickstart.md",
+      "path": "integrations/inngest/quickstart.md",
+      "type": "docs-page",
+      "description": "Enable your AI agents to search Reddit with Browserbase's managed headless browsers."
+    },
+    {
+      "order": 35,
+      "section": "Docs",
+      "group": "integrations / inngest",
+      "title": "Add Stagehand to AgentKit tools",
+      "url": "https://docs.browserbase.com/integrations/inngest/stagehand.md",
+      "path": "integrations/inngest/stagehand.md",
+      "type": "docs-page",
+      "description": "Use Stagehand, the SDK for browser agents, with AgentKit."
+    },
+    {
+      "order": 36,
+      "section": "Docs",
+      "group": "integrations / langchain",
+      "title": "LangChain Deep Agents with Browserbase",
+      "url": "https://docs.browserbase.com/integrations/langchain/deepagents.md",
+      "path": "integrations/langchain/deepagents.md",
+      "type": "docs-page",
+      "description": "Build a Deep Agent that browses the web with Browserbase Search, Fetch, and Stagehand."
+    },
+    {
+      "order": 37,
+      "section": "Docs",
+      "group": "integrations / langchain",
+      "title": "LangChain integration",
+      "url": "https://docs.browserbase.com/integrations/langchain/introduction.md",
+      "path": "integrations/langchain/introduction.md",
+      "type": "docs-page",
+      "description": "Add Browserbase to your LangChain application (Python)."
+    },
+    {
+      "order": 38,
+      "section": "Docs",
+      "group": "integrations / langchain",
+      "title": "Configure Browserbase for LangChain",
+      "url": "https://docs.browserbase.com/integrations/langchain/python.md",
+      "path": "integrations/langchain/python.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 39,
+      "section": "Docs",
+      "group": "integrations / mastra",
+      "title": "Mastra integration",
+      "url": "https://docs.browserbase.com/integrations/mastra/introduction.md",
+      "path": "integrations/mastra/introduction.md",
+      "type": "docs-page",
+      "description": "Build browser agents with Mastra and Stagehand"
+    },
+    {
+      "order": 40,
+      "section": "Docs",
+      "group": "integrations / mastra",
+      "title": "Mastra agent quickstart",
+      "url": "https://docs.browserbase.com/integrations/mastra/quickstart.md",
+      "path": "integrations/mastra/quickstart.md",
+      "type": "docs-page",
+      "description": "Build AI-powered browser agents with Mastra and Stagehand"
+    },
+    {
+      "order": 41,
+      "section": "Docs",
+      "group": "integrations / mcp",
+      "title": "Browserbase MCP server",
+      "url": "https://docs.browserbase.com/integrations/mcp/introduction.md",
+      "path": "integrations/mcp/introduction.md",
+      "type": "docs-page",
+      "description": "Give MCP clients a browser through Model Context Protocol integration with Stagehand"
+    },
+    {
+      "order": 42,
+      "section": "Docs",
+      "group": "integrations / mcp",
+      "title": "Browserbase MCP server setup",
+      "url": "https://docs.browserbase.com/integrations/mcp/setup.md",
+      "path": "integrations/mcp/setup.md",
+      "type": "docs-page",
+      "description": "Add the Browserbase MCP Server to your MCP client"
+    },
+    {
+      "order": 43,
+      "section": "Docs",
+      "group": "integrations / mongo-db",
+      "title": "Introduction",
+      "url": "https://docs.browserbase.com/integrations/mongo-db/introduction.md",
+      "path": "integrations/mongo-db/introduction.md",
+      "type": "docs-page",
+      "description": "Intelligent data extraction with MongoDB storage using Stagehand"
+    },
+    {
+      "order": 44,
+      "section": "Docs",
+      "group": "integrations / mongo-db",
+      "title": "Quickstart",
+      "url": "https://docs.browserbase.com/integrations/mongo-db/quickstart.md",
+      "path": "integrations/mongo-db/quickstart.md",
+      "type": "docs-page",
+      "description": "Build an AI-powered data extraction agent that pulls product data from e-commerce sites and stores it in MongoDB with automatic schema validation and data analysis capabilities."
+    },
+    {
+      "order": 45,
+      "section": "Docs",
+      "group": "integrations / n8n",
+      "title": "n8n integration",
+      "url": "https://docs.browserbase.com/integrations/n8n/introduction.md",
+      "path": "integrations/n8n/introduction.md",
+      "type": "docs-page",
+      "description": "Build browser agents in n8n with the Browserbase node."
+    },
+    {
+      "order": 46,
+      "section": "Docs",
+      "group": "integrations / n8n",
+      "title": "n8n quickstart",
+      "url": "https://docs.browserbase.com/integrations/n8n/quickstart.md",
+      "path": "integrations/n8n/quickstart.md",
+      "type": "docs-page",
+      "description": "Install the Browserbase community node, configure credentials, and use Agent, Search, and Fetch resources in n8n."
+    },
+    {
+      "order": 47,
+      "section": "Docs",
+      "group": "integrations / openai-cua",
+      "title": "OpenAI Computer Use Agent",
+      "url": "https://docs.browserbase.com/integrations/openai-cua/introduction.md",
+      "path": "integrations/openai-cua/introduction.md",
+      "type": "docs-page",
+      "description": "Integrate OpenAI CUA with Browserbase for scalable browser agents"
+    },
+    {
+      "order": 48,
+      "section": "Docs",
+      "group": "integrations / openclaw",
+      "title": "OpenClaw integration",
+      "url": "https://docs.browserbase.com/integrations/openclaw/introduction.md",
+      "path": "integrations/openclaw/introduction.md",
+      "type": "docs-page",
+      "description": "Run OpenClaw's browser on Browserbase instead of OpenClaw's built-in local Chromium."
+    },
+    {
+      "order": 49,
+      "section": "Docs",
+      "group": "integrations / openclaw",
+      "title": "OpenClaw setup",
+      "url": "https://docs.browserbase.com/integrations/openclaw/setup.md",
+      "path": "integrations/openclaw/setup.md",
+      "type": "docs-page",
+      "description": "Run OpenClaw's browser on Browserbase instead of OpenClaw's built-in local Chromium."
+    },
+    {
+      "order": 50,
+      "section": "Docs",
+      "group": "integrations / prime-intellect",
+      "title": "Evaluate browser agents with Prime Intellect",
+      "url": "https://docs.browserbase.com/integrations/prime-intellect/evals.md",
+      "path": "integrations/prime-intellect/evals.md",
+      "type": "docs-page",
+      "description": "Run browser agent evaluations using BrowserEnv and the Prime CLI."
+    },
+    {
+      "order": 51,
+      "section": "Docs",
+      "group": "integrations / prime-intellect",
+      "title": "Prime Intellect",
+      "url": "https://docs.browserbase.com/integrations/prime-intellect/introduction.md",
+      "path": "integrations/prime-intellect/introduction.md",
+      "type": "docs-page",
+      "description": "Run Browserbase-backed browser environments for AI agent evaluation and RL training with Prime Intellect."
+    },
+    {
+      "order": 52,
+      "section": "Docs",
+      "group": "integrations / prime-intellect",
+      "title": "Training browser agents with Prime Intellect",
+      "url": "https://docs.browserbase.com/integrations/prime-intellect/rl-training.md",
+      "path": "integrations/prime-intellect/rl-training.md",
+      "type": "docs-page",
+      "description": "Wire BrowserEnv into Prime Intellect's RL training workflows for browser-capable models."
+    },
+    {
+      "order": 53,
+      "section": "Docs",
+      "group": "integrations / skills",
+      "title": "Browse CLI",
+      "url": "https://docs.browserbase.com/integrations/skills/browse-cli.md",
+      "path": "integrations/skills/browse-cli.md",
+      "type": "docs-page",
+      "description": "Use the Browse CLI to drive browser automation, Browserbase cloud APIs, and Browse.sh skills from AI coding agents."
+    },
+    {
+      "order": 54,
+      "section": "Docs",
+      "group": "integrations / skills",
+      "title": "Auto-fix selectors in CI/CD",
+      "url": "https://docs.browserbase.com/integrations/skills/github-action.md",
+      "path": "integrations/skills/github-action.md",
+      "type": "docs-page",
+      "description": "Automatically fix broken CSS selectors using Claude Code and Browserbase in GitHub Actions"
+    },
+    {
+      "order": 55,
+      "section": "Docs",
+      "group": "integrations / skills",
+      "title": "Skills",
+      "url": "https://docs.browserbase.com/integrations/skills/introduction.md",
+      "path": "integrations/skills/introduction.md",
+      "type": "docs-page",
+      "description": "Extend your AI coding agents with browser agents, Browserbase Functions, and Browse CLI workflows using Browserbase Skills"
+    },
+    {
+      "order": 56,
+      "section": "Docs",
+      "group": "integrations / stripe",
+      "title": "Introduction",
+      "url": "https://docs.browserbase.com/integrations/stripe/introduction.md",
+      "path": "integrations/stripe/introduction.md",
+      "type": "docs-page",
+      "description": "Give your AI agent a responsible credit card to use for online payments."
+    },
+    {
+      "order": 57,
+      "section": "Docs",
+      "group": "integrations / stripe",
+      "title": "Agentic credit card automation",
+      "url": "https://docs.browserbase.com/integrations/stripe/quickstart.md",
+      "path": "integrations/stripe/quickstart.md",
+      "type": "docs-page",
+      "description": "Effortlessly create virtual cards with Stripe and automate purchases using Browserbase."
+    },
+    {
+      "order": 58,
+      "section": "Docs",
+      "group": "integrations / temporal",
+      "title": "Introduction",
+      "url": "https://docs.browserbase.com/integrations/temporal/introduction.md",
+      "path": "integrations/temporal/introduction.md",
+      "type": "docs-page",
+      "description": "Resilient browser automation with Temporal workflows and Stagehand"
+    },
+    {
+      "order": 59,
+      "section": "Docs",
+      "group": "integrations / temporal",
+      "title": "Quickstart",
+      "url": "https://docs.browserbase.com/integrations/temporal/quickstart.md",
+      "path": "integrations/temporal/quickstart.md",
+      "type": "docs-page",
+      "description": "Get production-ready browser agents with automatic retries and failure recovery"
+    },
+    {
+      "order": 60,
+      "section": "Docs",
+      "group": "integrations / trigger",
+      "title": "Introduction",
+      "url": "https://docs.browserbase.com/integrations/trigger/introduction.md",
+      "path": "integrations/trigger/introduction.md",
+      "type": "docs-page",
+      "description": "Learn what Trigger.dev is, why you might pair it with Browserbase, and what you can build with this integration."
+    },
+    {
+      "order": 61,
+      "section": "Docs",
+      "group": "integrations / trigger",
+      "title": "Quickstart",
+      "url": "https://docs.browserbase.com/integrations/trigger/quickstart.md",
+      "path": "integrations/trigger/quickstart.md",
+      "type": "docs-page",
+      "description": "Spin up your first Trigger.dev job that controls a Browserbase browser in under 5 minutes."
+    },
+    {
+      "order": 62,
+      "section": "Docs",
+      "group": "integrations / val-town",
+      "title": "Val Town integration",
+      "url": "https://docs.browserbase.com/integrations/val-town/introduction.md",
+      "path": "integrations/val-town/introduction.md",
+      "type": "docs-page",
+      "description": "Allow your Val Town script to perform complex tasks on the web."
+    },
+    {
+      "order": 63,
+      "section": "Docs",
+      "group": "integrations / val-town",
+      "title": "Tutorial: Slack Scout",
+      "url": "https://docs.browserbase.com/integrations/val-town/slack-scout.md",
+      "path": "integrations/val-town/slack-scout.md",
+      "type": "docs-page",
+      "description": "Send a Slack notification every time your keywords are mentioned on Twitter, Hacker News, or Reddit."
+    },
+    {
+      "order": 64,
+      "section": "Docs",
+      "group": "integrations / vercel",
+      "title": "BrowseGPT",
+      "url": "https://docs.browserbase.com/integrations/vercel/browsegpt.md",
+      "path": "integrations/vercel/browsegpt.md",
+      "type": "docs-page",
+      "description": "BrowseGPT is a tool that allows you to search the web using a chat interface."
+    },
+    {
+      "order": 65,
+      "section": "Docs",
+      "group": "integrations / vercel",
+      "title": "Vercel AI integration",
+      "url": "https://docs.browserbase.com/integrations/vercel/introduction.md",
+      "path": "integrations/vercel/introduction.md",
+      "type": "docs-page",
+      "description": "Build AI-powered research agents with parallel browser sessions, deployable on Vercel."
+    },
+    {
+      "order": 66,
+      "section": "Docs",
+      "group": "integrations / vercel",
+      "title": "Deploying Puppeteer on Vercel",
+      "url": "https://docs.browserbase.com/integrations/vercel/puppeteer.md",
+      "path": "integrations/vercel/puppeteer.md",
+      "type": "docs-page",
+      "description": "Learn how to set up your project, deploy to Vercel, and scale with Browserbase"
+    },
+    {
+      "order": 67,
+      "section": "Docs",
+      "group": "integrations / vercel",
+      "title": "Build a research agent with Stagehand + Vercel",
+      "url": "https://docs.browserbase.com/integrations/vercel/quickstart.md",
+      "path": "integrations/vercel/quickstart.md",
+      "type": "docs-page",
+      "description": "Build an AI-powered research agent that runs parallel browser sessions on Browserbase, powered by Stagehand and the Vercel AI SDK."
+    },
+    {
+      "order": 68,
+      "section": "Docs",
+      "group": "integrations / x402",
+      "title": "Human verification with AgentKit",
+      "url": "https://docs.browserbase.com/integrations/x402/agentkit.md",
+      "path": "integrations/x402/agentkit.md",
+      "type": "docs-page",
+      "description": "Prove your agent is human-backed to unlock Verified browsers on x402 sessions."
+    },
+    {
+      "order": 69,
+      "section": "Docs",
+      "group": "integrations / x402",
+      "title": "x402 protocol integration",
+      "url": "https://docs.browserbase.com/integrations/x402/introduction.md",
+      "path": "integrations/x402/introduction.md",
+      "type": "docs-page",
+      "description": "Pay-per-use browser sessions with crypto. No API keys, no accounts. Just pay and connect."
+    },
+    {
+      "order": 70,
+      "section": "Docs",
+      "group": "integrations / x402",
+      "title": "x402 quickstart",
+      "url": "https://docs.browserbase.com/integrations/x402/quickstart.md",
+      "path": "integrations/x402/quickstart.md",
+      "type": "docs-page",
+      "description": "Create pay-per-use browser sessions with crypto payments"
+    },
+    {
+      "order": 71,
+      "section": "Docs",
+      "group": "optimizations / concurrency",
+      "title": "Concurrency management",
+      "url": "https://docs.browserbase.com/optimizations/concurrency/overview.md",
+      "path": "optimizations/concurrency/overview.md",
+      "type": "docs-page",
+      "description": "Session limits and rate controls for concurrent browsers"
+    },
+    {
+      "order": 72,
+      "section": "Docs",
+      "group": "optimizations / cost",
+      "title": "Cost optimization",
+      "url": "https://docs.browserbase.com/optimizations/cost/cost-optimization.md",
+      "path": "optimizations/cost/cost-optimization.md",
+      "type": "docs-page",
+      "description": "Your guide to lowering your browser infrastructure costs"
+    },
+    {
+      "order": 73,
+      "section": "Docs",
+      "group": "optimizations / cost",
+      "title": "Usage tracking",
+      "url": "https://docs.browserbase.com/optimizations/cost/measuring-usage.md",
+      "path": "optimizations/cost/measuring-usage.md",
+      "type": "docs-page",
+      "description": "Learn how to measure your usage of Browserbase"
+    },
+    {
+      "order": 74,
+      "section": "Docs",
+      "group": "optimizations / latency",
+      "title": "Browser regions",
+      "url": "https://docs.browserbase.com/optimizations/latency/multi-region.md",
+      "path": "optimizations/latency/multi-region.md",
+      "type": "docs-page",
+      "description": "Connect to a browser closest to you for improved performance."
+    },
+    {
+      "order": 75,
+      "section": "Docs",
+      "group": "optimizations / latency",
+      "title": "Performance optimization",
+      "url": "https://docs.browserbase.com/optimizations/latency/speed-optimization.md",
+      "path": "optimizations/latency/speed-optimization.md",
+      "type": "docs-page",
+      "description": "Best practices for speeding up your browsers"
+    },
+    {
+      "order": 76,
+      "section": "Docs",
+      "group": "platform / browser / core-features",
+      "title": "Browser extensions",
+      "url": "https://docs.browserbase.com/platform/browser/core-features/browser-extensions.md",
+      "path": "platform/browser/core-features/browser-extensions.md",
+      "type": "docs-page",
+      "description": "Augment your browser sessions with your own Chrome extensions."
+    },
+    {
+      "order": 77,
+      "section": "Docs",
+      "group": "platform / browser / core-features",
+      "title": "Contexts",
+      "url": "https://docs.browserbase.com/platform/browser/core-features/contexts.md",
+      "path": "platform/browser/core-features/contexts.md",
+      "type": "docs-page",
+      "description": "Reuse cookies, authentication, and application data across browser sessions."
+    },
+    {
+      "order": 78,
+      "section": "Docs",
+      "group": "platform / browser / core-features",
+      "title": "Core features",
+      "url": "https://docs.browserbase.com/platform/browser/core-features/overview.md",
+      "path": "platform/browser/core-features/overview.md",
+      "type": "docs-page",
+      "description": "The building blocks for powerful browser automation with Browserbase"
+    },
+    {
+      "order": 79,
+      "section": "Docs",
+      "group": "platform / browser / core-features",
+      "title": "Metadata",
+      "url": "https://docs.browserbase.com/platform/browser/core-features/session-metadata.md",
+      "path": "platform/browser/core-features/session-metadata.md",
+      "type": "docs-page",
+      "description": "Tag and query sessions with custom data"
+    },
+    {
+      "order": 80,
+      "section": "Docs",
+      "group": "platform / browser / core-features",
+      "title": "Viewports",
+      "url": "https://docs.browserbase.com/platform/browser/core-features/viewports.md",
+      "path": "platform/browser/core-features/viewports.md",
+      "type": "docs-page",
+      "description": "Configure viewport sizes for your sessions"
+    },
+    {
+      "order": 81,
+      "section": "Docs",
+      "group": "platform / browser / files",
+      "title": "Downloads",
+      "url": "https://docs.browserbase.com/platform/browser/files/downloads.md",
+      "path": "platform/browser/files/downloads.md",
+      "type": "docs-page",
+      "description": "Triggering and retrieving downloaded files"
+    },
+    {
+      "order": 82,
+      "section": "Docs",
+      "group": "platform / browser / files",
+      "title": "Files & screenshots",
+      "url": "https://docs.browserbase.com/platform/browser/files/overview.md",
+      "path": "platform/browser/files/overview.md",
+      "type": "docs-page",
+      "description": "Download, upload, and capture files from your browser sessions"
+    },
+    {
+      "order": 83,
+      "section": "Docs",
+      "group": "platform / browser / files",
+      "title": "PDFs",
+      "url": "https://docs.browserbase.com/platform/browser/files/pdfs.md",
+      "path": "platform/browser/files/pdfs.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 84,
+      "section": "Docs",
+      "group": "platform / browser / files",
+      "title": "Screenshots",
+      "url": "https://docs.browserbase.com/platform/browser/files/screenshots.md",
+      "path": "platform/browser/files/screenshots.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 85,
+      "section": "Docs",
+      "group": "platform / browser / files",
+      "title": "Uploads",
+      "url": "https://docs.browserbase.com/platform/browser/files/uploads.md",
+      "path": "platform/browser/files/uploads.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 86,
+      "section": "Docs",
+      "group": "platform / browser / getting-started",
+      "title": "Create a browser session",
+      "url": "https://docs.browserbase.com/platform/browser/getting-started/create-browser-session.md",
+      "path": "platform/browser/getting-started/create-browser-session.md",
+      "type": "docs-page",
+      "description": "Learn how to create and configure browser sessions in Browserbase"
+    },
+    {
+      "order": 87,
+      "section": "Docs",
+      "group": "platform / browser / getting-started",
+      "title": "Deploying a browser session",
+      "url": "https://docs.browserbase.com/platform/browser/getting-started/deploying-browser-session.md",
+      "path": "platform/browser/getting-started/deploying-browser-session.md",
+      "type": "docs-page",
+      "description": "Learn how to deploy existing browser automation scripts as Functions"
+    },
+    {
+      "order": 88,
+      "section": "Docs",
+      "group": "platform / browser / getting-started",
+      "title": "Manage a browser session",
+      "url": "https://docs.browserbase.com/platform/browser/getting-started/manage-browser-session.md",
+      "path": "platform/browser/getting-started/manage-browser-session.md",
+      "type": "docs-page",
+      "description": "Learn how to manage session termination and inspect completed sessions"
+    },
+    {
+      "order": 89,
+      "section": "Docs",
+      "group": "platform / browser / getting-started",
+      "title": "Managed vs self-hosted",
+      "url": "https://docs.browserbase.com/platform/browser/getting-started/remote-browser-versus-local-browser.md",
+      "path": "platform/browser/getting-started/remote-browser-versus-local-browser.md",
+      "type": "docs-page",
+      "description": "Why managed Browserbase sessions usually win over self-hosted Chromium in a VM."
+    },
+    {
+      "order": 90,
+      "section": "Docs",
+      "group": "platform / browser / getting-started",
+      "title": "Using a browser session",
+      "url": "https://docs.browserbase.com/platform/browser/getting-started/using-browser-session.md",
+      "path": "platform/browser/getting-started/using-browser-session.md",
+      "type": "docs-page",
+      "description": "Learn how to connect to and interact with browser sessions"
+    },
+    {
+      "order": 91,
+      "section": "Docs",
+      "group": "platform / browser / getting-started",
+      "title": "What is a headless browser?",
+      "url": "https://docs.browserbase.com/platform/browser/getting-started/what-is-headless-browser.md",
+      "path": "platform/browser/getting-started/what-is-headless-browser.md",
+      "type": "docs-page",
+      "description": "A headless browser is a web browser controlled by code, without a GUI. Learn how headless browsers work and how to use them for automation, data extraction, and testing."
+    },
+    {
+      "order": 92,
+      "section": "Docs",
+      "group": "platform / browser / long-sessions",
+      "title": "Keep alive",
+      "url": "https://docs.browserbase.com/platform/browser/long-sessions/keep-alive.md",
+      "path": "platform/browser/long-sessions/keep-alive.md",
+      "type": "docs-page",
+      "description": "Keep sessions alive across disconnects, allowing you to reconnect without ending your session."
+    },
+    {
+      "order": 93,
+      "section": "Docs",
+      "group": "platform / browser / long-sessions",
+      "title": "Long sessions",
+      "url": "https://docs.browserbase.com/platform/browser/long-sessions/overview.md",
+      "path": "platform/browser/long-sessions/overview.md",
+      "type": "docs-page",
+      "description": "Keep sessions running longer and survive disconnects with keep alive and custom timeouts"
+    },
+    {
+      "order": 94,
+      "section": "Docs",
+      "group": "platform / browser / long-sessions",
+      "title": "Timeout",
+      "url": "https://docs.browserbase.com/platform/browser/long-sessions/timeouts.md",
+      "path": "platform/browser/long-sessions/timeouts.md",
+      "type": "docs-page",
+      "description": "Extend session duration beyond the default timeout period."
+    },
+    {
+      "order": 95,
+      "section": "Docs",
+      "group": "platform / browser / observability",
+      "title": "Observability",
+      "url": "https://docs.browserbase.com/platform/browser/observability/observability.md",
+      "path": "platform/browser/observability/observability.md",
+      "type": "docs-page",
+      "description": "Debug and monitor your browser sessions with logs, metrics, and real-time inspection"
+    },
+    {
+      "order": 96,
+      "section": "Docs",
+      "group": "platform / browser / observability",
+      "title": "Session live view",
+      "url": "https://docs.browserbase.com/platform/browser/observability/session-live-view.md",
+      "path": "platform/browser/observability/session-live-view.md",
+      "type": "docs-page",
+      "description": "An interactive window to display or control a browser session."
+    },
+    {
+      "order": 97,
+      "section": "Docs",
+      "group": "platform / browser / observability",
+      "title": "Session recording (rrweb)",
+      "url": "https://docs.browserbase.com/platform/browser/observability/session-recording.md",
+      "path": "platform/browser/observability/session-recording.md",
+      "type": "docs-page",
+      "description": "Every session is automatically recorded so you can inspect actions and debug issues"
+    },
+    {
+      "order": 98,
+      "section": "Docs",
+      "group": "platform / browser / observability",
+      "title": "Session replay",
+      "url": "https://docs.browserbase.com/platform/browser/observability/session-replay.md",
+      "path": "platform/browser/observability/session-replay.md",
+      "type": "docs-page",
+      "description": "Stream session replays as HLS to embed playback in your own application."
+    },
+    {
+      "order": 99,
+      "section": "Docs",
+      "group": "platform / browser / techniques",
+      "title": "Dialogs",
+      "url": "https://docs.browserbase.com/platform/browser/techniques/dialogues.md",
+      "path": "platform/browser/techniques/dialogues.md",
+      "type": "docs-page",
+      "description": "Handling browser dialog windows in automated sessions."
+    },
+    {
+      "order": 100,
+      "section": "Docs",
+      "group": "platform / fetch",
+      "title": "Fetch",
+      "url": "https://docs.browserbase.com/platform/fetch/overview.md",
+      "path": "platform/fetch/overview.md",
+      "type": "docs-page",
+      "description": "Lightweight page retrieval as a complement to browser sessions."
+    },
+    {
+      "order": 101,
+      "section": "Docs",
+      "group": "platform / identity",
+      "title": "Allowed Domains",
+      "url": "https://docs.browserbase.com/platform/identity/allowed-domains.md",
+      "path": "platform/identity/allowed-domains.md",
+      "type": "docs-page",
+      "description": "Restrict session navigation to an allowlist of domains"
+    },
+    {
+      "order": 102,
+      "section": "Docs",
+      "group": "platform / identity",
+      "title": "Website authentication",
+      "url": "https://docs.browserbase.com/platform/identity/authentication.md",
+      "path": "platform/identity/authentication.md",
+      "type": "docs-page",
+      "description": "Managing 2FA and other authentication flows."
+    },
+    {
+      "order": 103,
+      "section": "Docs",
+      "group": "platform / identity",
+      "title": "Agent Auth & Identity",
+      "url": "https://docs.browserbase.com/platform/identity/overview.md",
+      "path": "platform/identity/overview.md",
+      "type": "docs-page",
+      "description": "How Browserbase works with bot protection providers to give your agents verified access to the web."
+    },
+    {
+      "order": 104,
+      "section": "Docs",
+      "group": "platform / identity",
+      "title": "Proxies",
+      "url": "https://docs.browserbase.com/platform/identity/proxies.md",
+      "path": "platform/identity/proxies.md",
+      "type": "docs-page",
+      "description": "Consistent geolocation and network identity for your browser sessions"
+    },
+    {
+      "order": 105,
+      "section": "Docs",
+      "group": "platform / identity",
+      "title": "Verified",
+      "url": "https://docs.browserbase.com/platform/identity/verified-customization.md",
+      "path": "platform/identity/verified-customization.md",
+      "type": "docs-page",
+      "description": "Customize Verified sessions with OS configurations"
+    },
+    {
+      "order": 106,
+      "section": "Docs",
+      "group": "platform / identity",
+      "title": "IP allowlisting",
+      "url": "https://docs.browserbase.com/platform/identity/vpn.md",
+      "path": "platform/identity/vpn.md",
+      "type": "docs-page",
+      "description": "Route Browserbase traffic through your VPN by allowlisting proxies."
+    },
+    {
+      "order": 107,
+      "section": "Docs",
+      "group": "platform / model-gateway",
+      "title": "Model Gateway",
+      "url": "https://docs.browserbase.com/platform/model-gateway/overview.md",
+      "path": "platform/model-gateway/overview.md",
+      "type": "docs-page",
+      "description": "Access top LLM providers through your Browserbase API key: one key, one bill, no provider accounts needed."
+    },
+    {
+      "order": 108,
+      "section": "Docs",
+      "group": "platform / runtime",
+      "title": "Deploy from playground",
+      "url": "https://docs.browserbase.com/platform/runtime/deploy-from-playground.md",
+      "path": "platform/runtime/deploy-from-playground.md",
+      "type": "docs-page",
+      "description": "Create, test, and deploy browser agent Functions directly from the Browserbase dashboard"
+    },
+    {
+      "order": 109,
+      "section": "Docs",
+      "group": "platform / runtime",
+      "title": "Functions",
+      "url": "https://docs.browserbase.com/platform/runtime/overview.md",
+      "path": "platform/runtime/overview.md",
+      "type": "docs-page",
+      "description": "Deploy browser agents and automations with Browserbase"
+    },
+    {
+      "order": 110,
+      "section": "Docs",
+      "group": "platform / runtime",
+      "title": "Functions reference",
+      "url": "https://docs.browserbase.com/platform/runtime/reference.md",
+      "path": "platform/runtime/reference.md",
+      "type": "docs-page",
+      "description": "Deploy browser agent Functions with Browserbase"
+    },
+    {
+      "order": 111,
+      "section": "Docs",
+      "group": "platform / search",
+      "title": "Search",
+      "url": "https://docs.browserbase.com/platform/search/overview.md",
+      "path": "platform/search/overview.md",
+      "type": "docs-page",
+      "description": "Fast, token-efficient web search results as a complement to browser sessions."
+    },
+    {
+      "order": 112,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Create a Context",
+      "url": "https://docs.browserbase.com/reference/api/create-a-context.md",
+      "path": "reference/api/create-a-context.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 113,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Create a Session",
+      "url": "https://docs.browserbase.com/reference/api/create-a-session.md",
+      "path": "reference/api/create-a-session.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 114,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Create Session Uploads",
+      "url": "https://docs.browserbase.com/reference/api/create-session-uploads.md",
+      "path": "reference/api/create-session-uploads.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 115,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Delete a Certificate",
+      "url": "https://docs.browserbase.com/reference/api/delete-a-certificate.md",
+      "path": "reference/api/delete-a-certificate.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 116,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Delete a Context",
+      "url": "https://docs.browserbase.com/reference/api/delete-a-context.md",
+      "path": "reference/api/delete-a-context.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 117,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Delete a Download",
+      "url": "https://docs.browserbase.com/reference/api/delete-a-download.md",
+      "path": "reference/api/delete-a-download.md",
+      "type": "docs-page",
+      "description": "Delete a download file from storage and mark as deleted."
+    },
+    {
+      "order": 118,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Delete an Extension",
+      "url": "https://docs.browserbase.com/reference/api/delete-an-extension.md",
+      "path": "reference/api/delete-an-extension.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 119,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Delete a Download",
+      "url": "https://docs.browserbase.com/reference/api/delete-download.md",
+      "path": "reference/api/delete-download.md",
+      "type": "docs-page",
+      "description": "Delete a download file from storage and mark as deleted."
+    },
+    {
+      "order": 120,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Fetch a Page",
+      "url": "https://docs.browserbase.com/reference/api/fetch-a-page.md",
+      "path": "reference/api/fetch-a-page.md",
+      "type": "docs-page",
+      "description": "Fetch a page and return its content, headers, and metadata."
+    },
+    {
+      "order": 121,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Certificate",
+      "url": "https://docs.browserbase.com/reference/api/get-a-certificate.md",
+      "path": "reference/api/get-a-certificate.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 122,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Context",
+      "url": "https://docs.browserbase.com/reference/api/get-a-context.md",
+      "path": "reference/api/get-a-context.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 123,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Download",
+      "url": "https://docs.browserbase.com/reference/api/get-a-download.md",
+      "path": "reference/api/get-a-download.md",
+      "type": "docs-page",
+      "description": "Get download metadata (Accept: application/json) or file content (Accept: application/octet-stream)."
+    },
+    {
+      "order": 124,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Function",
+      "url": "https://docs.browserbase.com/reference/api/get-a-function.md",
+      "path": "reference/api/get-a-function.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 125,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Function Build",
+      "url": "https://docs.browserbase.com/reference/api/get-a-function-build.md",
+      "path": "reference/api/get-a-function-build.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 126,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Function Version",
+      "url": "https://docs.browserbase.com/reference/api/get-a-function-version.md",
+      "path": "reference/api/get-a-function-version.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 127,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Project",
+      "url": "https://docs.browserbase.com/reference/api/get-a-project.md",
+      "path": "reference/api/get-a-project.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 128,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Session",
+      "url": "https://docs.browserbase.com/reference/api/get-a-session.md",
+      "path": "reference/api/get-a-session.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 129,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get an Extension",
+      "url": "https://docs.browserbase.com/reference/api/get-an-extension.md",
+      "path": "reference/api/get-an-extension.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 130,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get an Invocation",
+      "url": "https://docs.browserbase.com/reference/api/get-an-invocation.md",
+      "path": "reference/api/get-an-invocation.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 131,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get a Download",
+      "url": "https://docs.browserbase.com/reference/api/get-download.md",
+      "path": "reference/api/get-download.md",
+      "type": "docs-page",
+      "description": "Get download metadata (Accept: application/json) or file content (Accept: application/octet-stream)."
+    },
+    {
+      "order": 132,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get Function Build Logs",
+      "url": "https://docs.browserbase.com/reference/api/get-function-build-logs.md",
+      "path": "reference/api/get-function-build-logs.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 133,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get Invocation Logs",
+      "url": "https://docs.browserbase.com/reference/api/get-invocation-logs.md",
+      "path": "reference/api/get-invocation-logs.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 134,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get Project Usage",
+      "url": "https://docs.browserbase.com/reference/api/get-project-usage.md",
+      "path": "reference/api/get-project-usage.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 135,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Invoke a Function",
+      "url": "https://docs.browserbase.com/reference/api/invoke-a-function.md",
+      "path": "reference/api/invoke-a-function.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 136,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Sessions",
+      "url": "https://docs.browserbase.com/reference/api/list-all-sessions.md",
+      "path": "reference/api/list-all-sessions.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 137,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Certificates",
+      "url": "https://docs.browserbase.com/reference/api/list-certificates.md",
+      "path": "reference/api/list-certificates.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 138,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Downloads",
+      "url": "https://docs.browserbase.com/reference/api/list-downloads.md",
+      "path": "reference/api/list-downloads.md",
+      "type": "docs-page",
+      "description": "List all downloads for a session with optional filtering and pagination."
+    },
+    {
+      "order": 139,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Function Builds",
+      "url": "https://docs.browserbase.com/reference/api/list-function-builds.md",
+      "path": "reference/api/list-function-builds.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 140,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Function Versions",
+      "url": "https://docs.browserbase.com/reference/api/list-function-versions.md",
+      "path": "reference/api/list-function-versions.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 141,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Functions",
+      "url": "https://docs.browserbase.com/reference/api/list-functions.md",
+      "path": "reference/api/list-functions.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 142,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Invocations for a Function Version",
+      "url": "https://docs.browserbase.com/reference/api/list-invocations-for-a-function-version.md",
+      "path": "reference/api/list-invocations-for-a-function-version.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 143,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Projects",
+      "url": "https://docs.browserbase.com/reference/api/list-projects.md",
+      "path": "reference/api/list-projects.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 144,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Sessions",
+      "url": "https://docs.browserbase.com/reference/api/list-sessions.md",
+      "path": "reference/api/list-sessions.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 145,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "List Invocations for a Function Version",
+      "url": "https://docs.browserbase.com/reference/api/list-version-invocations.md",
+      "path": "reference/api/list-version-invocations.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 146,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Overview",
+      "url": "https://docs.browserbase.com/reference/api/overview.md",
+      "path": "reference/api/overview.md",
+      "type": "docs-page",
+      "description": "Create, connect, and retrieve information from browser sessions."
+    },
+    {
+      "order": 147,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Session Live URLs",
+      "url": "https://docs.browserbase.com/reference/api/session-live-urls.md",
+      "path": "reference/api/session-live-urls.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 148,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Session Logs",
+      "url": "https://docs.browserbase.com/reference/api/session-logs.md",
+      "path": "reference/api/session-logs.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 149,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Session Recording",
+      "url": "https://docs.browserbase.com/reference/api/session-recording.md",
+      "path": "reference/api/session-recording.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 150,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get Replay Page",
+      "url": "https://docs.browserbase.com/reference/api/session-replay-page.md",
+      "path": "reference/api/session-replay-page.md",
+      "type": "docs-page",
+      "description": "Returns an HLS VOD media playlist (.m3u8) for a specific page of a session replay."
+    },
+    {
+      "order": 151,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Get Session Replay",
+      "url": "https://docs.browserbase.com/reference/api/session-replays.md",
+      "path": "reference/api/session-replays.md",
+      "type": "docs-page",
+      "description": "Returns page metadata for a session replay, including timing information and the URL of each page's HLS playlist."
+    },
+    {
+      "order": 152,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Update a Context",
+      "url": "https://docs.browserbase.com/reference/api/update-a-context.md",
+      "path": "reference/api/update-a-context.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 153,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Update a Session",
+      "url": "https://docs.browserbase.com/reference/api/update-a-session.md",
+      "path": "reference/api/update-a-session.md",
+      "type": "docs-page",
+      "description": "Close a Browserbase session by updating its status to REQUEST_RELEASE, or update other mutable session fields."
+    },
+    {
+      "order": 154,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Upload a Certificate",
+      "url": "https://docs.browserbase.com/reference/api/upload-a-certificate.md",
+      "path": "reference/api/upload-a-certificate.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 155,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Upload an Extension",
+      "url": "https://docs.browserbase.com/reference/api/upload-an-extension.md",
+      "path": "reference/api/upload-an-extension.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 156,
+      "section": "Docs",
+      "group": "reference / api",
+      "title": "Web Search",
+      "url": "https://docs.browserbase.com/reference/api/web-search.md",
+      "path": "reference/api/web-search.md",
+      "type": "docs-page",
+      "description": "Perform a web search and return structured results."
+    },
+    {
+      "order": 157,
+      "section": "Docs",
+      "group": "reference",
+      "title": "APIs and SDKs",
+      "url": "https://docs.browserbase.com/reference/introduction.md",
+      "path": "reference/introduction.md",
+      "type": "docs-page",
+      "description": "Choose your favorite way to interact with browser fleets."
+    },
+    {
+      "order": 158,
+      "section": "Docs",
+      "group": "reference / sdk",
+      "title": "Node.js SDK",
+      "url": "https://docs.browserbase.com/reference/sdk/nodejs.md",
+      "path": "reference/sdk/nodejs.md",
+      "type": "docs-page",
+      "description": "All the features and utilities for fast Node.js development with Browserbase."
+    },
+    {
+      "order": 159,
+      "section": "Docs",
+      "group": "reference / sdk",
+      "title": "Overview",
+      "url": "https://docs.browserbase.com/reference/sdk/overview.md",
+      "path": "reference/sdk/overview.md",
+      "type": "docs-page",
+      "description": "Faster development for Python and Node.js."
+    },
+    {
+      "order": 160,
+      "section": "Docs",
+      "group": "reference / sdk",
+      "title": "Python SDK",
+      "url": "https://docs.browserbase.com/reference/sdk/python.md",
+      "path": "reference/sdk/python.md",
+      "type": "docs-page",
+      "description": "All the features and utilities for fast Python development with Browserbase."
+    },
+    {
+      "order": 161,
+      "section": "Docs",
+      "group": "use-cases",
+      "title": "Browser agents",
+      "url": "https://docs.browserbase.com/use-cases/agents.md",
+      "path": "use-cases/agents.md",
+      "type": "docs-page",
+      "description": "Give your agents a headless browser to browse and interact with the web at scale, persistent sessions, real-time observability, and Agent Identity built in."
+    },
+    {
+      "order": 162,
+      "section": "Docs",
+      "group": "use-cases",
+      "title": "Automating form submissions",
+      "url": "https://docs.browserbase.com/use-cases/automating-form-submissions.md",
+      "path": "use-cases/automating-form-submissions.md",
+      "type": "docs-page",
+      "description": "Automate form submissions at scale with Browserbase. Handle logins, registrations, data entry, and checkouts using Stagehand or Playwright in reliable cloud browsers."
+    },
+    {
+      "order": 163,
+      "section": "Docs",
+      "group": "use-cases",
+      "title": "Automated testing",
+      "url": "https://docs.browserbase.com/use-cases/building-automated-tests.md",
+      "path": "use-cases/building-automated-tests.md",
+      "type": "docs-page",
+      "description": "Run reliable end-to-end browser tests at scale with Browserbase. Automate login flows, UI validation, and regression testing using Stagehand or Playwright."
+    },
+    {
+      "order": 164,
+      "section": "Docs",
+      "group": "use-cases",
+      "title": "Buying with an AI agent",
+      "url": "https://docs.browserbase.com/use-cases/buy-with-ai-agent.md",
+      "path": "use-cases/buy-with-ai-agent.md",
+      "type": "docs-page",
+      "description": "Automate purchasing workflows with AI-powered agents and browser automation"
+    },
+    {
+      "order": 165,
+      "section": "Docs",
+      "group": "use-cases",
+      "title": "Web data retrieval",
+      "url": "https://docs.browserbase.com/use-cases/web-data-retrieval.md",
+      "path": "use-cases/web-data-retrieval.md",
+      "type": "docs-page",
+      "description": "Extract structured data from any website at scale with Browserbase. Use Stagehand or Playwright with Verified, proxy rotation, and CAPTCHA solving."
+    },
+    {
+      "order": 166,
+      "section": "Docs",
+      "group": "welcome",
+      "title": "Overview",
+      "url": "https://docs.browserbase.com/welcome/getting-started.md",
+      "path": "welcome/getting-started.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 167,
+      "section": "Docs",
+      "group": "welcome",
+      "title": "Introducing Browserbase",
+      "url": "https://docs.browserbase.com/welcome/introduction.md",
+      "path": "welcome/introduction.md",
+      "type": "docs-page",
+      "description": ""
+    },
+    {
+      "order": 168,
+      "section": "Docs",
+      "group": "welcome / quickstarts",
+      "title": "Start your first session with Playwright",
+      "url": "https://docs.browserbase.com/welcome/quickstarts/playwright.md",
+      "path": "welcome/quickstarts/playwright.md",
+      "type": "docs-page",
+      "description": "Connect Playwright to Browserbase cloud browsers in minutes. Run headless browser automation at scale with session recording and debugging."
+    },
+    {
+      "order": 169,
+      "section": "Docs",
+      "group": "welcome / quickstarts",
+      "title": "Start your first session with Puppeteer",
+      "url": "https://docs.browserbase.com/welcome/quickstarts/puppeteer.md",
+      "path": "welcome/quickstarts/puppeteer.md",
+      "type": "docs-page",
+      "description": "Connect Puppeteer to Browserbase cloud browsers. Run headless Chrome automation at scale with built-in session management and debugging."
+    },
+    {
+      "order": 170,
+      "section": "Docs",
+      "group": "welcome / quickstarts",
+      "title": "Start your first session with Selenium",
+      "url": "https://docs.browserbase.com/welcome/quickstarts/selenium.md",
+      "path": "welcome/quickstarts/selenium.md",
+      "type": "docs-page",
+      "description": "Connect Selenium WebDriver to Browserbase cloud browsers. Run cross-browser automation at scale with session recording and observability."
+    },
+    {
+      "order": 171,
+      "section": "Docs",
+      "group": "welcome / quickstarts",
+      "title": "Skills",
+      "url": "https://docs.browserbase.com/welcome/quickstarts/skills.md",
+      "path": "welcome/quickstarts/skills.md",
+      "type": "docs-page",
+      "description": "Give your AI coding agent a browser in one prompt"
+    },
+    {
+      "order": 172,
+      "section": "Docs",
+      "group": "welcome / quickstarts",
+      "title": "Stagehand",
+      "url": "https://docs.browserbase.com/welcome/quickstarts/stagehand.md",
+      "path": "welcome/quickstarts/stagehand.md",
+      "type": "docs-page",
+      "description": "Build browser agents with Stagehand + Browserbase"
+    },
+    {
+      "order": 173,
+      "section": "Docs",
+      "group": "welcome",
+      "title": "What is Browserbase?",
+      "url": "https://docs.browserbase.com/welcome/what-is-browserbase.md",
+      "path": "welcome/what-is-browserbase.md",
+      "type": "docs-page",
+      "description": "The complete platform to build and deploy agents that browse and interact with the web like humans."
+    },
+    {
+      "order": 174,
+      "section": "OpenAPI Specs",
+      "group": "reference / api",
+      "title": "openapi.v1",
+      "url": "https://docs.browserbase.com/reference/api/openapi.v1.yaml",
+      "path": "reference/api/openapi.v1.yaml",
+      "type": "openapi",
+      "description": ""
+    },
+    {
+      "order": 175,
+      "section": "OpenAPI Specs",
+      "group": "metadata",
+      "title": "package",
+      "url": "https://docs.browserbase.com/package.json",
+      "path": "package.json",
+      "type": "package",
+      "description": ""
+    },
+    {
+      "order": 176,
+      "section": "Optional",
+      "group": "external / optional",
+      "title": "Templates ↗",
+      "url": "https://www.browserbase.com/templates",
+      "path": "templates",
+      "type": "external",
+      "description": ""
+    },
+    {
+      "order": 177,
+      "section": "Optional",
+      "group": "root",
+      "title": "Stagehand ↗",
+      "url": "https://docs.stagehand.dev/",
+      "path": "",
+      "type": "external",
+      "description": ""
+    },
+    {
+      "order": 178,
+      "section": "Optional",
+      "group": "external / optional",
+      "title": "Changelog ↗",
+      "url": "https://www.browserbase.com/changelog",
+      "path": "changelog",
+      "type": "external",
+      "description": ""
+    },
+    {
+      "order": 179,
+      "section": "Optional",
+      "group": "external / optional",
+      "title": "Dashboard ↗",
+      "url": "https://www.browserbase.com/overview",
+      "path": "overview",
+      "type": "external",
+      "description": ""
+    }
+  ],
+  "grouped": [
+    {
+      "group": "internal / cursor",
+      "count": 1,
+      "entries": [
+        {
+          "order": 0,
+          "section": "Docs",
+          "group": "internal / cursor",
+          "title": "BUGBOT",
+          "url": "https://docs.browserbase.com/.cursor/BUGBOT.md",
+          "path": ".cursor/BUGBOT.md",
+          "type": "docs-page",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "group": "account / billing",
+      "count": 2,
+      "entries": [
+        {
+          "order": 1,
+          "section": "Docs",
+          "group": "account / billing",
+          "title": "Billing",
+          "url": "https://docs.browserbase.com/account/billing/plan-management.md",
+          "path": "account/billing/plan-management.md",
+          "type": "docs-page",
+          "description": "Manage your subscription, invoices, and payment details"
+        },
+        {
+          "order": 2,
+          "section": "Docs",
+          "group": "account / billing",
+          "title": "Plans",
+          "url": "https://docs.browserbase.com/account/billing/plans.md",
+          "path": "account/billing/plans.md",
+          "type": "docs-page",
+          "description": "Your guide to Browserbase plans, pricing, and usage limits"
+        }
+      ]
+    },
+    {
+      "group": "account / enterprise",
+      "count": 3,
+      "entries": [
+        {
+          "order": 3,
+          "section": "Docs",
+          "group": "account / enterprise",
+          "title": "Bring your own storage (BYOS)",
+          "url": "https://docs.browserbase.com/account/enterprise/byos-setup-guide.md",
+          "path": "account/enterprise/byos-setup-guide.md",
+          "type": "docs-page",
+          "description": "Configure your own AWS S3 buckets for storing Browserbase artifacts"
+        },
+        {
+          "order": 4,
+          "section": "Docs",
+          "group": "account / enterprise",
+          "title": "Enterprise security",
+          "url": "https://docs.browserbase.com/account/enterprise/security.md",
+          "path": "account/enterprise/security.md",
+          "type": "docs-page",
+          "description": "SOC 2 Type II, HIPAA compliance, zero-trust browser isolation, and enterprise-grade security for Browserbase infrastructure."
+        },
+        {
+          "order": 5,
+          "section": "Docs",
+          "group": "account / enterprise",
+          "title": "Zero data retention (ZDR)",
+          "url": "https://docs.browserbase.com/account/enterprise/zero-data-retention.md",
+          "path": "account/enterprise/zero-data-retention.md",
+          "type": "docs-page",
+          "description": "Run Browserbase sessions for regulated workloads without persisting logs, recordings, or replay data."
+        }
+      ]
+    },
+    {
+      "group": "account / team",
+      "count": 2,
+      "entries": [
+        {
+          "order": 6,
+          "section": "Docs",
+          "group": "account / team",
+          "title": "Teams",
+          "url": "https://docs.browserbase.com/account/team/roles.md",
+          "path": "account/team/roles.md",
+          "type": "docs-page",
+          "description": "Manage team members, roles, and project access"
+        },
+        {
+          "order": 7,
+          "section": "Docs",
+          "group": "account / team",
+          "title": "SSO (single sign-on) with SAML",
+          "url": "https://docs.browserbase.com/account/team/sso.md",
+          "path": "account/team/sso.md",
+          "type": "docs-page",
+          "description": "Learn how to enable SAML 2.0-based Single Sign-On for your Browserbase organization"
+        }
+      ]
+    },
+    {
+      "group": "integrations / 1password",
+      "count": 3,
+      "entries": [
+        {
+          "order": 8,
+          "section": "Docs",
+          "group": "integrations / 1password",
+          "title": "Set up 1Password Nightly Autofill for Director",
+          "url": "https://docs.browserbase.com/integrations/1password/director.md",
+          "path": "integrations/1password/director.md",
+          "type": "docs-page",
+          "description": "Enable agentic autofill in 1Password to securely authenticate with Director AI."
+        },
+        {
+          "order": 9,
+          "section": "Docs",
+          "group": "integrations / 1password",
+          "title": "Introduction",
+          "url": "https://docs.browserbase.com/integrations/1password/introduction.md",
+          "path": "integrations/1password/introduction.md",
+          "type": "docs-page",
+          "description": "Securely log into websites in a Browserbase session using 1Password."
+        },
+        {
+          "order": 10,
+          "section": "Docs",
+          "group": "integrations / 1password",
+          "title": "Use 1Password to log in with Browserbase",
+          "url": "https://docs.browserbase.com/integrations/1password/quickstart.md",
+          "path": "integrations/1password/quickstart.md",
+          "type": "docs-page",
+          "description": "Securely retrieve credentials from your 1Password vault and use them to log into websites."
+        }
+      ]
+    },
+    {
+      "group": "integrations / agent-browser",
+      "count": 2,
+      "entries": [
+        {
+          "order": 11,
+          "section": "Docs",
+          "group": "integrations / agent-browser",
+          "title": "Agent Browser integration",
+          "url": "https://docs.browserbase.com/integrations/agent-browser/introduction.md",
+          "path": "integrations/agent-browser/introduction.md",
+          "type": "docs-page",
+          "description": "Use Agent Browser with Browserbase for fast, CLI-driven browser control optimized for AI agents."
+        },
+        {
+          "order": 12,
+          "section": "Docs",
+          "group": "integrations / agent-browser",
+          "title": "Add cloud browsers to Agent Browser",
+          "url": "https://docs.browserbase.com/integrations/agent-browser/quickstart.md",
+          "path": "integrations/agent-browser/quickstart.md",
+          "type": "docs-page",
+          "description": "Integrate Browserbase with Agent Browser for cloud-hosted browser automation."
+        }
+      ]
+    },
+    {
+      "group": "integrations / agentkit",
+      "count": 2,
+      "entries": [
+        {
+          "order": 13,
+          "section": "Docs",
+          "group": "integrations / agentkit",
+          "title": "AgentKit by Tools for Humanity",
+          "url": "https://docs.browserbase.com/integrations/agentkit/introduction.md",
+          "path": "integrations/agentkit/introduction.md",
+          "type": "docs-page",
+          "description": "Use AgentKit to prove your AI agent is backed by a real human with cryptographic proof-of-humanity."
+        },
+        {
+          "order": 14,
+          "section": "Docs",
+          "group": "integrations / agentkit",
+          "title": "AgentKit quickstart",
+          "url": "https://docs.browserbase.com/integrations/agentkit/quickstart.md",
+          "path": "integrations/agentkit/quickstart.md",
+          "type": "docs-page",
+          "description": "Set up AgentKit human verification and create your first verified browser session via x402."
+        }
+      ]
+    },
+    {
+      "group": "integrations / agno",
+      "count": 2,
+      "entries": [
+        {
+          "order": 15,
+          "section": "Docs",
+          "group": "integrations / agno",
+          "title": "Agno integration",
+          "url": "https://docs.browserbase.com/integrations/agno/introduction.md",
+          "path": "integrations/agno/introduction.md",
+          "type": "docs-page",
+          "description": "Utilize Browserbase with Agno to give your AI agents Browser Tools."
+        },
+        {
+          "order": 16,
+          "section": "Docs",
+          "group": "integrations / agno",
+          "title": "Add web browsing capabilities to Agno",
+          "url": "https://docs.browserbase.com/integrations/agno/quickstart.md",
+          "path": "integrations/agno/quickstart.md",
+          "type": "docs-page",
+          "description": "Integrate Browserbase with Agno"
+        }
+      ]
+    },
+    {
+      "group": "integrations / anthropic",
+      "count": 2,
+      "entries": [
+        {
+          "order": 17,
+          "section": "Docs",
+          "group": "integrations / anthropic",
+          "title": "Anthropic Managed Agents",
+          "url": "https://docs.browserbase.com/integrations/anthropic/managed-agents/introduction.md",
+          "path": "integrations/anthropic/managed-agents/introduction.md",
+          "type": "docs-page",
+          "description": "Run Claude agents in Anthropic's managed runtime and give them a Browserbase session to drive the web."
+        },
+        {
+          "order": 18,
+          "section": "Docs",
+          "group": "integrations / anthropic",
+          "title": "Browsers for Managed Agents",
+          "url": "https://docs.browserbase.com/integrations/anthropic/managed-agents/quickstart.md",
+          "path": "integrations/anthropic/managed-agents/quickstart.md",
+          "type": "docs-page",
+          "description": "Hand your Anthropic Managed Agents a full cloud browser"
+        }
+      ]
+    },
+    {
+      "group": "integrations / braintrust",
+      "count": 2,
+      "entries": [
+        {
+          "order": 19,
+          "section": "Docs",
+          "group": "integrations / braintrust",
+          "title": "Braintrust integration",
+          "url": "https://docs.browserbase.com/integrations/braintrust/introduction.md",
+          "path": "integrations/braintrust/introduction.md",
+          "type": "docs-page",
+          "description": "Utilize Browserbase with Braintrust for browser agent capabilities."
+        },
+        {
+          "order": 20,
+          "section": "Docs",
+          "group": "integrations / braintrust",
+          "title": "Add web browsing capabilities to Braintrust",
+          "url": "https://docs.browserbase.com/integrations/braintrust/typescript.md",
+          "path": "integrations/braintrust/typescript.md",
+          "type": "docs-page",
+          "description": "Integrate Browserbase with Braintrust"
+        }
+      ]
+    },
+    {
+      "group": "integrations / browseruse",
+      "count": 2,
+      "entries": [
+        {
+          "order": 21,
+          "section": "Docs",
+          "group": "integrations / browseruse",
+          "title": "Browser Use integration",
+          "url": "https://docs.browserbase.com/integrations/browseruse/introduction.md",
+          "path": "integrations/browseruse/introduction.md",
+          "type": "docs-page",
+          "description": "Utilize Browserbase with Browser Use for browser agent capabilities."
+        },
+        {
+          "order": 22,
+          "section": "Docs",
+          "group": "integrations / browseruse",
+          "title": "Add web browsing capabilities to Browser Use",
+          "url": "https://docs.browserbase.com/integrations/browseruse/python.md",
+          "path": "integrations/browseruse/python.md",
+          "type": "docs-page",
+          "description": "Integrate Browserbase with Browser Use"
+        }
+      ]
+    },
+    {
+      "group": "integrations / crew-ai",
+      "count": 3,
+      "entries": [
+        {
+          "order": 23,
+          "section": "Docs",
+          "group": "integrations / crew-ai",
+          "title": "Tutorial: build a flight booking Crew",
+          "url": "https://docs.browserbase.com/integrations/crew-ai/build-a-flight-booker.md",
+          "path": "integrations/crew-ai/build-a-flight-booker.md",
+          "type": "docs-page",
+          "description": "Build a Crew that finds the best roundtrip flights on the given dates."
+        },
+        {
+          "order": 24,
+          "section": "Docs",
+          "group": "integrations / crew-ai",
+          "title": "crewAI integration",
+          "url": "https://docs.browserbase.com/integrations/crew-ai/introduction.md",
+          "path": "integrations/crew-ai/introduction.md",
+          "type": "docs-page",
+          "description": "Let your crewAI Agent browse the web like a human."
+        },
+        {
+          "order": 25,
+          "section": "Docs",
+          "group": "integrations / crew-ai",
+          "title": "Add web browsing capabilities to your agent",
+          "url": "https://docs.browserbase.com/integrations/crew-ai/python.md",
+          "path": "integrations/crew-ai/python.md",
+          "type": "docs-page",
+          "description": "Let your crewAI Agent browse the web like a human."
+        }
+      ]
+    },
+    {
+      "group": "integrations",
+      "count": 1,
+      "entries": [
+        {
+          "order": 26,
+          "section": "Docs",
+          "group": "integrations",
+          "title": "Get started with integrations",
+          "url": "https://docs.browserbase.com/integrations/get-started.md",
+          "path": "integrations/get-started.md",
+          "type": "docs-page",
+          "description": "Use your favorite technologies seamlessly with Browserbase."
+        }
+      ]
+    },
+    {
+      "group": "integrations / google-adk",
+      "count": 2,
+      "entries": [
+        {
+          "order": 27,
+          "section": "Docs",
+          "group": "integrations / google-adk",
+          "title": "Google ADK integration",
+          "url": "https://docs.browserbase.com/integrations/google-adk/introduction.md",
+          "path": "integrations/google-adk/introduction.md",
+          "type": "docs-page",
+          "description": "Give Google ADK agents a browser with Browserbase and Stagehand"
+        },
+        {
+          "order": 28,
+          "section": "Docs",
+          "group": "integrations / google-adk",
+          "title": "Google ADK setup",
+          "url": "https://docs.browserbase.com/integrations/google-adk/setup.md",
+          "path": "integrations/google-adk/setup.md",
+          "type": "docs-page",
+          "description": "Configure Browserbase MCP Server for Google Agent Development Kit"
+        }
+      ]
+    },
+    {
+      "group": "integrations / hermes-agent",
+      "count": 2,
+      "entries": [
+        {
+          "order": 29,
+          "section": "Docs",
+          "group": "integrations / hermes-agent",
+          "title": "Hermes Agent integration",
+          "url": "https://docs.browserbase.com/integrations/hermes-agent/introduction.md",
+          "path": "integrations/hermes-agent/introduction.md",
+          "type": "docs-page",
+          "description": "Connect Browserbase to Hermes Agent using Hermes' built-in Browserbase cloud mode or the Browse CLI."
+        },
+        {
+          "order": 30,
+          "section": "Docs",
+          "group": "integrations / hermes-agent",
+          "title": "Hermes Agent setup",
+          "url": "https://docs.browserbase.com/integrations/hermes-agent/setup.md",
+          "path": "integrations/hermes-agent/setup.md",
+          "type": "docs-page",
+          "description": "Set up Hermes Agent with Browserbase, starting with Hermes' built-in Browserbase cloud mode and then the Browse CLI."
+        }
+      ]
+    },
+    {
+      "group": "integrations / ibm",
+      "count": 2,
+      "entries": [
+        {
+          "order": 31,
+          "section": "Docs",
+          "group": "integrations / ibm",
+          "title": "Introduction",
+          "url": "https://docs.browserbase.com/integrations/ibm/introduction.md",
+          "path": "integrations/ibm/introduction.md",
+          "type": "docs-page",
+          "description": "Track real-time mortgage rates using IBM watsonx.ai"
+        },
+        {
+          "order": 32,
+          "section": "Docs",
+          "group": "integrations / ibm",
+          "title": "Mortgage rate capture",
+          "url": "https://docs.browserbase.com/integrations/ibm/quickstart.md",
+          "path": "integrations/ibm/quickstart.md",
+          "type": "docs-page",
+          "description": "This guide shows how to use Browserbase with IBM watsonx.ai to create a mortgage rate analysis tool. The integration captures screenshots of mortgage rate data from Freddie Mac's website and uses a vision model to analyze and summarize the rates."
+        }
+      ]
+    },
+    {
+      "group": "integrations / inngest",
+      "count": 3,
+      "entries": [
+        {
+          "order": 33,
+          "section": "Docs",
+          "group": "integrations / inngest",
+          "title": "Using Inngest with Browserbase",
+          "url": "https://docs.browserbase.com/integrations/inngest/introduction.md",
+          "path": "integrations/inngest/introduction.md",
+          "type": "docs-page",
+          "description": "Develop AI agents that can browse the web autonomously using Browserbase and Inngest AgentKit."
+        },
+        {
+          "order": 34,
+          "section": "Docs",
+          "group": "integrations / inngest",
+          "title": "Reddit search agent",
+          "url": "https://docs.browserbase.com/integrations/inngest/quickstart.md",
+          "path": "integrations/inngest/quickstart.md",
+          "type": "docs-page",
+          "description": "Enable your AI agents to search Reddit with Browserbase's managed headless browsers."
+        },
+        {
+          "order": 35,
+          "section": "Docs",
+          "group": "integrations / inngest",
+          "title": "Add Stagehand to AgentKit tools",
+          "url": "https://docs.browserbase.com/integrations/inngest/stagehand.md",
+          "path": "integrations/inngest/stagehand.md",
+          "type": "docs-page",
+          "description": "Use Stagehand, the SDK for browser agents, with AgentKit."
+        }
+      ]
+    },
+    {
+      "group": "integrations / langchain",
+      "count": 3,
+      "entries": [
+        {
+          "order": 36,
+          "section": "Docs",
+          "group": "integrations / langchain",
+          "title": "LangChain Deep Agents with Browserbase",
+          "url": "https://docs.browserbase.com/integrations/langchain/deepagents.md",
+          "path": "integrations/langchain/deepagents.md",
+          "type": "docs-page",
+          "description": "Build a Deep Agent that browses the web with Browserbase Search, Fetch, and Stagehand."
+        },
+        {
+          "order": 37,
+          "section": "Docs",
+          "group": "integrations / langchain",
+          "title": "LangChain integration",
+          "url": "https://docs.browserbase.com/integrations/langchain/introduction.md",
+          "path": "integrations/langchain/introduction.md",
+          "type": "docs-page",
+          "description": "Add Browserbase to your LangChain application (Python)."
+        },
+        {
+          "order": 38,
+          "section": "Docs",
+          "group": "integrations / langchain",
+          "title": "Configure Browserbase for LangChain",
+          "url": "https://docs.browserbase.com/integrations/langchain/python.md",
+          "path": "integrations/langchain/python.md",
+          "type": "docs-page",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "group": "integrations / mastra",
+      "count": 2,
+      "entries": [
+        {
+          "order": 39,
+          "section": "Docs",
+          "group": "integrations / mastra",
+          "title": "Mastra integration",
+          "url": "https://docs.browserbase.com/integrations/mastra/introduction.md",
+          "path": "integrations/mastra/introduction.md",
+          "type": "docs-page",
+          "description": "Build browser agents with Mastra and Stagehand"
+        },
+        {
+          "order": 40,
+          "section": "Docs",
+          "group": "integrations / mastra",
+          "title": "Mastra agent quickstart",
+          "url": "https://docs.browserbase.com/integrations/mastra/quickstart.md",
+          "path": "integrations/mastra/quickstart.md",
+          "type": "docs-page",
+          "description": "Build AI-powered browser agents with Mastra and Stagehand"
+        }
+      ]
+    },
+    {
+      "group": "integrations / mcp",
+      "count": 2,
+      "entries": [
+        {
+          "order": 41,
+          "section": "Docs",
+          "group": "integrations / mcp",
+          "title": "Browserbase MCP server",
+          "url": "https://docs.browserbase.com/integrations/mcp/introduction.md",
+          "path": "integrations/mcp/introduction.md",
+          "type": "docs-page",
+          "description": "Give MCP clients a browser through Model Context Protocol integration with Stagehand"
+        },
+        {
+          "order": 42,
+          "section": "Docs",
+          "group": "integrations / mcp",
+          "title": "Browserbase MCP server setup",
+          "url": "https://docs.browserbase.com/integrations/mcp/setup.md",
+          "path": "integrations/mcp/setup.md",
+          "type": "docs-page",
+          "description": "Add the Browserbase MCP Server to your MCP client"
+        }
+      ]
+    },
+    {
+      "group": "integrations / mongo-db",
+      "count": 2,
+      "entries": [
+        {
+          "order": 43,
+          "section": "Docs",
+          "group": "integrations / mongo-db",
+          "title": "Introduction",
+          "url": "https://docs.browserbase.com/integrations/mongo-db/introduction.md",
+          "path": "integrations/mongo-db/introduction.md",
+          "type": "docs-page",
+          "description": "Intelligent data extraction with MongoDB storage using Stagehand"
+        },
+        {
+          "order": 44,
+          "section": "Docs",
+          "group": "integrations / mongo-db",
+          "title": "Quickstart",
+          "url": "https://docs.browserbase.com/integrations/mongo-db/quickstart.md",
+          "path": "integrations/mongo-db/quickstart.md",
+          "type": "docs-page",
+          "description": "Build an AI-powered data extraction agent that pulls product data from e-commerce sites and stores it in MongoDB with automatic schema validation and data analysis capabilities."
+        }
+      ]
+    },
+    {
+      "group": "integrations / n8n",
+      "count": 2,
+      "entries": [
+        {
+          "order": 45,
+          "section": "Docs",
+          "group": "integrations / n8n",
+          "title": "n8n integration",
+          "url": "https://docs.browserbase.com/integrations/n8n/introduction.md",
+          "path": "integrations/n8n/introduction.md",
+          "type": "docs-page",
+          "description": "Build browser agents in n8n with the Browserbase node."
+        },
+        {
+          "order": 46,
+          "section": "Docs",
+          "group": "integrations / n8n",
+          "title": "n8n quickstart",
+          "url": "https://docs.browserbase.com/integrations/n8n/quickstart.md",
+          "path": "integrations/n8n/quickstart.md",
+          "type": "docs-page",
+          "description": "Install the Browserbase community node, configure credentials, and use Agent, Search, and Fetch resources in n8n."
+        }
+      ]
+    },
+    {
+      "group": "integrations / openai-cua",
+      "count": 1,
+      "entries": [
+        {
+          "order": 47,
+          "section": "Docs",
+          "group": "integrations / openai-cua",
+          "title": "OpenAI Computer Use Agent",
+          "url": "https://docs.browserbase.com/integrations/openai-cua/introduction.md",
+          "path": "integrations/openai-cua/introduction.md",
+          "type": "docs-page",
+          "description": "Integrate OpenAI CUA with Browserbase for scalable browser agents"
+        }
+      ]
+    },
+    {
+      "group": "integrations / openclaw",
+      "count": 2,
+      "entries": [
+        {
+          "order": 48,
+          "section": "Docs",
+          "group": "integrations / openclaw",
+          "title": "OpenClaw integration",
+          "url": "https://docs.browserbase.com/integrations/openclaw/introduction.md",
+          "path": "integrations/openclaw/introduction.md",
+          "type": "docs-page",
+          "description": "Run OpenClaw's browser on Browserbase instead of OpenClaw's built-in local Chromium."
+        },
+        {
+          "order": 49,
+          "section": "Docs",
+          "group": "integrations / openclaw",
+          "title": "OpenClaw setup",
+          "url": "https://docs.browserbase.com/integrations/openclaw/setup.md",
+          "path": "integrations/openclaw/setup.md",
+          "type": "docs-page",
+          "description": "Run OpenClaw's browser on Browserbase instead of OpenClaw's built-in local Chromium."
+        }
+      ]
+    },
+    {
+      "group": "integrations / prime-intellect",
+      "count": 3,
+      "entries": [
+        {
+          "order": 50,
+          "section": "Docs",
+          "group": "integrations / prime-intellect",
+          "title": "Evaluate browser agents with Prime Intellect",
+          "url": "https://docs.browserbase.com/integrations/prime-intellect/evals.md",
+          "path": "integrations/prime-intellect/evals.md",
+          "type": "docs-page",
+          "description": "Run browser agent evaluations using BrowserEnv and the Prime CLI."
+        },
+        {
+          "order": 51,
+          "section": "Docs",
+          "group": "integrations / prime-intellect",
+          "title": "Prime Intellect",
+          "url": "https://docs.browserbase.com/integrations/prime-intellect/introduction.md",
+          "path": "integrations/prime-intellect/introduction.md",
+          "type": "docs-page",
+          "description": "Run Browserbase-backed browser environments for AI agent evaluation and RL training with Prime Intellect."
+        },
+        {
+          "order": 52,
+          "section": "Docs",
+          "group": "integrations / prime-intellect",
+          "title": "Training browser agents with Prime Intellect",
+          "url": "https://docs.browserbase.com/integrations/prime-intellect/rl-training.md",
+          "path": "integrations/prime-intellect/rl-training.md",
+          "type": "docs-page",
+          "description": "Wire BrowserEnv into Prime Intellect's RL training workflows for browser-capable models."
+        }
+      ]
+    },
+    {
+      "group": "integrations / skills",
+      "count": 3,
+      "entries": [
+        {
+          "order": 53,
+          "section": "Docs",
+          "group": "integrations / skills",
+          "title": "Browse CLI",
+          "url": "https://docs.browserbase.com/integrations/skills/browse-cli.md",
+          "path": "integrations/skills/browse-cli.md",
+          "type": "docs-page",
+          "description": "Use the Browse CLI to drive browser automation, Browserbase cloud APIs, and Browse.sh skills from AI coding agents."
+        },
+        {
+          "order": 54,
+          "section": "Docs",
+          "group": "integrations / skills",
+          "title": "Auto-fix selectors in CI/CD",
+          "url": "https://docs.browserbase.com/integrations/skills/github-action.md",
+          "path": "integrations/skills/github-action.md",
+          "type": "docs-page",
+          "description": "Automatically fix broken CSS selectors using Claude Code and Browserbase in GitHub Actions"
+        },
+        {
+          "order": 55,
+          "section": "Docs",
+          "group": "integrations / skills",
+          "title": "Skills",
+          "url": "https://docs.browserbase.com/integrations/skills/introduction.md",
+          "path": "integrations/skills/introduction.md",
+          "type": "docs-page",
+          "description": "Extend your AI coding agents with browser agents, Browserbase Functions, and Browse CLI workflows using Browserbase Skills"
+        }
+      ]
+    },
+    {
+      "group": "integrations / stripe",
+      "count": 2,
+      "entries": [
+        {
+          "order": 56,
+          "section": "Docs",
+          "group": "integrations / stripe",
+          "title": "Introduction",
+          "url": "https://docs.browserbase.com/integrations/stripe/introduction.md",
+          "path": "integrations/stripe/introduction.md",
+          "type": "docs-page",
+          "description": "Give your AI agent a responsible credit card to use for online payments."
+        },
+        {
+          "order": 57,
+          "section": "Docs",
+          "group": "integrations / stripe",
+          "title": "Agentic credit card automation",
+          "url": "https://docs.browserbase.com/integrations/stripe/quickstart.md",
+          "path": "integrations/stripe/quickstart.md",
+          "type": "docs-page",
+          "description": "Effortlessly create virtual cards with Stripe and automate purchases using Browserbase."
+        }
+      ]
+    },
+    {
+      "group": "integrations / temporal",
+      "count": 2,
+      "entries": [
+        {
+          "order": 58,
+          "section": "Docs",
+          "group": "integrations / temporal",
+          "title": "Introduction",
+          "url": "https://docs.browserbase.com/integrations/temporal/introduction.md",
+          "path": "integrations/temporal/introduction.md",
+          "type": "docs-page",
+          "description": "Resilient browser automation with Temporal workflows and Stagehand"
+        },
+        {
+          "order": 59,
+          "section": "Docs",
+          "group": "integrations / temporal",
+          "title": "Quickstart",
+          "url": "https://docs.browserbase.com/integrations/temporal/quickstart.md",
+          "path": "integrations/temporal/quickstart.md",
+          "type": "docs-page",
+          "description": "Get production-ready browser agents with automatic retries and failure recovery"
+        }
+      ]
+    },
+    {
+      "group": "integrations / trigger",
+      "count": 2,
+      "entries": [
+        {
+          "order": 60,
+          "section": "Docs",
+          "group": "integrations / trigger",
+          "title": "Introduction",
+          "url": "https://docs.browserbase.com/integrations/trigger/introduction.md",
+          "path": "integrations/trigger/introduction.md",
+          "type": "docs-page",
+          "description": "Learn what Trigger.dev is, why you might pair it with Browserbase, and what you can build with this integration."
+        },
+        {
+          "order": 61,
+          "section": "Docs",
+          "group": "integrations / trigger",
+          "title": "Quickstart",
+          "url": "https://docs.browserbase.com/integrations/trigger/quickstart.md",
+          "path": "integrations/trigger/quickstart.md",
+          "type": "docs-page",
+          "description": "Spin up your first Trigger.dev job that controls a Browserbase browser in under 5 minutes."
+        }
+      ]
+    },
+    {
+      "group": "integrations / val-town",
+      "count": 2,
+      "entries": [
+        {
+          "order": 62,
+          "section": "Docs",
+          "group": "integrations / val-town",
+          "title": "Val Town integration",
+          "url": "https://docs.browserbase.com/integrations/val-town/introduction.md",
+          "path": "integrations/val-town/introduction.md",
+          "type": "docs-page",
+          "description": "Allow your Val Town script to perform complex tasks on the web."
+        },
+        {
+          "order": 63,
+          "section": "Docs",
+          "group": "integrations / val-town",
+          "title": "Tutorial: Slack Scout",
+          "url": "https://docs.browserbase.com/integrations/val-town/slack-scout.md",
+          "path": "integrations/val-town/slack-scout.md",
+          "type": "docs-page",
+          "description": "Send a Slack notification every time your keywords are mentioned on Twitter, Hacker News, or Reddit."
+        }
+      ]
+    },
+    {
+      "group": "integrations / vercel",
+      "count": 4,
+      "entries": [
+        {
+          "order": 64,
+          "section": "Docs",
+          "group": "integrations / vercel",
+          "title": "BrowseGPT",
+          "url": "https://docs.browserbase.com/integrations/vercel/browsegpt.md",
+          "path": "integrations/vercel/browsegpt.md",
+          "type": "docs-page",
+          "description": "BrowseGPT is a tool that allows you to search the web using a chat interface."
+        },
+        {
+          "order": 65,
+          "section": "Docs",
+          "group": "integrations / vercel",
+          "title": "Vercel AI integration",
+          "url": "https://docs.browserbase.com/integrations/vercel/introduction.md",
+          "path": "integrations/vercel/introduction.md",
+          "type": "docs-page",
+          "description": "Build AI-powered research agents with parallel browser sessions, deployable on Vercel."
+        },
+        {
+          "order": 66,
+          "section": "Docs",
+          "group": "integrations / vercel",
+          "title": "Deploying Puppeteer on Vercel",
+          "url": "https://docs.browserbase.com/integrations/vercel/puppeteer.md",
+          "path": "integrations/vercel/puppeteer.md",
+          "type": "docs-page",
+          "description": "Learn how to set up your project, deploy to Vercel, and scale with Browserbase"
+        },
+        {
+          "order": 67,
+          "section": "Docs",
+          "group": "integrations / vercel",
+          "title": "Build a research agent with Stagehand + Vercel",
+          "url": "https://docs.browserbase.com/integrations/vercel/quickstart.md",
+          "path": "integrations/vercel/quickstart.md",
+          "type": "docs-page",
+          "description": "Build an AI-powered research agent that runs parallel browser sessions on Browserbase, powered by Stagehand and the Vercel AI SDK."
+        }
+      ]
+    },
+    {
+      "group": "integrations / x402",
+      "count": 3,
+      "entries": [
+        {
+          "order": 68,
+          "section": "Docs",
+          "group": "integrations / x402",
+          "title": "Human verification with AgentKit",
+          "url": "https://docs.browserbase.com/integrations/x402/agentkit.md",
+          "path": "integrations/x402/agentkit.md",
+          "type": "docs-page",
+          "description": "Prove your agent is human-backed to unlock Verified browsers on x402 sessions."
+        },
+        {
+          "order": 69,
+          "section": "Docs",
+          "group": "integrations / x402",
+          "title": "x402 protocol integration",
+          "url": "https://docs.browserbase.com/integrations/x402/introduction.md",
+          "path": "integrations/x402/introduction.md",
+          "type": "docs-page",
+          "description": "Pay-per-use browser sessions with crypto. No API keys, no accounts. Just pay and connect."
+        },
+        {
+          "order": 70,
+          "section": "Docs",
+          "group": "integrations / x402",
+          "title": "x402 quickstart",
+          "url": "https://docs.browserbase.com/integrations/x402/quickstart.md",
+          "path": "integrations/x402/quickstart.md",
+          "type": "docs-page",
+          "description": "Create pay-per-use browser sessions with crypto payments"
+        }
+      ]
+    },
+    {
+      "group": "optimizations / concurrency",
+      "count": 1,
+      "entries": [
+        {
+          "order": 71,
+          "section": "Docs",
+          "group": "optimizations / concurrency",
+          "title": "Concurrency management",
+          "url": "https://docs.browserbase.com/optimizations/concurrency/overview.md",
+          "path": "optimizations/concurrency/overview.md",
+          "type": "docs-page",
+          "description": "Session limits and rate controls for concurrent browsers"
+        }
+      ]
+    },
+    {
+      "group": "optimizations / cost",
+      "count": 2,
+      "entries": [
+        {
+          "order": 72,
+          "section": "Docs",
+          "group": "optimizations / cost",
+          "title": "Cost optimization",
+          "url": "https://docs.browserbase.com/optimizations/cost/cost-optimization.md",
+          "path": "optimizations/cost/cost-optimization.md",
+          "type": "docs-page",
+          "description": "Your guide to lowering your browser infrastructure costs"
+        },
+        {
+          "order": 73,
+          "section": "Docs",
+          "group": "optimizations / cost",
+          "title": "Usage tracking",
+          "url": "https://docs.browserbase.com/optimizations/cost/measuring-usage.md",
+          "path": "optimizations/cost/measuring-usage.md",
+          "type": "docs-page",
+          "description": "Learn how to measure your usage of Browserbase"
+        }
+      ]
+    },
+    {
+      "group": "optimizations / latency",
+      "count": 2,
+      "entries": [
+        {
+          "order": 74,
+          "section": "Docs",
+          "group": "optimizations / latency",
+          "title": "Browser regions",
+          "url": "https://docs.browserbase.com/optimizations/latency/multi-region.md",
+          "path": "optimizations/latency/multi-region.md",
+          "type": "docs-page",
+          "description": "Connect to a browser closest to you for improved performance."
+        },
+        {
+          "order": 75,
+          "section": "Docs",
+          "group": "optimizations / latency",
+          "title": "Performance optimization",
+          "url": "https://docs.browserbase.com/optimizations/latency/speed-optimization.md",
+          "path": "optimizations/latency/speed-optimization.md",
+          "type": "docs-page",
+          "description": "Best practices for speeding up your browsers"
+        }
+      ]
+    },
+    {
+      "group": "platform / browser / core-features",
+      "count": 5,
+      "entries": [
+        {
+          "order": 76,
+          "section": "Docs",
+          "group": "platform / browser / core-features",
+          "title": "Browser extensions",
+          "url": "https://docs.browserbase.com/platform/browser/core-features/browser-extensions.md",
+          "path": "platform/browser/core-features/browser-extensions.md",
+          "type": "docs-page",
+          "description": "Augment your browser sessions with your own Chrome extensions."
+        },
+        {
+          "order": 77,
+          "section": "Docs",
+          "group": "platform / browser / core-features",
+          "title": "Contexts",
+          "url": "https://docs.browserbase.com/platform/browser/core-features/contexts.md",
+          "path": "platform/browser/core-features/contexts.md",
+          "type": "docs-page",
+          "description": "Reuse cookies, authentication, and application data across browser sessions."
+        },
+        {
+          "order": 78,
+          "section": "Docs",
+          "group": "platform / browser / core-features",
+          "title": "Core features",
+          "url": "https://docs.browserbase.com/platform/browser/core-features/overview.md",
+          "path": "platform/browser/core-features/overview.md",
+          "type": "docs-page",
+          "description": "The building blocks for powerful browser automation with Browserbase"
+        },
+        {
+          "order": 79,
+          "section": "Docs",
+          "group": "platform / browser / core-features",
+          "title": "Metadata",
+          "url": "https://docs.browserbase.com/platform/browser/core-features/session-metadata.md",
+          "path": "platform/browser/core-features/session-metadata.md",
+          "type": "docs-page",
+          "description": "Tag and query sessions with custom data"
+        },
+        {
+          "order": 80,
+          "section": "Docs",
+          "group": "platform / browser / core-features",
+          "title": "Viewports",
+          "url": "https://docs.browserbase.com/platform/browser/core-features/viewports.md",
+          "path": "platform/browser/core-features/viewports.md",
+          "type": "docs-page",
+          "description": "Configure viewport sizes for your sessions"
+        }
+      ]
+    },
+    {
+      "group": "platform / browser / files",
+      "count": 5,
+      "entries": [
+        {
+          "order": 81,
+          "section": "Docs",
+          "group": "platform / browser / files",
+          "title": "Downloads",
+          "url": "https://docs.browserbase.com/platform/browser/files/downloads.md",
+          "path": "platform/browser/files/downloads.md",
+          "type": "docs-page",
+          "description": "Triggering and retrieving downloaded files"
+        },
+        {
+          "order": 82,
+          "section": "Docs",
+          "group": "platform / browser / files",
+          "title": "Files & screenshots",
+          "url": "https://docs.browserbase.com/platform/browser/files/overview.md",
+          "path": "platform/browser/files/overview.md",
+          "type": "docs-page",
+          "description": "Download, upload, and capture files from your browser sessions"
+        },
+        {
+          "order": 83,
+          "section": "Docs",
+          "group": "platform / browser / files",
+          "title": "PDFs",
+          "url": "https://docs.browserbase.com/platform/browser/files/pdfs.md",
+          "path": "platform/browser/files/pdfs.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 84,
+          "section": "Docs",
+          "group": "platform / browser / files",
+          "title": "Screenshots",
+          "url": "https://docs.browserbase.com/platform/browser/files/screenshots.md",
+          "path": "platform/browser/files/screenshots.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 85,
+          "section": "Docs",
+          "group": "platform / browser / files",
+          "title": "Uploads",
+          "url": "https://docs.browserbase.com/platform/browser/files/uploads.md",
+          "path": "platform/browser/files/uploads.md",
+          "type": "docs-page",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "group": "platform / browser / getting-started",
+      "count": 6,
+      "entries": [
+        {
+          "order": 86,
+          "section": "Docs",
+          "group": "platform / browser / getting-started",
+          "title": "Create a browser session",
+          "url": "https://docs.browserbase.com/platform/browser/getting-started/create-browser-session.md",
+          "path": "platform/browser/getting-started/create-browser-session.md",
+          "type": "docs-page",
+          "description": "Learn how to create and configure browser sessions in Browserbase"
+        },
+        {
+          "order": 87,
+          "section": "Docs",
+          "group": "platform / browser / getting-started",
+          "title": "Deploying a browser session",
+          "url": "https://docs.browserbase.com/platform/browser/getting-started/deploying-browser-session.md",
+          "path": "platform/browser/getting-started/deploying-browser-session.md",
+          "type": "docs-page",
+          "description": "Learn how to deploy existing browser automation scripts as Functions"
+        },
+        {
+          "order": 88,
+          "section": "Docs",
+          "group": "platform / browser / getting-started",
+          "title": "Manage a browser session",
+          "url": "https://docs.browserbase.com/platform/browser/getting-started/manage-browser-session.md",
+          "path": "platform/browser/getting-started/manage-browser-session.md",
+          "type": "docs-page",
+          "description": "Learn how to manage session termination and inspect completed sessions"
+        },
+        {
+          "order": 89,
+          "section": "Docs",
+          "group": "platform / browser / getting-started",
+          "title": "Managed vs self-hosted",
+          "url": "https://docs.browserbase.com/platform/browser/getting-started/remote-browser-versus-local-browser.md",
+          "path": "platform/browser/getting-started/remote-browser-versus-local-browser.md",
+          "type": "docs-page",
+          "description": "Why managed Browserbase sessions usually win over self-hosted Chromium in a VM."
+        },
+        {
+          "order": 90,
+          "section": "Docs",
+          "group": "platform / browser / getting-started",
+          "title": "Using a browser session",
+          "url": "https://docs.browserbase.com/platform/browser/getting-started/using-browser-session.md",
+          "path": "platform/browser/getting-started/using-browser-session.md",
+          "type": "docs-page",
+          "description": "Learn how to connect to and interact with browser sessions"
+        },
+        {
+          "order": 91,
+          "section": "Docs",
+          "group": "platform / browser / getting-started",
+          "title": "What is a headless browser?",
+          "url": "https://docs.browserbase.com/platform/browser/getting-started/what-is-headless-browser.md",
+          "path": "platform/browser/getting-started/what-is-headless-browser.md",
+          "type": "docs-page",
+          "description": "A headless browser is a web browser controlled by code, without a GUI. Learn how headless browsers work and how to use them for automation, data extraction, and testing."
+        }
+      ]
+    },
+    {
+      "group": "platform / browser / long-sessions",
+      "count": 3,
+      "entries": [
+        {
+          "order": 92,
+          "section": "Docs",
+          "group": "platform / browser / long-sessions",
+          "title": "Keep alive",
+          "url": "https://docs.browserbase.com/platform/browser/long-sessions/keep-alive.md",
+          "path": "platform/browser/long-sessions/keep-alive.md",
+          "type": "docs-page",
+          "description": "Keep sessions alive across disconnects, allowing you to reconnect without ending your session."
+        },
+        {
+          "order": 93,
+          "section": "Docs",
+          "group": "platform / browser / long-sessions",
+          "title": "Long sessions",
+          "url": "https://docs.browserbase.com/platform/browser/long-sessions/overview.md",
+          "path": "platform/browser/long-sessions/overview.md",
+          "type": "docs-page",
+          "description": "Keep sessions running longer and survive disconnects with keep alive and custom timeouts"
+        },
+        {
+          "order": 94,
+          "section": "Docs",
+          "group": "platform / browser / long-sessions",
+          "title": "Timeout",
+          "url": "https://docs.browserbase.com/platform/browser/long-sessions/timeouts.md",
+          "path": "platform/browser/long-sessions/timeouts.md",
+          "type": "docs-page",
+          "description": "Extend session duration beyond the default timeout period."
+        }
+      ]
+    },
+    {
+      "group": "platform / browser / observability",
+      "count": 4,
+      "entries": [
+        {
+          "order": 95,
+          "section": "Docs",
+          "group": "platform / browser / observability",
+          "title": "Observability",
+          "url": "https://docs.browserbase.com/platform/browser/observability/observability.md",
+          "path": "platform/browser/observability/observability.md",
+          "type": "docs-page",
+          "description": "Debug and monitor your browser sessions with logs, metrics, and real-time inspection"
+        },
+        {
+          "order": 96,
+          "section": "Docs",
+          "group": "platform / browser / observability",
+          "title": "Session live view",
+          "url": "https://docs.browserbase.com/platform/browser/observability/session-live-view.md",
+          "path": "platform/browser/observability/session-live-view.md",
+          "type": "docs-page",
+          "description": "An interactive window to display or control a browser session."
+        },
+        {
+          "order": 97,
+          "section": "Docs",
+          "group": "platform / browser / observability",
+          "title": "Session recording (rrweb)",
+          "url": "https://docs.browserbase.com/platform/browser/observability/session-recording.md",
+          "path": "platform/browser/observability/session-recording.md",
+          "type": "docs-page",
+          "description": "Every session is automatically recorded so you can inspect actions and debug issues"
+        },
+        {
+          "order": 98,
+          "section": "Docs",
+          "group": "platform / browser / observability",
+          "title": "Session replay",
+          "url": "https://docs.browserbase.com/platform/browser/observability/session-replay.md",
+          "path": "platform/browser/observability/session-replay.md",
+          "type": "docs-page",
+          "description": "Stream session replays as HLS to embed playback in your own application."
+        }
+      ]
+    },
+    {
+      "group": "platform / browser / techniques",
+      "count": 1,
+      "entries": [
+        {
+          "order": 99,
+          "section": "Docs",
+          "group": "platform / browser / techniques",
+          "title": "Dialogs",
+          "url": "https://docs.browserbase.com/platform/browser/techniques/dialogues.md",
+          "path": "platform/browser/techniques/dialogues.md",
+          "type": "docs-page",
+          "description": "Handling browser dialog windows in automated sessions."
+        }
+      ]
+    },
+    {
+      "group": "platform / fetch",
+      "count": 1,
+      "entries": [
+        {
+          "order": 100,
+          "section": "Docs",
+          "group": "platform / fetch",
+          "title": "Fetch",
+          "url": "https://docs.browserbase.com/platform/fetch/overview.md",
+          "path": "platform/fetch/overview.md",
+          "type": "docs-page",
+          "description": "Lightweight page retrieval as a complement to browser sessions."
+        }
+      ]
+    },
+    {
+      "group": "platform / identity",
+      "count": 6,
+      "entries": [
+        {
+          "order": 101,
+          "section": "Docs",
+          "group": "platform / identity",
+          "title": "Allowed Domains",
+          "url": "https://docs.browserbase.com/platform/identity/allowed-domains.md",
+          "path": "platform/identity/allowed-domains.md",
+          "type": "docs-page",
+          "description": "Restrict session navigation to an allowlist of domains"
+        },
+        {
+          "order": 102,
+          "section": "Docs",
+          "group": "platform / identity",
+          "title": "Website authentication",
+          "url": "https://docs.browserbase.com/platform/identity/authentication.md",
+          "path": "platform/identity/authentication.md",
+          "type": "docs-page",
+          "description": "Managing 2FA and other authentication flows."
+        },
+        {
+          "order": 103,
+          "section": "Docs",
+          "group": "platform / identity",
+          "title": "Agent Auth & Identity",
+          "url": "https://docs.browserbase.com/platform/identity/overview.md",
+          "path": "platform/identity/overview.md",
+          "type": "docs-page",
+          "description": "How Browserbase works with bot protection providers to give your agents verified access to the web."
+        },
+        {
+          "order": 104,
+          "section": "Docs",
+          "group": "platform / identity",
+          "title": "Proxies",
+          "url": "https://docs.browserbase.com/platform/identity/proxies.md",
+          "path": "platform/identity/proxies.md",
+          "type": "docs-page",
+          "description": "Consistent geolocation and network identity for your browser sessions"
+        },
+        {
+          "order": 105,
+          "section": "Docs",
+          "group": "platform / identity",
+          "title": "Verified",
+          "url": "https://docs.browserbase.com/platform/identity/verified-customization.md",
+          "path": "platform/identity/verified-customization.md",
+          "type": "docs-page",
+          "description": "Customize Verified sessions with OS configurations"
+        },
+        {
+          "order": 106,
+          "section": "Docs",
+          "group": "platform / identity",
+          "title": "IP allowlisting",
+          "url": "https://docs.browserbase.com/platform/identity/vpn.md",
+          "path": "platform/identity/vpn.md",
+          "type": "docs-page",
+          "description": "Route Browserbase traffic through your VPN by allowlisting proxies."
+        }
+      ]
+    },
+    {
+      "group": "platform / model-gateway",
+      "count": 1,
+      "entries": [
+        {
+          "order": 107,
+          "section": "Docs",
+          "group": "platform / model-gateway",
+          "title": "Model Gateway",
+          "url": "https://docs.browserbase.com/platform/model-gateway/overview.md",
+          "path": "platform/model-gateway/overview.md",
+          "type": "docs-page",
+          "description": "Access top LLM providers through your Browserbase API key: one key, one bill, no provider accounts needed."
+        }
+      ]
+    },
+    {
+      "group": "platform / runtime",
+      "count": 3,
+      "entries": [
+        {
+          "order": 108,
+          "section": "Docs",
+          "group": "platform / runtime",
+          "title": "Deploy from playground",
+          "url": "https://docs.browserbase.com/platform/runtime/deploy-from-playground.md",
+          "path": "platform/runtime/deploy-from-playground.md",
+          "type": "docs-page",
+          "description": "Create, test, and deploy browser agent Functions directly from the Browserbase dashboard"
+        },
+        {
+          "order": 109,
+          "section": "Docs",
+          "group": "platform / runtime",
+          "title": "Functions",
+          "url": "https://docs.browserbase.com/platform/runtime/overview.md",
+          "path": "platform/runtime/overview.md",
+          "type": "docs-page",
+          "description": "Deploy browser agents and automations with Browserbase"
+        },
+        {
+          "order": 110,
+          "section": "Docs",
+          "group": "platform / runtime",
+          "title": "Functions reference",
+          "url": "https://docs.browserbase.com/platform/runtime/reference.md",
+          "path": "platform/runtime/reference.md",
+          "type": "docs-page",
+          "description": "Deploy browser agent Functions with Browserbase"
+        }
+      ]
+    },
+    {
+      "group": "platform / search",
+      "count": 1,
+      "entries": [
+        {
+          "order": 111,
+          "section": "Docs",
+          "group": "platform / search",
+          "title": "Search",
+          "url": "https://docs.browserbase.com/platform/search/overview.md",
+          "path": "platform/search/overview.md",
+          "type": "docs-page",
+          "description": "Fast, token-efficient web search results as a complement to browser sessions."
+        }
+      ]
+    },
+    {
+      "group": "reference / api",
+      "count": 46,
+      "entries": [
+        {
+          "order": 112,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Create a Context",
+          "url": "https://docs.browserbase.com/reference/api/create-a-context.md",
+          "path": "reference/api/create-a-context.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 113,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Create a Session",
+          "url": "https://docs.browserbase.com/reference/api/create-a-session.md",
+          "path": "reference/api/create-a-session.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 114,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Create Session Uploads",
+          "url": "https://docs.browserbase.com/reference/api/create-session-uploads.md",
+          "path": "reference/api/create-session-uploads.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 115,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Delete a Certificate",
+          "url": "https://docs.browserbase.com/reference/api/delete-a-certificate.md",
+          "path": "reference/api/delete-a-certificate.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 116,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Delete a Context",
+          "url": "https://docs.browserbase.com/reference/api/delete-a-context.md",
+          "path": "reference/api/delete-a-context.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 117,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Delete a Download",
+          "url": "https://docs.browserbase.com/reference/api/delete-a-download.md",
+          "path": "reference/api/delete-a-download.md",
+          "type": "docs-page",
+          "description": "Delete a download file from storage and mark as deleted."
+        },
+        {
+          "order": 118,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Delete an Extension",
+          "url": "https://docs.browserbase.com/reference/api/delete-an-extension.md",
+          "path": "reference/api/delete-an-extension.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 119,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Delete a Download",
+          "url": "https://docs.browserbase.com/reference/api/delete-download.md",
+          "path": "reference/api/delete-download.md",
+          "type": "docs-page",
+          "description": "Delete a download file from storage and mark as deleted."
+        },
+        {
+          "order": 120,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Fetch a Page",
+          "url": "https://docs.browserbase.com/reference/api/fetch-a-page.md",
+          "path": "reference/api/fetch-a-page.md",
+          "type": "docs-page",
+          "description": "Fetch a page and return its content, headers, and metadata."
+        },
+        {
+          "order": 121,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Certificate",
+          "url": "https://docs.browserbase.com/reference/api/get-a-certificate.md",
+          "path": "reference/api/get-a-certificate.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 122,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Context",
+          "url": "https://docs.browserbase.com/reference/api/get-a-context.md",
+          "path": "reference/api/get-a-context.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 123,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Download",
+          "url": "https://docs.browserbase.com/reference/api/get-a-download.md",
+          "path": "reference/api/get-a-download.md",
+          "type": "docs-page",
+          "description": "Get download metadata (Accept: application/json) or file content (Accept: application/octet-stream)."
+        },
+        {
+          "order": 124,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Function",
+          "url": "https://docs.browserbase.com/reference/api/get-a-function.md",
+          "path": "reference/api/get-a-function.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 125,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Function Build",
+          "url": "https://docs.browserbase.com/reference/api/get-a-function-build.md",
+          "path": "reference/api/get-a-function-build.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 126,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Function Version",
+          "url": "https://docs.browserbase.com/reference/api/get-a-function-version.md",
+          "path": "reference/api/get-a-function-version.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 127,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Project",
+          "url": "https://docs.browserbase.com/reference/api/get-a-project.md",
+          "path": "reference/api/get-a-project.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 128,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Session",
+          "url": "https://docs.browserbase.com/reference/api/get-a-session.md",
+          "path": "reference/api/get-a-session.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 129,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get an Extension",
+          "url": "https://docs.browserbase.com/reference/api/get-an-extension.md",
+          "path": "reference/api/get-an-extension.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 130,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get an Invocation",
+          "url": "https://docs.browserbase.com/reference/api/get-an-invocation.md",
+          "path": "reference/api/get-an-invocation.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 131,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get a Download",
+          "url": "https://docs.browserbase.com/reference/api/get-download.md",
+          "path": "reference/api/get-download.md",
+          "type": "docs-page",
+          "description": "Get download metadata (Accept: application/json) or file content (Accept: application/octet-stream)."
+        },
+        {
+          "order": 132,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get Function Build Logs",
+          "url": "https://docs.browserbase.com/reference/api/get-function-build-logs.md",
+          "path": "reference/api/get-function-build-logs.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 133,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get Invocation Logs",
+          "url": "https://docs.browserbase.com/reference/api/get-invocation-logs.md",
+          "path": "reference/api/get-invocation-logs.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 134,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get Project Usage",
+          "url": "https://docs.browserbase.com/reference/api/get-project-usage.md",
+          "path": "reference/api/get-project-usage.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 135,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Invoke a Function",
+          "url": "https://docs.browserbase.com/reference/api/invoke-a-function.md",
+          "path": "reference/api/invoke-a-function.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 136,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Sessions",
+          "url": "https://docs.browserbase.com/reference/api/list-all-sessions.md",
+          "path": "reference/api/list-all-sessions.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 137,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Certificates",
+          "url": "https://docs.browserbase.com/reference/api/list-certificates.md",
+          "path": "reference/api/list-certificates.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 138,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Downloads",
+          "url": "https://docs.browserbase.com/reference/api/list-downloads.md",
+          "path": "reference/api/list-downloads.md",
+          "type": "docs-page",
+          "description": "List all downloads for a session with optional filtering and pagination."
+        },
+        {
+          "order": 139,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Function Builds",
+          "url": "https://docs.browserbase.com/reference/api/list-function-builds.md",
+          "path": "reference/api/list-function-builds.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 140,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Function Versions",
+          "url": "https://docs.browserbase.com/reference/api/list-function-versions.md",
+          "path": "reference/api/list-function-versions.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 141,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Functions",
+          "url": "https://docs.browserbase.com/reference/api/list-functions.md",
+          "path": "reference/api/list-functions.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 142,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Invocations for a Function Version",
+          "url": "https://docs.browserbase.com/reference/api/list-invocations-for-a-function-version.md",
+          "path": "reference/api/list-invocations-for-a-function-version.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 143,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Projects",
+          "url": "https://docs.browserbase.com/reference/api/list-projects.md",
+          "path": "reference/api/list-projects.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 144,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Sessions",
+          "url": "https://docs.browserbase.com/reference/api/list-sessions.md",
+          "path": "reference/api/list-sessions.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 145,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "List Invocations for a Function Version",
+          "url": "https://docs.browserbase.com/reference/api/list-version-invocations.md",
+          "path": "reference/api/list-version-invocations.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 146,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Overview",
+          "url": "https://docs.browserbase.com/reference/api/overview.md",
+          "path": "reference/api/overview.md",
+          "type": "docs-page",
+          "description": "Create, connect, and retrieve information from browser sessions."
+        },
+        {
+          "order": 147,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Session Live URLs",
+          "url": "https://docs.browserbase.com/reference/api/session-live-urls.md",
+          "path": "reference/api/session-live-urls.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 148,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Session Logs",
+          "url": "https://docs.browserbase.com/reference/api/session-logs.md",
+          "path": "reference/api/session-logs.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 149,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Session Recording",
+          "url": "https://docs.browserbase.com/reference/api/session-recording.md",
+          "path": "reference/api/session-recording.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 150,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get Replay Page",
+          "url": "https://docs.browserbase.com/reference/api/session-replay-page.md",
+          "path": "reference/api/session-replay-page.md",
+          "type": "docs-page",
+          "description": "Returns an HLS VOD media playlist (.m3u8) for a specific page of a session replay."
+        },
+        {
+          "order": 151,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Get Session Replay",
+          "url": "https://docs.browserbase.com/reference/api/session-replays.md",
+          "path": "reference/api/session-replays.md",
+          "type": "docs-page",
+          "description": "Returns page metadata for a session replay, including timing information and the URL of each page's HLS playlist."
+        },
+        {
+          "order": 152,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Update a Context",
+          "url": "https://docs.browserbase.com/reference/api/update-a-context.md",
+          "path": "reference/api/update-a-context.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 153,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Update a Session",
+          "url": "https://docs.browserbase.com/reference/api/update-a-session.md",
+          "path": "reference/api/update-a-session.md",
+          "type": "docs-page",
+          "description": "Close a Browserbase session by updating its status to REQUEST_RELEASE, or update other mutable session fields."
+        },
+        {
+          "order": 154,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Upload a Certificate",
+          "url": "https://docs.browserbase.com/reference/api/upload-a-certificate.md",
+          "path": "reference/api/upload-a-certificate.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 155,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Upload an Extension",
+          "url": "https://docs.browserbase.com/reference/api/upload-an-extension.md",
+          "path": "reference/api/upload-an-extension.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 156,
+          "section": "Docs",
+          "group": "reference / api",
+          "title": "Web Search",
+          "url": "https://docs.browserbase.com/reference/api/web-search.md",
+          "path": "reference/api/web-search.md",
+          "type": "docs-page",
+          "description": "Perform a web search and return structured results."
+        },
+        {
+          "order": 174,
+          "section": "OpenAPI Specs",
+          "group": "reference / api",
+          "title": "openapi.v1",
+          "url": "https://docs.browserbase.com/reference/api/openapi.v1.yaml",
+          "path": "reference/api/openapi.v1.yaml",
+          "type": "openapi",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "group": "reference",
+      "count": 1,
+      "entries": [
+        {
+          "order": 157,
+          "section": "Docs",
+          "group": "reference",
+          "title": "APIs and SDKs",
+          "url": "https://docs.browserbase.com/reference/introduction.md",
+          "path": "reference/introduction.md",
+          "type": "docs-page",
+          "description": "Choose your favorite way to interact with browser fleets."
+        }
+      ]
+    },
+    {
+      "group": "reference / sdk",
+      "count": 3,
+      "entries": [
+        {
+          "order": 158,
+          "section": "Docs",
+          "group": "reference / sdk",
+          "title": "Node.js SDK",
+          "url": "https://docs.browserbase.com/reference/sdk/nodejs.md",
+          "path": "reference/sdk/nodejs.md",
+          "type": "docs-page",
+          "description": "All the features and utilities for fast Node.js development with Browserbase."
+        },
+        {
+          "order": 159,
+          "section": "Docs",
+          "group": "reference / sdk",
+          "title": "Overview",
+          "url": "https://docs.browserbase.com/reference/sdk/overview.md",
+          "path": "reference/sdk/overview.md",
+          "type": "docs-page",
+          "description": "Faster development for Python and Node.js."
+        },
+        {
+          "order": 160,
+          "section": "Docs",
+          "group": "reference / sdk",
+          "title": "Python SDK",
+          "url": "https://docs.browserbase.com/reference/sdk/python.md",
+          "path": "reference/sdk/python.md",
+          "type": "docs-page",
+          "description": "All the features and utilities for fast Python development with Browserbase."
+        }
+      ]
+    },
+    {
+      "group": "use-cases",
+      "count": 5,
+      "entries": [
+        {
+          "order": 161,
+          "section": "Docs",
+          "group": "use-cases",
+          "title": "Browser agents",
+          "url": "https://docs.browserbase.com/use-cases/agents.md",
+          "path": "use-cases/agents.md",
+          "type": "docs-page",
+          "description": "Give your agents a headless browser to browse and interact with the web at scale, persistent sessions, real-time observability, and Agent Identity built in."
+        },
+        {
+          "order": 162,
+          "section": "Docs",
+          "group": "use-cases",
+          "title": "Automating form submissions",
+          "url": "https://docs.browserbase.com/use-cases/automating-form-submissions.md",
+          "path": "use-cases/automating-form-submissions.md",
+          "type": "docs-page",
+          "description": "Automate form submissions at scale with Browserbase. Handle logins, registrations, data entry, and checkouts using Stagehand or Playwright in reliable cloud browsers."
+        },
+        {
+          "order": 163,
+          "section": "Docs",
+          "group": "use-cases",
+          "title": "Automated testing",
+          "url": "https://docs.browserbase.com/use-cases/building-automated-tests.md",
+          "path": "use-cases/building-automated-tests.md",
+          "type": "docs-page",
+          "description": "Run reliable end-to-end browser tests at scale with Browserbase. Automate login flows, UI validation, and regression testing using Stagehand or Playwright."
+        },
+        {
+          "order": 164,
+          "section": "Docs",
+          "group": "use-cases",
+          "title": "Buying with an AI agent",
+          "url": "https://docs.browserbase.com/use-cases/buy-with-ai-agent.md",
+          "path": "use-cases/buy-with-ai-agent.md",
+          "type": "docs-page",
+          "description": "Automate purchasing workflows with AI-powered agents and browser automation"
+        },
+        {
+          "order": 165,
+          "section": "Docs",
+          "group": "use-cases",
+          "title": "Web data retrieval",
+          "url": "https://docs.browserbase.com/use-cases/web-data-retrieval.md",
+          "path": "use-cases/web-data-retrieval.md",
+          "type": "docs-page",
+          "description": "Extract structured data from any website at scale with Browserbase. Use Stagehand or Playwright with Verified, proxy rotation, and CAPTCHA solving."
+        }
+      ]
+    },
+    {
+      "group": "welcome",
+      "count": 3,
+      "entries": [
+        {
+          "order": 166,
+          "section": "Docs",
+          "group": "welcome",
+          "title": "Overview",
+          "url": "https://docs.browserbase.com/welcome/getting-started.md",
+          "path": "welcome/getting-started.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 167,
+          "section": "Docs",
+          "group": "welcome",
+          "title": "Introducing Browserbase",
+          "url": "https://docs.browserbase.com/welcome/introduction.md",
+          "path": "welcome/introduction.md",
+          "type": "docs-page",
+          "description": ""
+        },
+        {
+          "order": 173,
+          "section": "Docs",
+          "group": "welcome",
+          "title": "What is Browserbase?",
+          "url": "https://docs.browserbase.com/welcome/what-is-browserbase.md",
+          "path": "welcome/what-is-browserbase.md",
+          "type": "docs-page",
+          "description": "The complete platform to build and deploy agents that browse and interact with the web like humans."
+        }
+      ]
+    },
+    {
+      "group": "welcome / quickstarts",
+      "count": 5,
+      "entries": [
+        {
+          "order": 168,
+          "section": "Docs",
+          "group": "welcome / quickstarts",
+          "title": "Start your first session with Playwright",
+          "url": "https://docs.browserbase.com/welcome/quickstarts/playwright.md",
+          "path": "welcome/quickstarts/playwright.md",
+          "type": "docs-page",
+          "description": "Connect Playwright to Browserbase cloud browsers in minutes. Run headless browser automation at scale with session recording and debugging."
+        },
+        {
+          "order": 169,
+          "section": "Docs",
+          "group": "welcome / quickstarts",
+          "title": "Start your first session with Puppeteer",
+          "url": "https://docs.browserbase.com/welcome/quickstarts/puppeteer.md",
+          "path": "welcome/quickstarts/puppeteer.md",
+          "type": "docs-page",
+          "description": "Connect Puppeteer to Browserbase cloud browsers. Run headless Chrome automation at scale with built-in session management and debugging."
+        },
+        {
+          "order": 170,
+          "section": "Docs",
+          "group": "welcome / quickstarts",
+          "title": "Start your first session with Selenium",
+          "url": "https://docs.browserbase.com/welcome/quickstarts/selenium.md",
+          "path": "welcome/quickstarts/selenium.md",
+          "type": "docs-page",
+          "description": "Connect Selenium WebDriver to Browserbase cloud browsers. Run cross-browser automation at scale with session recording and observability."
+        },
+        {
+          "order": 171,
+          "section": "Docs",
+          "group": "welcome / quickstarts",
+          "title": "Skills",
+          "url": "https://docs.browserbase.com/welcome/quickstarts/skills.md",
+          "path": "welcome/quickstarts/skills.md",
+          "type": "docs-page",
+          "description": "Give your AI coding agent a browser in one prompt"
+        },
+        {
+          "order": 172,
+          "section": "Docs",
+          "group": "welcome / quickstarts",
+          "title": "Stagehand",
+          "url": "https://docs.browserbase.com/welcome/quickstarts/stagehand.md",
+          "path": "welcome/quickstarts/stagehand.md",
+          "type": "docs-page",
+          "description": "Build browser agents with Stagehand + Browserbase"
+        }
+      ]
+    },
+    {
+      "group": "metadata",
+      "count": 1,
+      "entries": [
+        {
+          "order": 175,
+          "section": "OpenAPI Specs",
+          "group": "metadata",
+          "title": "package",
+          "url": "https://docs.browserbase.com/package.json",
+          "path": "package.json",
+          "type": "package",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "group": "external / optional",
+      "count": 3,
+      "entries": [
+        {
+          "order": 176,
+          "section": "Optional",
+          "group": "external / optional",
+          "title": "Templates ↗",
+          "url": "https://www.browserbase.com/templates",
+          "path": "templates",
+          "type": "external",
+          "description": ""
+        },
+        {
+          "order": 178,
+          "section": "Optional",
+          "group": "external / optional",
+          "title": "Changelog ↗",
+          "url": "https://www.browserbase.com/changelog",
+          "path": "changelog",
+          "type": "external",
+          "description": ""
+        },
+        {
+          "order": 179,
+          "section": "Optional",
+          "group": "external / optional",
+          "title": "Dashboard ↗",
+          "url": "https://www.browserbase.com/overview",
+          "path": "overview",
+          "type": "external",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "group": "root",
+      "count": 1,
+      "entries": [
+        {
+          "order": 177,
+          "section": "Optional",
+          "group": "root",
+          "title": "Stagehand ↗",
+          "url": "https://docs.stagehand.dev/",
+          "path": "",
+          "type": "external",
+          "description": ""
+        }
+      ]
+    }
+  ]
+}
