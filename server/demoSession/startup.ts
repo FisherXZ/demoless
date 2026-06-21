@@ -41,6 +41,14 @@ export interface DemoSessionStartupDeps {
    * and the per-turn prompt tokens are both skipped.
    */
   learningsEnabled?: boolean;
+  /**
+   * Fetch the buyer's prior-session memory (profile + notes) and let the agent
+   * reference it — the "welcome back…" recall line and the notes injected into
+   * the prompt. Defaults to the DEMO_MEMORY env flag (off unless set to
+   * on/1/true) — kept off by default so the agent treats every visitor as new.
+   * When off, the connect-time loadBuyer read is skipped entirely.
+   */
+  memoryEnabled?: boolean;
   getDemoConfig?: (company?: string) => DemoConfig;
   now?: () => number;
   log?: (message: string) => void;
@@ -86,6 +94,9 @@ export function createDemoSessionStartup(
   const learningsEnabled =
     deps.learningsEnabled ??
     /^(on|1|true)$/i.test(process.env.DEMO_LEARNINGS ?? "");
+  const memoryEnabled =
+    deps.memoryEnabled ??
+    /^(on|1|true)$/i.test(process.env.DEMO_MEMORY ?? "");
   const getDemoConfig = deps.getDemoConfig ?? defaultGetDemoConfig;
   const now = deps.now ?? Date.now;
   const log = deps.log ?? console.log;
@@ -142,11 +153,13 @@ export function createDemoSessionStartup(
 
       let buyer: BuyerMemory | undefined;
       let buyerNotes: string[] = [];
-      try {
-        buyer = await loadBuyer(args.buyerId);
-        buyerNotes = buyer.notes.map((note) => note.text);
-      } catch {
-        // Degrade gracefully: no buyer notes injected.
+      if (memoryEnabled) {
+        try {
+          buyer = await loadBuyer(args.buyerId);
+          buyerNotes = buyer.notes.map((note) => note.text);
+        } catch {
+          // Degrade gracefully: no buyer notes injected.
+        }
       }
 
       let learningsContext = "";

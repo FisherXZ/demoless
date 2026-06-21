@@ -44,6 +44,7 @@ describe("demo session startup", () => {
       loadBuyer,
       getLearnings,
       learningsEnabled: true,
+      memoryEnabled: true,
       buildLearningsContext: (learnings) =>
         `Past demo learnings:\n${learnings.map((l) => `- ${l.text}`).join("\n")}`,
       getDemoConfig: () => ({
@@ -127,6 +128,53 @@ describe("demo session startup", () => {
     expect(getLearnings).not.toHaveBeenCalled();
     expect(buildLearningsContext).not.toHaveBeenCalled();
     expect(prepared.learningsContext).toBe("");
+  });
+
+  it("skips buyer memory entirely when disabled (default)", async () => {
+    const loadBuyer = vi.fn(async () => ({
+      profile: { email: "buyer@example.com", firstSeen: 1, lastSeen: 2, visitCount: 3 },
+      notes: [
+        { id: "n1", type: "interest" as const, text: "cares about session replay", importance: 0.8, ts: 3 },
+      ],
+      isReturning: true,
+      recall: {
+        line: "Welcome back — last time you were focused on session replay.",
+        topInterests: [],
+        painPoints: [],
+        objections: [],
+      },
+    }));
+
+    const startup = createDemoSessionStartup({
+      startSession: vi.fn(async () => ({
+        liveViewUrl: "https://live.example.com/final",
+        sessionId: "bb-123",
+        url: "https://browserbase.test/",
+        title: "Browserbase",
+      })),
+      createOrchestrator: vi.fn(() => ({ runTurn: vi.fn(async function* () {}) })),
+      loadBuyer,
+      getLearnings: vi.fn(async () => []),
+      buildLearningsContext: vi.fn(() => ""),
+      // memoryEnabled omitted → defaults off
+      getDemoConfig: () => ({
+        company: "browserbase",
+        productName: "Browserbase",
+        persona: "Messi",
+        browseTargetUrl: "https://browserbase.test/",
+        corpusSeed: "browserbase",
+      }),
+      log: vi.fn(),
+    });
+
+    const prepared = await startup.prepare({
+      buyerId: "buyer@example.com",
+      onLiveView: vi.fn(),
+    });
+
+    expect(loadBuyer).not.toHaveBeenCalled();
+    expect(prepared.buyer).toBeUndefined();
+    expect(prepared.buyerNotes).toEqual([]);
   });
 
   it("prewarms once and lets the next prepare adopt the warm browser", async () => {
@@ -256,6 +304,7 @@ describe("demo session startup", () => {
         throw new Error("learnings down");
       }),
       learningsEnabled: true,
+      memoryEnabled: true,
       getDemoConfig: () => ({
         company: "browserbase",
         productName: "Browserbase",
