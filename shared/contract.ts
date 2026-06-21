@@ -7,7 +7,16 @@
 
 import { z } from "zod";
 
-export const NoteType = z.enum(["objection", "interest", "role", "question"]);
+export const NoteType = z.enum([
+  "objection",
+  "interest",
+  "role",
+  "question",
+  "pain_point",
+  "next_step",
+  "persona",
+  "preference",
+]);
 
 /** What the LLM produces — no timestamp. */
 export const NoteInput = z.object({

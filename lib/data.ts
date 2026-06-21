@@ -12,14 +12,14 @@ export const SECTIONS = [
 ];
 
 export const CAPTIONS = [
-  "Hey! I'm Maya. I'll walk you through Browserbase in about three minutes. Let's start with the big picture.",
+  "Hey! I'm Maya. Before I show anything, what are you trying to figure out about Browserbase today?",
   "This is your Browserbase dashboard, every cloud browser your agents run shows up here, with usage at a glance.",
   "Open Sessions and you get the full picture of any run, a live view, network logs, and a replay you can scrub through.",
   "The Playground lets you spin up a real cloud browser in one click and try it live, no setup.",
   "Under the hood it's built for the whole web, stealth mode, residential proxies, and persistent contexts so logins just stick.",
   "And it scales, thousands of concurrent browsers with sub-second starts, so your agents never wait.",
   "Pricing scales with usage, not seats, so you only pay for the browser time you actually run.",
-  "That's the tour. Want to keep going?",
+  "Want to dig into the part that matters most for your team?",
 ];
 
 export const PIPELINE = [
