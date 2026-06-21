@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import SessionList from "@/components/dashboard/SessionList";
 import { Group, SignalRow } from "@/components/dashboard/SignalGroup";
 import { getSession, fmtDuration, intentOf, kpis } from "@/lib/dashboard/data";
+import RecapPanel from "@/components/dashboard/RecapPanel";
+import { getRecapView } from "@/lib/dashboard/source";
 
 function scoreClass(n: number) {
   return n >= 80 ? "text-goodlit" : n >= 65 ? "text-brandlit2" : "text-warnlit";
@@ -18,6 +20,36 @@ export default async function SessionDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const view = await getRecapView(id);
+  if (view) {
+    // Real recorded session: render the evidence-backed recap.
+    return (
+      <div className="flex h-screen flex-col text-chalk">
+        <header className="flex flex-none items-center gap-[10px] border-b border-edge px-5 py-[14px]">
+          <span className="font-serif text-[17px] font-medium tracking-[-0.01em]">Session recap</span>
+          <span className="dl-num ml-auto font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
+            {view.record.company}
+          </span>
+        </header>
+        <div className="dl-scroll min-h-0 flex-1 overflow-y-auto px-6 py-[22px]">
+          <div className="mx-auto max-w-[760px]">
+            {view.record.replayUrl && (
+              <a
+                href={view.record.replayUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mb-4 inline-block rounded-[8px] border border-edge px-3 py-1.5 text-[12px] font-semibold text-brandlit2 hover:border-ember hover:text-chalk"
+              >
+                ▶ Open Browserbase replay →
+              </a>
+            )}
+            <RecapPanel view={view} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // Fall back to the seeded mock prototype for ids that aren't real sessions.
   const s = getSession(id);
   if (!s) notFound();
   const k = kpis();
