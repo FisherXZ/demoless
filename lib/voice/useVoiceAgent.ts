@@ -42,7 +42,16 @@ export interface VoiceAgent {
 
 const WS_URL = process.env.NEXT_PUBLIC_VOICE_WS_URL ?? "ws://localhost:3001";
 
-export function useVoiceAgent(): VoiceAgent {
+/** Options for {@link useVoiceAgent}. */
+export interface VoiceAgentOptions {
+  /**
+   * Visitor's self-reported role (from the pre-call form). Sent to the gateway
+   * so it can pick an audience persona (technical vs non-technical).
+   */
+  role?: string;
+}
+
+export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const [status, setStatus] = useState<VoiceStatus>("idle");
   const [active, setActive] = useState(false);
   const [agentSpeaking, setAgentSpeaking] = useState(false);
@@ -60,8 +69,10 @@ export function useVoiceAgent(): VoiceAgent {
   const stream = useRef<MediaStream | null>(null);
   const player = useRef<PcmPlayer | null>(null);
   const languageRef = useRef<Language>(language);
+  const roleRef = useRef<string | undefined>(options.role);
 
   languageRef.current = language;
+  roleRef.current = options.role;
 
   const teardown = useCallback(() => {
     node.current?.port.close();
@@ -142,7 +153,9 @@ export function useVoiceAgent(): VoiceAgent {
 
   const sendText = useCallback((text: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ t: "text_input", text }));
+      ws.current.send(
+        JSON.stringify({ t: "text_input", text, role: roleRef.current })
+      );
     }
   }, []);
 
@@ -188,6 +201,7 @@ export function useVoiceAgent(): VoiceAgent {
             t: "audio_start",
             sampleRate: AUDIO_SAMPLE_RATE,
             language: languageRef.current,
+            role: roleRef.current,
           })
         );
       };

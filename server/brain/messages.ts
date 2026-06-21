@@ -2,8 +2,13 @@ import type Anthropic from "@anthropic-ai/sdk";
 import type { DemoConfig } from "../config/demoConfig";
 import { SECTIONS } from "../config/demoConfig";
 import type { ConversationTurn } from "../orchestrator/types";
+import { personaBlock } from "./persona";
 
-export function buildSystem(cfg: DemoConfig, memoryContext: string): string {
+export function buildSystem(
+  cfg: DemoConfig,
+  memoryContext: string,
+  role?: string
+): string {
   const deeplinks = SECTIONS.map((s) => `${s.label} → ${s.url}`).join("\n");
   const persona =
     cfg.systemPrompt ??
@@ -17,6 +22,7 @@ export function buildSystem(cfg: DemoConfig, memoryContext: string): string {
     `\nBefore stating product facts, call search_knowledge. Save durable buyer signals with remember.`,
     `Report your sales phase with set_phase as the conversation moves (HOOK→DISCOVERY→WALKTHROUGH→CLOSE).`,
     memoryContext ? `\n${memoryContext}` : "",
+    `\n${personaBlock(role)}`,
   ].join("\n");
 }
 

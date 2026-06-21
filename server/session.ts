@@ -48,6 +48,9 @@ export class VoiceSession {
   private history: ConversationTurn[] = [];
   private buyerNotes: string[] = [];
 
+  /** Visitor's self-reported role from the pre-call form; picks the persona. */
+  private role: string | undefined;
+
   /** Finalized transcript segments for the in-progress user utterance. */
   private finals: string[] = [];
 
@@ -168,6 +171,7 @@ export class VoiceSession {
     if (!msg) return;
     switch (msg.t) {
       case "audio_start":
+        if (msg.role) this.role = msg.role;
         void this.ensureStarted(msg.language);
         break;
       case "audio_stop":
@@ -183,6 +187,7 @@ export class VoiceSession {
         // A text-only visitor may type before enabling the mic; make sure the
         // browser session + orchestrator are started before running a turn
         // (otherwise this.orchestrator is null and runTurn crashes).
+        if (msg.role) this.role = msg.role;
         this.send({ t: "user_said", text: msg.text, final: true });
         void this.ensureStarted(this.language).then(() => this.runTurn(msg.text));
         break;
@@ -358,6 +363,7 @@ export class VoiceSession {
         history: recentHistory,
         buyerNotes: this.buyerNotes,
         agentName: this.agentName,
+        role: this.role,
       },
       signal
     )) {

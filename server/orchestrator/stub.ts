@@ -7,6 +7,7 @@ import type {
   TurnInput,
 } from "./types";
 import { SentenceChunker } from "../util/sentenceChunker";
+import { personaBlock } from "../brain/persona";
 
 /**
  * Swappable stand-in for P1's LLM loop: a thin streaming Claude call grounded
@@ -113,6 +114,8 @@ You are speaking out loud, so your replies must sound like natural speech:
 
 Ground every claim in these product facts. Do not invent pricing, security, or integration details that aren't here:
 
-${blob}${memory}`;
+${blob}${memory}
+
+${personaBlock(context.role)}`;
 }
 

@@ -100,6 +100,11 @@ export interface AudioStartMessage {
   /** Sample rate of the PCM frames that will follow. */
   sampleRate: number;
   language: Language;
+  /**
+   * The visitor's self-reported role from the pre-call form. Used server-side
+   * to pick an audience persona (technical vs non-technical) for the prompt.
+   */
+  role?: string;
 }
 
 export interface AudioStopMessage {
@@ -120,6 +125,8 @@ export interface BargeInMessage {
 export interface TextInputMessage {
   t: "text_input";
   text: string;
+  /** Visitor role for persona selection (see {@link AudioStartMessage.role}). */
+  role?: string;
 }
 
 export type ClientMessage =

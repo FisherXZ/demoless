@@ -25,6 +25,19 @@ vi.mock("./bargeIn", () => ({
   novelWordCount: vi.fn().mockReturnValue(0),
   tokenize: vi.fn().mockReturnValue([]),
 }));
+// The session loads buyer memory at startup; stub it so the turn isn't blocked
+// behind a (missing) live Redis connection.
+vi.mock("../lib/memory/store", () => ({
+  loadBuyer: vi.fn().mockResolvedValue({
+    profile: { email: "anonymous" },
+    notes: [],
+    isReturning: false,
+    recall: null,
+  }),
+}));
+vi.mock("../lib/memory/pubsub", () => ({
+  publishPhase: vi.fn().mockResolvedValue(undefined),
+}));
 
 import { VoiceSession } from "./session";
 
