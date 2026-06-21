@@ -1,94 +1,49 @@
-// LAYER 1 transport: WebSocket server speaking shared/wire.ts. The frontend
-// test harness connects here. One Loop per connection.
+import dotenv from "dotenv";
+// Prefer .env.local (gitignored, matches Next.js), fall back to .env.
+dotenv.config({ path: ".env.local" });
+dotenv.config();
 
-import { WebSocketServer, type WebSocket } from "ws";
-import { ClientMsg, type ServerMsg } from "../shared/wire";
-import { Loop } from "./loop";
-import { registerVoiceFake } from "./fakes/voice";
-import { registerBrowserFake } from "./fakes/browser";
-import { registerMemoryFake, wipeBuyer } from "./fakes/memory";
+import { WebSocketServer } from "ws";
+import { VoiceSession } from "./session";
 
-function snapshot(loop: Loop): ServerMsg {
-  const s = loop.getState();
-  return {
-    t: "turn",
-    snapshot: {
-      phase: s.phase,
-      tourIndex: s.tourIndex,
-      currentStep: s.selected[s.tourIndex] ?? null,
-      buyer: s.buyer ?? null,
-    },
-  };
+/**
+ * Voice WebSocket gateway (P2).
+ *
+ * Keeps Deepgram/Anthropic keys server-side. The browser connects to
+ * NEXT_PUBLIC_VOICE_WS_URL; each connection gets one {@link VoiceSession}.
+ */
+const port = Number(process.env.VOICE_SERVER_PORT ?? 3001);
+const deepgramKey = process.env.DEEPGRAM_API_KEY ?? "";
+
+if (!deepgramKey) {
+  console.warn(
+    "[voice] DEEPGRAM_API_KEY is not set - STT/TTS will fail. Copy .env.example to .env.local and add your keys."
+  );
+}
+if (!process.env.ANTHROPIC_API_KEY) {
+  console.warn(
+    "[voice] ANTHROPIC_API_KEY is not set - the stub orchestrator will fail to answer."
+  );
 }
 
-function attach(ws: WebSocket) {
-  let loop: Loop | null = null;
-  let buyerId = "";
+const wss = new WebSocketServer({ port });
 
-  const emit = (m: ServerMsg) => {
-    if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(m));
-  };
+wss.on("connection", (ws) => {
+  console.log("[voice] client connected");
+  new VoiceSession(ws, deepgramKey);
+});
 
-  const wire = (l: Loop) => {
-    registerVoiceFake(l);
-    registerBrowserFake(l);
-    registerMemoryFake(l, buyerId); // fires buyer_loaded
-    l.onIncoming((msg) => emit({ t: "incoming", msg }));
-    l.onCommand((cmd) => emit({ t: "command", cmd }));
-    l.onTurn(() => emit(snapshot(l)));
-  };
+wss.on("listening", () => {
+  console.log(`[voice] gateway listening on ws://localhost:${port}`);
+});
 
-  ws.on("message", (raw) => {
-    let parsed: unknown;
-    try {
-      parsed = ClientMsg.parse(JSON.parse(raw.toString()));
-    } catch (e) {
-      emit({ t: "error", message: `bad ClientMsg: ${(e as Error).message}` });
-      return;
-    }
-    const msg = parsed as import("../shared/wire").ClientMsg;
+wss.on("error", (err) => {
+  console.error("[voice] server error:", err);
+});
 
-    if (msg.t === "start") {
-      if (!msg.buyerId) {
-        emit({ t: "error", message: "buyerId required" });
-        return;
-      }
-      buyerId = msg.buyerId;
-      loop = new Loop(`sess-${Date.now()}`, buyerId);
-      wire(loop);
-      // greet AFTER wire(): buyer_loaded must land first
-      loop.start();
-      return;
-    }
-    if (!loop) {
-      emit({ t: "error", message: "send {t:'start'} first" });
-      return;
-    }
-    if (msg.t === "user_said") {
-      loop.send({ kind: "user_said", text: msg.text, final: true });
-    } else if (msg.t === "reset") {
-      if (msg.wipeBuyer) wipeBuyer(buyerId);
-      // Recreate the Loop so handler arrays are fresh (no double-registration).
-      loop = new Loop(`sess-${Date.now()}`, buyerId);
-      wire(loop);
-      // greet AFTER wire(): buyer_loaded must land first
-      loop.start();
-    }
-  });
-}
-
-export function startServer(port: number) {
-  const wss = new WebSocketServer({ port });
-  wss.on("connection", attach);
-  return {
-    get port() { return (wss.address() as { port: number }).port; },
-    close: () => new Promise<void>((res) => wss.close(() => res())),
-  };
-}
-
-// Run directly: `npm run server`
-if (process.argv[1] && process.argv[1].endsWith("index.ts")) {
-  const port = Number(process.env.PORT ?? 8787);
-  startServer(port);
-  console.log(`[orchestrator] ws://localhost:${port} — send {t:"start",buyerId:"..."}`);
-}
+const shutdown = () => {
+  console.log("[voice] shutting down");
+  wss.close(() => process.exit(0));
+};
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

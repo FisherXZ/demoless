@@ -1,7 +1,7 @@
-// server/index.test.ts
+// server/harness.test.ts
 import { describe, it, expect, afterEach } from "vitest";
 import { WebSocket } from "ws";
-import { startServer } from "./index";
+import { startServer } from "./harness";
 import { loadBuyer, wipeBuyer } from "./fakes/memory";
 import type { ServerMsg } from "../shared/wire";
 

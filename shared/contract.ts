@@ -64,3 +64,4 @@ export type Buyer = z.infer<typeof Buyer>;
 export type Incoming = z.infer<typeof Incoming>;
 export type Command = z.infer<typeof Command>;
 export type Reply = z.infer<typeof Reply>;
+export type TourDirective = NonNullable<Reply["tour"]>;
