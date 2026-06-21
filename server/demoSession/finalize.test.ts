@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { SessionRecorder } from "../../lib/sessions";
+import { SessionRecorder, type SessionRecord } from "../../lib/sessions";
 import { createDemoSessionFinalizer } from "./finalize";
 
 describe("demo session finalizer", () => {
@@ -9,8 +9,8 @@ describe("demo session finalizer", () => {
     recorder.recordAgent("Let me show you sessions.", 1, 1200);
 
     const reflectAndStore = vi.fn(async () => {});
-    const saveSession = vi.fn(async () => {});
-    const analyzeAndStore = vi.fn(async () => {});
+    const saveSession = vi.fn(async (_record: SessionRecord) => {});
+    const analyzeAndStore = vi.fn(async (_record: SessionRecord) => {});
 
     const finalizer = createDemoSessionFinalizer({
       reflectAndStore,
@@ -42,8 +42,9 @@ describe("demo session finalizer", () => {
 
     expect(saveSession).toHaveBeenCalledTimes(1);
     expect(analyzeAndStore).toHaveBeenCalledTimes(1);
-    expect(saveSession.mock.calls[0][0]).toBe(analyzeAndStore.mock.calls[0][0]);
-    expect(saveSession.mock.calls[0][0]).toMatchObject({
+    const record = saveSession.mock.calls[0][0];
+    expect(record).toBe(analyzeAndStore.mock.calls[0][0]);
+    expect(record).toMatchObject({
       id: "bb-789",
       company: "browserbase",
       role: "Founder",

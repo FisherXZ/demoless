@@ -5,7 +5,7 @@ import { Group, SignalRow } from "@/components/dashboard/SignalGroup";
 import { getSession, fmtDuration, intentOf, kpis } from "@/lib/dashboard/data";
 import RecapPanel from "@/components/dashboard/RecapPanel";
 import { getRecapView, type RecapView } from "@/lib/dashboard/source";
-import type { RecapReport } from "@/lib/sessions";
+import { LABEL_CLASS, LABEL_TEXT } from "@/lib/dashboard/recapFormat";
 
 function scoreClass(n: number) {
   return n >= 80 ? "text-goodlit" : n >= 65 ? "text-brandlit2" : "text-warnlit";
@@ -13,24 +13,6 @@ function scoreClass(n: number) {
 function intentClass(n: number) {
   const i = intentOf(n);
   return i === "High" ? "text-goodlit" : i === "Medium" ? "text-warnlit" : "text-ash";
-}
-
-function recapLabelText(label: RecapReport["label"]): string {
-  if (label === "hot") return "Hot";
-  if (label === "follow_up_needed") return "Follow-up";
-  return "Nurture";
-}
-
-function recapScore(label: RecapReport["label"]): number {
-  if (label === "hot") return 86;
-  if (label === "follow_up_needed") return 68;
-  return 42;
-}
-
-function recapScoreClass(label: RecapReport["label"]): string {
-  if (label === "hot") return "text-goodlit";
-  if (label === "follow_up_needed") return "text-warnlit";
-  return "text-ash";
 }
 
 function RealRecapRail({ view }: { view: RecapView }) {
@@ -55,21 +37,18 @@ function RealRecapRail({ view }: { view: RecapView }) {
     );
   }
 
-  const score = recapScore(recap.label);
-
   return (
     <>
       <Group label="Snapshot">
         <div className="mb-2 flex items-center text-[13px]">
           <span className="text-ash">Recap label</span>
-          <span className={"ml-auto font-mono font-semibold " + recapScoreClass(recap.label)}>
-            {recapLabelText(recap.label)}
-          </span>
-        </div>
-        <div className="mb-2 flex items-center text-[13px]">
-          <span className="text-ash">Demo score</span>
-          <span className={"dl-num ml-auto font-mono text-[26px] font-semibold " + recapScoreClass(recap.label)}>
-            {score}
+          <span
+            className={
+              "ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold " +
+              LABEL_CLASS[recap.label]
+            }
+          >
+            {LABEL_TEXT[recap.label]}
           </span>
         </div>
         <div className="flex items-center text-[13px]">

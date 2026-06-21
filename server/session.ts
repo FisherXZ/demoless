@@ -658,14 +658,18 @@ export class VoiceSession {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
-    this.deps.finalizer.finalize({
-      browserSessionId: this.browserSessionId,
-      company: this.company,
-      role: this.role,
-      phaseReached: this.lastPhase,
-      recorder: this.recorder,
-      turns: this.history,
-    });
+    try {
+      this.deps.finalizer.finalize({
+        browserSessionId: this.browserSessionId,
+        company: this.company,
+        role: this.role,
+        phaseReached: this.lastPhase,
+        recorder: this.recorder,
+        turns: this.history,
+      });
+    } catch {
+      // Teardown must never throw out through ws close/error handlers.
+    }
     this.cancelActive();
     void this.stopStt();
     if (this.browserSessionId) {

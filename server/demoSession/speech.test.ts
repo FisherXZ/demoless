@@ -179,19 +179,10 @@ describe("demo session speech streaming", () => {
     const ac = new AbortController();
     const tts: TtsProvider = {
       voiceName: vi.fn().mockReturnValue("Maya"),
-      synthesize: vi.fn(() => ({
-        [Symbol.asyncIterator]() {
-          let sent = false;
-          return {
-            async next() {
-              if (sent) return { done: true, value: undefined };
-              sent = true;
-              ac.abort();
-              return { done: false, value: Buffer.from("late audio") };
-            },
-          };
-        },
-      })),
+      synthesize: vi.fn(async function* () {
+        ac.abort();
+        yield Buffer.from("late audio");
+      }),
     };
 
     async function* texts() {
