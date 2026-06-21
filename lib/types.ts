@@ -1,5 +1,5 @@
 import type { ChangeEvent } from "react";
-import type { BuyerIdentity } from "./voice/messages";
+import type { BuyerIdentity, Language } from "./voice/messages";
 
 export type Screen = "landing" | "form" | "room" | "dashboard";
 
@@ -8,6 +8,8 @@ export type Screen = "landing" | "form" | "room" | "dashboard";
 export interface FormState {
   name: string;
   email: string;
+  /** Language the visitor picks on the form; seeds the voice session. */
+  language: Language;
 }
 
 export type FieldChange = (e: ChangeEvent<HTMLInputElement>) => void;
@@ -102,6 +104,7 @@ export interface DemoVals {
   form: FormState;
   onName: FieldChange;
   onEmail: FieldChange;
+  onLanguage: (lang: Language) => void;
 
   tailoredFor: string;
   clock: string;

@@ -48,6 +48,9 @@ export interface VoiceAgentOptions {
   /** Verified identity for this demo session; gates connection and records the
    *  session under the right buyer. */
   buyer?: BuyerIdentity;
+  /** Language the visitor chose on the form; seeds the session so the first
+   *  utterance is transcribed and answered in it (no Whisper auto-detect). */
+  language?: Language;
 }
 
 export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
@@ -57,7 +60,9 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const [partialTranscript, setPartialTranscript] = useState("");
   const [lastCaption, setLastCaption] = useState("");
   const [agentName, setAgentName] = useState("");
-  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+  const [language, setLanguageState] = useState<Language>(
+    options.language ?? DEFAULT_LANGUAGE
+  );
   const [error, setError] = useState<string | null>(null);
   const [liveViewUrl, setLiveViewUrl] = useState<string | null>(null);
   const [lastScreen, setLastScreen] = useState<{ page: string } | null>(null);

@@ -47,6 +47,7 @@ const initialState: DemoState = {
   form: {
     name: "",
     email: "",
+    language: "en",
   },
 };
 
@@ -55,7 +56,7 @@ export function useDemoState(): DemoVals {
   const { data: session } = useSession();
 
   const patch = (p: Partial<DemoState>) => set((prev) => ({ ...prev, ...p }));
-  const setF = (k: keyof FormState, v: string) =>
+  const setF = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     set((prev) => ({ ...prev, form: { ...prev.form, [k]: v } }));
 
   const m = s.moment;
@@ -164,6 +165,7 @@ export function useDemoState(): DemoVals {
     form,
     onName: (e) => setF("name", e.target.value),
     onEmail: (e) => setF("email", e.target.value),
+    onLanguage: (lang) => setF("language", lang),
 
     tailoredFor,
     clock:

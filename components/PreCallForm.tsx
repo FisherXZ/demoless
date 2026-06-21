@@ -4,6 +4,9 @@ import { useEffect } from "react";
 import type { DemoVals } from "@/lib/types";
 import { useAgentName } from "@/lib/voice/useAgentName";
 import { requestBrowserWarmup } from "@/lib/voice/warmBrowser";
+import { LANGUAGES, type Language } from "@/lib/voice/messages";
+
+const LANG_CODES = Object.keys(LANGUAGES) as Language[];
 
 const fieldClass =
   "border border-line3 rounded-[10px] px-[14px] py-3 text-[15px] bg-white transition-colors focus:border-brand focus:shadow-[0_0_0_3px_#eef0ff]";
@@ -15,6 +18,10 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
   useEffect(() => {
     requestBrowserWarmup();
   }, []);
+  // A valid work email is required: it keys the buyer + the demo session.
+  // Without it enterDemo can't create a session and the room fails with
+  // "Missing demo session identity", so gate the button instead.
+  const canJoin = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals.form.email.trim());
   return (
     <div className="min-h-screen grid grid-cols-[0.85fr_1fr]">
       {/* Left dark panel */}
@@ -117,9 +124,34 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
           </label>
         </div>
 
+        <div className="mt-4 flex flex-col gap-[7px]">
+          <span className="text-[13px] font-semibold text-ink2">Language</span>
+          <div className="grid grid-cols-3 gap-2">
+            {LANG_CODES.map((code) => {
+              const active = vals.form.language === code;
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => vals.onLanguage(code)}
+                  aria-pressed={active}
+                  className={`rounded-[10px] border px-3 py-2.5 text-[15px] font-semibold transition-colors ${
+                    active
+                      ? "border-brand bg-brand text-white"
+                      : "border-line3 bg-white text-ink2 hover:border-brand"
+                  }`}
+                >
+                  {LANGUAGES[code].label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <button
           onClick={vals.startDemo}
-          className="mt-[26px] flex cursor-pointer items-center justify-center gap-2.5 rounded-[10px] border-none bg-brand p-4 text-[17px] font-bold text-white transition-colors hover:bg-branddeep"
+          disabled={!canJoin}
+          className="mt-[26px] flex items-center justify-center gap-2.5 rounded-[10px] border-none bg-brand p-4 text-[17px] font-bold text-white transition-colors hover:bg-branddeep disabled:cursor-not-allowed disabled:bg-line3 disabled:hover:bg-line3 enabled:cursor-pointer"
         >
           <span
             className="w-[9px] h-[9px] rounded-full bg-white"
@@ -127,6 +159,11 @@ export default function PreCallForm({ vals }: { vals: DemoVals }) {
           />
           Join AI Demo
         </button>
+        {!canJoin && (
+          <p className="text-center text-[13px] text-muted2 mt-2 mb-0">
+            Enter a work email to join.
+          </p>
+        )}
         <p className="text-center text-[13px] text-faint mt-3.5 mb-0">
           By joining you agree to be recorded for quality. No spam, ever.
         </p>
