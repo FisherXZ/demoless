@@ -18,19 +18,27 @@
  */
 
 /** Languages the voice loop can run in (P2D). Keep in sync with LANGUAGES. */
-export type Language = "en" | "es";
+export type Language = "en" | "es" | "zh";
+
+/** Which TTS backend speaks a given language. Defaults to the env TTS_PROVIDER
+ *  (Deepgram). Mandarin is pinned to OpenAI because Deepgram Aura-2 can't speak
+ *  Chinese (it does en/es/nl/fr/de/it/ja only). */
+export type TtsProviderName = "deepgram" | "elevenlabs" | "openai";
 
 export interface LanguageOption {
   code: Language;
   /** Human label for the toggle UI. */
   label: string;
-  /** Deepgram STT language code. */
+  /** Deepgram STT (nova-3) language code. */
   sttLanguage: string;
-  /** Deepgram Aura-2 TTS voice model for this language. */
+  /** Voice model/id for this language, interpreted by `ttsProvider`
+   *  (a Deepgram Aura model, or an OpenAI voice like "nova"). */
   ttsModel: string;
+  /** TTS backend for this language. Omit to use the env default (Deepgram). */
+  ttsProvider?: TtsProviderName;
 }
 
-/** Supported languages and their Deepgram STT/TTS settings. */
+/** Supported languages and their STT/TTS settings. */
 export const LANGUAGES: Record<Language, LanguageOption> = {
   en: {
     code: "en",
@@ -43,6 +51,14 @@ export const LANGUAGES: Record<Language, LanguageOption> = {
     label: "Espanol",
     sttLanguage: "es",
     ttsModel: "aura-2-celeste-es",
+  },
+  zh: {
+    code: "zh",
+    label: "中文",
+    sttLanguage: "zh",
+    // OpenAI TTS voice (Deepgram Aura-2 has no Mandarin voice).
+    ttsModel: "nova",
+    ttsProvider: "openai",
   },
 };
 
