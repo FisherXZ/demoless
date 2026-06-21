@@ -27,12 +27,45 @@ import {
 } from "../lib/browser/session";
 import { loadBuyer } from "../lib/memory/store";
 import { publishPhase } from "../lib/memory/pubsub";
+import {
+  getLearnings,
+  buildLearningsContext,
+  reflectAndStore as defaultReflectAndStore,
+} from "../lib/learnings";
+import { detectLanguage } from "./util/detectLanguage";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
-  startSession: (url: string) => Promise<{ liveViewUrl: string; sessionId: string; url: string; title: string }>;
+  startSession: (
+    url: string,
+    onLiveView?: (liveViewUrl: string, sessionId: string) => void
+  ) => Promise<{ liveViewUrl: string; sessionId: string; url: string; title: string }>;
   stopSession: (sessionId: string) => Promise<void>;
   createOrchestrator: (args: { sessionId: string; buyerId: string; company: string }) => Orchestrator;
+  reflectAndStore: (args: {
+    company: string;
+    turns: { role: "user" | "agent"; text: string }[];
+    phaseReached?: string;
+  }) => Promise<void>;
+}
+
+/**
+ * A browser pre-created by a `prewarm` message, kept briefly so the next real
+ * session can adopt it (skipping the ~6s create+connect). Held at MODULE scope —
+ * not on a VoiceSession — so the short-lived prewarm connection closing doesn't
+ * release it. Opt-in: only populated when a client sends `prewarm`.
+ */
+let warmSession: { sessionId: string; liveViewUrl: string; at: number } | null = null;
+const WARM_TTL_MS = 120_000;
+
+function takeWarmSession(): { sessionId: string; liveViewUrl: string } | null {
+  if (warmSession && Date.now() - warmSession.at < WARM_TTL_MS) {
+    const { sessionId, liveViewUrl } = warmSession;
+    warmSession = null;
+    return { sessionId, liveViewUrl };
+  }
+  warmSession = null; // expired
+  return null;
 }
 
 /**
@@ -47,9 +80,31 @@ export class VoiceSession {
 
   private history: ConversationTurn[] = [];
   private buyerNotes: string[] = [];
+  private learningsContext = "";
+  private company = ""; // set in startListening; "" means a session that never started
+  private lastPhase: string | undefined;
+  private disposed = false; // dispose() is bound to both ws "close" and "error"
+
+  /** Visitor's self-reported role from the pre-call form; picks the persona. */
+  private role: string | undefined;
 
   /** Finalized transcript segments for the in-progress user utterance. */
   private finals: string[] = [];
+
+  /**
+   * First-utterance language auto-detection (Whisper). We buffer the opening
+   * utterance's raw PCM, detect its language, then lock the session to it.
+   * A manual toggle (set_language) sets `detected = true` to opt out.
+   */
+  private detected = false;
+  private detectBuf: Buffer[] = [];
+  private detectBytes = 0;
+  /** Cap the opening-utterance buffer (~12s of linear16 @ sample rate). */
+  private static readonly MAX_DETECT_BYTES = AUDIO_SAMPLE_RATE * 2 * 12;
+  /** Auto-detect needs an OpenAI key; opt out with VOICE_AUTODETECT=0. */
+  private get autoDetectEnabled(): boolean {
+    return process.env.VOICE_AUTODETECT !== "0" && !!process.env.OPENAI_API_KEY;
+  }
 
   private turnCounter = 0;
   /** The currently streaming agent turn, if any. */
@@ -147,6 +202,7 @@ export class VoiceSession {
       startSession: deps?.startSession ?? defaultStartSession,
       stopSession: deps?.stopSession ?? defaultStopSession,
       createOrchestrator: deps?.createOrchestrator ?? defaultCreateOrchestrator,
+      reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
     };
 
     ws.on("message", (data, isBinary) => {
@@ -154,7 +210,20 @@ export class VoiceSession {
         // Raw PCM from the mic -> Deepgram. In half-duplex mode we don't forward
         // mic audio while the agent is speaking, so it can't hear itself and
         // barge in on its own voice.
-        if (this.listening) this.stt?.sendAudio(data as Buffer);
+        if (this.listening) {
+          const buf = data as Buffer;
+          // Until the language is detected, also buffer the audio so Whisper can
+          // identify it (Deepgram is running only to endpoint the utterance).
+          if (
+            this.autoDetectEnabled &&
+            !this.detected &&
+            this.detectBytes < VoiceSession.MAX_DETECT_BYTES
+          ) {
+            this.detectBuf.push(buf);
+            this.detectBytes += buf.length;
+          }
+          this.stt?.sendAudio(buf);
+        }
       } else {
         this.onControl(data.toString());
       }
@@ -168,6 +237,7 @@ export class VoiceSession {
     if (!msg) return;
     switch (msg.t) {
       case "audio_start":
+        if (msg.role) this.role = msg.role;
         void this.ensureStarted(msg.language);
         break;
       case "audio_stop":
@@ -179,10 +249,14 @@ export class VoiceSession {
       case "barge_in":
         this.bargeIn();
         break;
+      case "prewarm":
+        void this.prewarm();
+        break;
       case "text_input":
         // A text-only visitor may type before enabling the mic; make sure the
         // browser session + orchestrator are started before running a turn
         // (otherwise this.orchestrator is null and runTurn crashes).
+        if (msg.role) this.role = msg.role;
         this.send({ t: "user_said", text: msg.text, final: true });
         void this.ensureStarted(this.language).then(() => this.runTurn(msg.text));
         break;
@@ -196,12 +270,45 @@ export class VoiceSession {
     return this.startPromise;
   }
 
+  /** Pre-create the cloud browser so the next real session adopts it. Does NOT
+   *  set this.browserSessionId, so this (short-lived) connection closing won't
+   *  release the warmed browser. Best-effort. */
+  private async prewarm() {
+    if (warmSession && Date.now() - warmSession.at < WARM_TTL_MS) return;
+    try {
+      const cfg = getDemoConfig();
+      const r = await this.deps.startSession(cfg.browseTargetUrl);
+      warmSession = { sessionId: r.sessionId, liveViewUrl: r.liveViewUrl, at: Date.now() };
+    } catch {
+      /* best-effort — warm-up never blocks anything */
+    }
+  }
+
   private async startListening(language: Language) {
     this.language = language ?? DEFAULT_LANGUAGE;
 
     // Start the cloud browser and wire the orchestrator to its session.
     const cfg = getDemoConfig();
-    const { liveViewUrl, sessionId } = await this.deps.startSession(cfg.browseTargetUrl);
+    let sessionId: string;
+    let liveViewUrl: string;
+    const warm = takeWarmSession();
+    if (warm) {
+      // Adopt a pre-warmed browser — instant, no create+connect+load wait.
+      sessionId = warm.sessionId;
+      liveViewUrl = warm.liveViewUrl;
+    } else {
+      // Show the live browser as soon as it's connectable (before the page
+      // finishes loading) so the visitor watches it navigate instead of waiting.
+      const started = await this.deps.startSession(
+        cfg.browseTargetUrl,
+        (url, sid) => {
+          this.browserSessionId = sid;
+          this.send({ t: "live_view", url });
+        }
+      );
+      sessionId = started.sessionId;
+      liveViewUrl = started.liveViewUrl;
+    }
     this.browserSessionId = sessionId;
     this.send({ t: "live_view", url: liveViewUrl });
 
@@ -219,6 +326,22 @@ export class VoiceSession {
       this.buyerNotes = buyer.notes.map((n) => n.text);
     } catch {
       // Degrade gracefully: no notes injected.
+    }
+
+    // Load cross-session demo learnings into the per-session prompt context.
+    // Same degrade-on-failure contract as buyer memory above.
+    this.company = cfg.company;
+    try {
+      const learnings = await getLearnings(cfg.company);
+      this.learningsContext = buildLearningsContext(learnings);
+      if (this.learningsContext) {
+        const n = this.learningsContext.split("\n").length - 1;
+        console.log(
+          `[learnings] loaded ${n} past-demo learning(s) for ${cfg.company} into this session's prompt`
+        );
+      }
+    } catch {
+      // Degrade gracefully: no learnings injected.
     }
 
     await this.openStt();
@@ -288,6 +411,42 @@ export class VoiceSession {
   private endUtterance() {
     const text = this.finals.join(" ").trim();
     this.finals = [];
+    // First utterance with auto-detect on: figure out the language (and get an
+    // accurate transcript) from the buffered audio before running the turn.
+    if (this.autoDetectEnabled && !this.detected) {
+      void this.detectThenRun(text);
+      return;
+    }
+    if (!text) return;
+    this.send({ t: "user_said", text, final: true });
+    void this.runTurn(text);
+  }
+
+  /**
+   * Detect the visitor's language from the opening utterance, lock the session
+   * to it (restart STT in that language; TTS + brain follow via this.language),
+   * then run the turn using Whisper's transcript. Falls back to the current
+   * language and Deepgram's transcript if detection fails.
+   */
+  private async detectThenRun(fallbackText: string) {
+    this.detected = true; // only ever detect once
+    const audio = Buffer.concat(this.detectBuf);
+    this.detectBuf = [];
+    this.detectBytes = 0;
+
+    let text = fallbackText;
+    try {
+      const result = await detectLanguage(audio, AUDIO_SAMPLE_RATE);
+      if (result.text) text = result.text;
+      if (result.language && result.language !== this.language) {
+        this.language = result.language;
+        if (this.stt) await this.openStt(); // STT for the rest of the session
+        this.send({ t: "ready", language: this.language, agentName: this.agentName });
+      }
+    } catch (err) {
+      this.send({ t: "error", message: `Language detect: ${(err as Error).message}` });
+    }
+
     if (!text) return;
     this.send({ t: "user_said", text, final: true });
     void this.runTurn(text);
@@ -358,6 +517,8 @@ export class VoiceSession {
         history: recentHistory,
         buyerNotes: this.buyerNotes,
         agentName: this.agentName,
+        learningsContext: this.learningsContext,
+        role: this.role,
       },
       signal
     )) {
@@ -384,6 +545,7 @@ export class VoiceSession {
           });
           break;
         case "set_phase":
+          this.lastPhase = cmd.phase;
           this.send({ t: "set_phase", phase: cmd.phase });
           // Also publish to the dashboard SSE channel so the live dashboard
           // panel receives phase transitions (spec §4.2 / §6).
@@ -565,6 +727,7 @@ export class VoiceSession {
   }
 
   private async setLanguage(language: Language) {
+    this.detected = true; // an explicit choice opts out of auto-detect
     if (language === this.language) return;
     this.language = language;
     this.finals = [];
@@ -598,6 +761,15 @@ export class VoiceSession {
   }
 
   dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    // Fire-and-forget: distill this demo into cross-session learnings. Must not
+    // block teardown; reflectAndStore never throws and no-ops on empty history.
+    void this.deps.reflectAndStore({
+      company: this.company,
+      turns: this.history,
+      phaseReached: this.lastPhase,
+    });
     this.cancelActive();
     void this.stopStt();
     if (this.browserSessionId) {

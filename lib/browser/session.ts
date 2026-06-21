@@ -54,16 +54,20 @@ async function screen(sessionId: string, page: Page): Promise<ScreenState> {
 }
 
 // Short, bounded settle after navigation. We intentionally do NOT wait for
-// networkidle: live-polling targets (like worldcuparena) never go idle, so it
+// networkidle: some live-polling targets never go idle, so it
 // would block for the full timeout on every move and make the demo feel frozen.
 async function settle(page: Page, ms = 350): Promise<void> {
   await page.waitForTimeout(ms);
 }
 
 /** Create a cloud browser, attach Playwright over CDP, land on targetUrl,
- *  and return the embeddable live-view URL the frontend iframes. */
+ *  and return the embeddable live-view URL the frontend iframes.
+ *  `onLiveView` (optional) fires as soon as the browser is connectable — before
+ *  the page has loaded — so the UI can show the live browser navigating instead
+ *  of an idle spinner. */
 export async function startSession(
-  targetUrl: string
+  targetUrl: string,
+  onLiveView?: (liveViewUrl: string, sessionId: string) => void
 ): Promise<{ liveViewUrl: string } & ScreenState> {
   const bb = client();
   // Smaller viewport => fewer pixels per screencast frame => smoother live view.
@@ -73,21 +77,32 @@ export async function startSession(
     projectId: projectId()!,
     keepAlive: true,
     timeout: 900,
-    // worldcuparena.live (Fly.io) drops Browserbase's datacenter IPs, so the
-    // cloud browser hangs on page.goto. Route through residential proxies.
-    proxies: true,
+    // Residential proxies are only needed for targets that block Browserbase's
+    // datacenter IPs (e.g. worldcuparena.live). They add ~8s to session start,
+    // so default OFF; set BROWSERBASE_PROXIES=1 when a target needs them.
+    proxies: process.env.BROWSERBASE_PROXIES === "1",
     browserSettings: {
       viewport: { width: 1280, height: 720 },
       ...(contextId() ? { context: { id: contextId()!, persist: false } } : {}),
     },
   });
-  const debug = await bb.sessions.debug(session.id);
+
+  // debug (the live-view URL) and the CDP connection both only need the new
+  // session id, so run them concurrently instead of one after the other.
+  const [debug, browser] = await Promise.all([
+    bb.sessions.debug(session.id),
+    chromium.connectOverCDP(session.connectUrl),
+  ]);
   // navbar=false strips Browserbase's devtools chrome from the embedded view.
   const liveViewUrl = debug.debuggerFullscreenUrl + "&navbar=false";
 
-  const browser = await chromium.connectOverCDP(session.connectUrl);
   const context = browser.contexts()[0] ?? (await browser.newContext());
   const page = context.pages()[0] ?? (await context.newPage());
+
+  // Surface the live browser NOW (it will visibly navigate on screen) rather
+  // than making the visitor wait for the page-load to finish.
+  onLiveView?.(liveViewUrl, session.id);
+
   await page.goto(targetUrl, {
     waitUntil: "domcontentloaded",
     timeout: 45000,
