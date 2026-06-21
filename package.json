@@ -27,7 +27,7 @@
     "@browserbasehq/sdk": "^2.14.1",
     "@deepgram/sdk": "^5.4.0",
     "ioredis": "^5.4.1",
-    "next": "15.1.6",
+    "next": "^15.5.19",
     "next-auth": "^5.0.0-beta.31",
     "playwright-core": "^1.61.0",
     "react": "^18.3.1",
