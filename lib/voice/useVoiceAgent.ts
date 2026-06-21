@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { base64ToInt16, PcmPlayer } from "./audioPlayback";
+import { PcmChunkDecoder, PcmPlayer } from "./audioPlayback";
 import {
   AUDIO_SAMPLE_RATE,
   DEFAULT_LANGUAGE,
@@ -76,6 +76,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const node = useRef<AudioWorkletNode | null>(null);
   const stream = useRef<MediaStream | null>(null);
   const player = useRef<PcmPlayer | null>(null);
+  const decoder = useRef<PcmChunkDecoder | null>(null);
   const languageRef = useRef<Language>(language);
   const buyerRef = useRef<BuyerIdentity | undefined>(options.buyer);
   const mutedRef = useRef(false);
@@ -93,6 +94,8 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
 
     player.current?.stop();
     player.current = null;
+    decoder.current?.reset();
+    decoder.current = null;
 
     if (ctx.current && ctx.current.state !== "closed") {
       void ctx.current.close();
@@ -125,6 +128,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
         // Local barge-in: the prospect started talking over the agent.
         if (player.current?.isPlaying) {
           player.current.stop();
+          decoder.current?.reset();
           setAgentSpeaking(false);
         }
         break;
@@ -133,10 +137,13 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
         setAgentSpeaking(true);
         break;
       case "tts_chunk":
-        player.current?.enqueue(base64ToInt16(ev.b64));
+        player.current?.enqueue(
+          decoder.current?.decode(ev.b64) ?? new Int16Array()
+        );
         setAgentSpeaking(true);
         break;
       case "tts_end":
+        decoder.current?.reset();
         break;
       case "agent_state":
         setStatus(ev.state);
@@ -144,6 +151,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
         break;
       case "barge_in":
         player.current?.stop();
+        decoder.current?.reset();
         setAgentSpeaking(false);
         break;
       case "live_view":
@@ -206,6 +214,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
       await audioCtx.audioWorklet.addModule("/worklets/pcm-capture.js");
 
       player.current = new PcmPlayer(audioCtx, AUDIO_SAMPLE_RATE);
+      decoder.current = new PcmChunkDecoder();
 
       const source = audioCtx.createMediaStreamSource(media);
       const worklet = new AudioWorkletNode(audioCtx, "pcm-capture");
@@ -255,6 +264,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
     setAgentSpeaking(false);
     setStatus("idle");
     setPartialTranscript("");
+    decoder.current?.reset();
     applyMuted(false);
   }, [applyMuted, teardown]);
 

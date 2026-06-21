@@ -79,3 +79,42 @@ export function base64ToInt16(b64: string): Int16Array {
   const usable = len - (len % 2);
   return new Int16Array(bytes.buffer, 0, usable / 2);
 }
+
+/**
+ * Stateful decoder for streamed linear16 PCM.
+ *
+ * Provider/network chunks may split on any byte boundary, including between the
+ * two bytes of a 16-bit sample. Keep the dangling byte and prepend it to the
+ * next chunk so playback never loses sample alignment.
+ */
+export class PcmChunkDecoder {
+  private carry: number | null = null;
+
+  decode(b64: string): Int16Array {
+    const binary = atob(b64);
+    let bytes = new Uint8Array(binary.length + (this.carry == null ? 0 : 1));
+    let offset = 0;
+
+    if (this.carry != null) {
+      bytes[0] = this.carry;
+      this.carry = null;
+      offset = 1;
+    }
+
+    for (let i = 0; i < binary.length; i++) {
+      bytes[offset + i] = binary.charCodeAt(i);
+    }
+
+    if (bytes.length % 2 === 1) {
+      this.carry = bytes[bytes.length - 1];
+      bytes = bytes.subarray(0, bytes.length - 1);
+    }
+
+    if (bytes.length === 0) return new Int16Array();
+    return new Int16Array(bytes.buffer, bytes.byteOffset, bytes.length / 2);
+  }
+
+  reset() {
+    this.carry = null;
+  }
+}
