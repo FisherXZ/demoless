@@ -1,6 +1,9 @@
 import Link from "next/link";
 import AskBar from "@/components/dashboard/AskBar";
 import { kpis, split, timeline, SESSIONS, intentOf } from "@/lib/dashboard/data";
+import { listRecapSessions } from "@/lib/dashboard/source";
+import type { SessionSummary } from "@/lib/sessions";
+import { LABEL_TEXT, LABEL_CLASS, relativeTime } from "@/lib/dashboard/recapFormat";
 
 // ── chart geometry helpers ───────────────────────────────────────────────
 
@@ -218,17 +221,71 @@ function Timeline() {
   );
 }
 
+// ── real sessions ─────────────────────────────────────────────────────────
+
+/** Real recorded demo sessions, newest first — each links to its recap. */
+function RecentSessions({ sessions, now }: { sessions: SessionSummary[]; now: number }) {
+  return (
+    <div className="mt-[18px] rounded-[12px] border border-edge bg-slate p-2">
+      <div className="flex items-center justify-between px-2 py-1.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ember">
+          Recent demo sessions
+        </span>
+        <span className="font-mono text-[10px] text-ember">{sessions.length} recorded</span>
+      </div>
+      <div className="flex flex-col">
+        {sessions.map((s) => (
+          <Link
+            key={s.id}
+            href={`/dashboard/sessions/${s.id}`}
+            className="group flex items-center gap-3 rounded-[9px] px-2 py-[10px] transition-colors hover:bg-slate2"
+          >
+            <span
+              className={
+                "flex-none rounded-[5px] px-[7px] py-px font-mono text-[9px] font-semibold uppercase tracking-[0.05em] " +
+                (s.label ? LABEL_CLASS[s.label] : "bg-slate2 text-ember")
+              }
+            >
+              {s.label ? LABEL_TEXT[s.label] : "Analyzing"}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[13px] text-chalk">{s.summary || "Recap pending…"}</div>
+              <div className="truncate text-[11px] text-ember">{s.company}</div>
+            </div>
+            <span className="flex-none font-mono text-[11px] text-ember">
+              {relativeTime(s.endedAt, now)}
+            </span>
+            <span className="flex-none font-mono text-[13px] text-ember transition-transform group-hover:translate-x-0.5 group-hover:text-brandlit">
+              →
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── page ──────────────────────────────────────────────────────────────────
 
 const DEVICE_COLORS = ["#3A41D6", "#E3E7EC"]; // brandlit, edge
 const SOURCE_COLORS = ["#16A34A", "#15803D", "#E3E7EC"]; // goodlit, deep green, edge
 
-export default function OverviewPage() {
+export default async function OverviewPage() {
   const k = kpis();
   const { all, qual } = timeline();
   const devices = split((s) => s.device);
   const sources = split((s) => s.source);
   const latest = SESSIONS[0];
+
+  // Real recorded sessions (newest first). Falls back to the mock "Latest" hero
+  // when Redis is empty or unavailable, so the prototype still renders.
+  let recent: SessionSummary[] = [];
+  try {
+    recent = await listRecapSessions(8);
+  } catch {
+    // Redis down — keep recent empty and render the mock hero below.
+  }
+  const now = Date.now();
 
   const cards = [
     { label: "Sessions", value: String(k.total), delta: "+18%", sub: "vs prev 30d", up: true, spark: all },
@@ -256,7 +313,10 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* latest session — live is the hero */}
+      {/* recorded sessions — real demos when present, else the mock hero */}
+      {recent.length > 0 ? (
+        <RecentSessions sessions={recent} now={now} />
+      ) : (
       <Link
         href={`/dashboard/sessions/${latest.id}`}
         className="group mt-[18px] flex items-center gap-4 rounded-[12px] border border-edge bg-slate px-4 py-[13px] transition-colors hover:border-ember"
@@ -292,6 +352,7 @@ export default function OverviewPage() {
           </span>
         </div>
       </Link>
+      )}
 
       <AskBar />
 

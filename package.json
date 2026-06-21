@@ -14,11 +14,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "memory:smoke": "tsx scripts/memory-smoke.ts",
-    "knowledge:seed": "node --env-file-if-exists=.env.local --env-file-if-exists=.env --import tsx scripts/knowledge-seed.ts",
-    "knowledge:curate": "node --env-file-if-exists=.env.local --env-file-if-exists=.env --import tsx scripts/knowledge-curate.ts",
-    "knowledge:reindex": "node --env-file-if-exists=.env.local --env-file-if-exists=.env --import tsx scripts/knowledge-reindex.ts",
-    "knowledge:export": "node --env-file-if-exists=.env.local --env-file-if-exists=.env --import tsx scripts/knowledge-export.ts",
-    "knowledge:smoke": "node --env-file-if-exists=.env.local --env-file-if-exists=.env --import tsx scripts/knowledge-smoke.ts"
+    "knowledge:seed": "tsx scripts/knowledge-seed.ts",
+    "knowledge:smoke": "tsx scripts/knowledge-smoke.ts",
+    "learnings:smoke": "tsx scripts/learnings-smoke.ts",
+    "sessions:smoke": "tsx scripts/sessions-smoke.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
