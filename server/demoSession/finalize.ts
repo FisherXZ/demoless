@@ -7,6 +7,7 @@ import {
   type SessionStatus,
   type ReplayStatus,
 } from "../../lib/sessions";
+import { extractAndStorePacket as defaultExtractAndStorePacket } from "../../lib/sessions/packet";
 import { reflectAndStore as defaultReflectAndStore } from "../../lib/learnings";
 
 export type DemoTurn = { role: "user" | "agent"; text: string };
@@ -19,6 +20,7 @@ export interface DemoSessionFinalizerDeps {
   }) => Promise<void>;
   saveSession?: (record: SessionRecord) => Promise<void>;
   analyzeAndStore?: (record: SessionRecord) => Promise<void>;
+  extractAndStorePacket?: (record: SessionRecord) => Promise<void>;
   replayUrl?: (sessionId: string) => string;
 }
 
@@ -51,6 +53,7 @@ export function createDemoSessionFinalizer(
   const reflectAndStore = deps.reflectAndStore ?? defaultReflectAndStore;
   const saveSession = deps.saveSession ?? defaultSaveSession;
   const analyzeAndStore = deps.analyzeAndStore ?? defaultAnalyzeAndStore;
+  const extractAndStorePacket = deps.extractAndStorePacket ?? defaultExtractAndStorePacket;
   const replayUrl = deps.replayUrl ?? defaultReplayUrl;
 
   return {
@@ -84,6 +87,8 @@ export function createDemoSessionFinalizer(
       });
       void saveSession(record).catch(() => {});
       void analyzeAndStore(record).catch(() => {});
+      // Issue #21: also generate the evidence-backed post-demo packet.
+      void extractAndStorePacket(record).catch(() => {});
     },
   };
 }
