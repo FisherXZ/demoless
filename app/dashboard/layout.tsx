@@ -26,9 +26,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 }
 
 function DashboardShell({ children }: { children: ReactNode }) {
-  const path = usePathname();
+  const path = usePathname() ?? "";
   const searchParams = useSearchParams();
-  const mode = searchParams.get("mode") === "live" ? "live" : "demo";
+  const mode = searchParams?.get("mode") === "live" ? "live" : "demo";
   const isActive = (href: string) =>
     href === "/dashboard" ? path === href : path.startsWith(href);
   const withMode = (href: string, nextMode = mode) => `${href}?mode=${nextMode}`;

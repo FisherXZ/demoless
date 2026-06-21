@@ -62,6 +62,27 @@ describe("runTurn", () => {
     expect(out).toEqual([{ type: "done" }]);
   });
 
+  it("stops if the signal is aborted while a stream event is being processed", async () => {
+    const ac = new AbortController();
+    const stream = (async function* () {
+      ac.abort();
+      yield { kind: "text", delta: "too late" };
+    }) as any;
+    const executor = { phase: "HOOK", run: vi.fn() };
+    const out: any[] = [];
+
+    for await (const c of runTurn({
+      system: "s",
+      messages: [],
+      executor: executor as any,
+      signal: ac.signal,
+      stream,
+    })) out.push(c);
+
+    expect(out).toEqual([{ type: "done" }]);
+    expect(executor.run).not.toHaveBeenCalled();
+  });
+
   it("does not start a second hop if aborted DURING tool execution (REVIEW FIX improvement 3)", async () => {
     const ac = new AbortController();
     const stream = (async function* () {
@@ -73,5 +94,72 @@ describe("runTurn", () => {
     for await (const c of runTurn({ system: "s", messages: [], executor: executor as any, signal: ac.signal, stream })) out.push(c);
     expect(executor.run).toHaveBeenCalledTimes(1);   // no second hop
     expect(out.at(-1)).toEqual({ type: "done" });
+  });
+
+  it("emits phase, memory, and screen commands from non-navigation tool calls", async () => {
+    const stream = (() => {
+      let i = 0;
+      const scripts = [
+        [
+          { kind: "tool_use", id: "phase", name: "set_phase", input: { phase: "DISCOVERY" } },
+          { kind: "tool_use", id: "memory", name: "remember", input: { type: "interest", note: "security" } },
+          { kind: "tool_use", id: "click", name: "click", input: { text: "Security" } },
+          { kind: "end" },
+        ],
+        [{ kind: "end" }],
+      ];
+      return async function* () { yield* scripts[i++]; } as any;
+    })();
+    const executor = {
+      phase: "HOOK",
+      run: vi.fn(async (name: string) => ({
+        ok: true,
+        content: name === "click" ? "URL: /security\n\nSecurity page" : "ok",
+      })),
+    };
+    const out: any[] = [];
+
+    for await (const c of runTurn({
+      system: "s",
+      messages: [],
+      executor: executor as any,
+      signal: new AbortController().signal,
+      stream,
+    })) out.push(c);
+
+    expect(out).toContainEqual({ type: "set_phase", phase: "DISCOVERY" });
+    expect(out).toContainEqual({
+      type: "remember",
+      note: "security",
+      noteType: "interest",
+    });
+    expect(out).toContainEqual({ type: "filler", text: "One sec." });
+    expect(out).toContainEqual({ type: "screen_is_on", page: "/security" });
+  });
+
+  it("falls back to an empty page label when a look result has no title, URL, or input URL", async () => {
+    const stream = (() => {
+      let i = 0;
+      const scripts = [
+        [{ kind: "tool_use", id: "look", name: "look", input: {} }, { kind: "end" }],
+        [{ kind: "end" }],
+      ];
+      return async function* () { yield* scripts[i++]; } as any;
+    })();
+    const executor = {
+      phase: "HOOK",
+      run: vi.fn(async () => ({ ok: true, content: "PAGE TEXT" })),
+    };
+    const out: any[] = [];
+
+    for await (const c of runTurn({
+      system: "s",
+      messages: [],
+      executor: executor as any,
+      signal: new AbortController().signal,
+      stream,
+    })) out.push(c);
+
+    expect(out).toContainEqual({ type: "screen_is_on", page: "" });
   });
 });

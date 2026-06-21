@@ -17,6 +17,41 @@ describe("LoopOrchestrator", () => {
     expect(orch.greeting("en", "Maya")).toContain("Maya");
   });
 
+  it("localizes the greeting for Spanish and Mandarin visitors", () => {
+    const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
+
+    expect(orch.greeting("es", "Maya")).toContain("Hola, soy Maya");
+    expect(orch.greeting("zh", "Maya")).toContain("你好，我是Maya");
+  });
+
+  it("adds the requested language directive to non-English turns", async () => {
+    const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
+    const systems: string[] = [];
+    (orch as any)._runTurn = async function* ({ system }: any) {
+      systems.push(system);
+      yield { type: "done" };
+    };
+
+    for await (const _ of orch.runTurn(
+      { text: "hola", language: "es" },
+      { history: [], buyerNotes: [], agentName: "Maya", learningsContext: "" },
+      new AbortController().signal
+    )) {
+      // drain
+    }
+
+    for await (const _ of orch.runTurn(
+      { text: "ni hao", language: "zh" },
+      { history: [], buyerNotes: [], agentName: "Maya", learningsContext: "" },
+      new AbortController().signal
+    )) {
+      // drain
+    }
+
+    expect(systems[0]).toContain("visitor is speaking Spanish");
+    expect(systems[1]).toContain("visitor is speaking Mandarin Chinese");
+  });
+
   it("default greeting asks one discovery question before offering a walkthrough", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
     const text = orch.greeting("en", "Maya");

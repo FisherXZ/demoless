@@ -76,4 +76,29 @@ describe("LoopOrchestrator recall", () => {
 
     expect(capturedSystem).toContain("parallel browser sessions");
   });
+
+  it("buildSystem includes learnings context even when no buyer notes are present", async () => {
+    const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
+    let capturedSystem = "";
+    (orch as any)._runTurn = async function* ({ system }: any) {
+      capturedSystem = system;
+      yield { type: "done" };
+    };
+
+    for await (const _ of orch.runTurn(
+      { text: "hi", language: "en" },
+      {
+        history: [],
+        buyerNotes: [],
+        agentName: "Maya",
+        learningsContext: "Reusable demo learning: show security first.",
+      },
+      new AbortController().signal
+    )) {
+      // drain
+    }
+
+    expect(capturedSystem).toContain("Reusable demo learning: show security first.");
+    expect(capturedSystem).not.toContain("Known buyer notes");
+  });
 });

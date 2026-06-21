@@ -10,11 +10,13 @@ function ranked(notes: Note[]): Note[] {
 function textsOfType(notes: Note[], ...types: Note["type"][]): string[] {
   return ranked(notes)
     .filter((n) => types.includes(n.type))
-    .map((n) => n.text);
+    .map((n) => n.text)
+    .filter((text): text is string => typeof text === "string" && text.length > 0);
 }
 
 /** Join a short list into prose: ["a","b","c"] -> "a, b and c". */
 function prose(items: string[]): string {
+  /* v8 ignore next -- composeRecall only calls this with one or more strings. */
   if (items.length <= 1) return items[0] ?? "";
   return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }

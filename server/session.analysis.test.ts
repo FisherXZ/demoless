@@ -106,4 +106,25 @@ describe("VoiceSession analysis", () => {
     expect(saveSession).not.toHaveBeenCalled();
     expect(analyzeAndStore).not.toHaveBeenCalled();
   });
+
+  it("swallows synchronous finalizer failures during teardown", () => {
+    const ws = fakeWs();
+    const finalizer = {
+      finalize: vi.fn(() => {
+        throw new Error("recorder unavailable");
+      }),
+    };
+    new VoiceSession(ws, "dg-key", {
+      finalizer,
+      startSession: vi.fn(),
+      stopSession: vi.fn(async () => {}),
+      createOrchestrator: vi.fn(),
+      reflectAndStore: vi.fn(async () => {}),
+      saveSession: vi.fn(async () => {}),
+      analyzeAndStore: vi.fn(async () => {}),
+    });
+
+    expect(() => ws.emit("close")).not.toThrow();
+    expect(finalizer.finalize).toHaveBeenCalledTimes(1);
+  });
 });

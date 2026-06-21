@@ -18,6 +18,7 @@ describe("parseLearnings", () => {
   it("returns [] for unparseable output", () => {
     expect(parseLearnings("no json here")).toEqual([]);
     expect(parseLearnings("[broken")).toEqual([]);
+    expect(parseLearnings("[broken]")).toEqual([]);
   });
   it("caps at 3 learnings", () => {
     const raw = JSON.stringify(

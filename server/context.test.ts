@@ -66,4 +66,20 @@ describe("assembleContext", () => {
     expect(messages[messages.length - 1].role).toBe("user");
     expect(messages[messages.length - 1].content).toContain("analytics");
   });
+
+  it("describes a screen turn even when the screen summary is not populated yet", () => {
+    const screenState: LoopState = {
+      ...base,
+      history: [{ role: "assistant", text: "Opening that now." }],
+      screen: undefined,
+    };
+
+    const { messages } = assembleContext(screenState, "screen");
+
+    expect(messages[messages.length - 1]).toEqual({
+      role: "user",
+      content: expect.stringContaining("a new page"),
+    });
+    expect(messages[messages.length - 1].content).not.toContain("(");
+  });
 });

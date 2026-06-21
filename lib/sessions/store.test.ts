@@ -22,9 +22,15 @@ const fake = {
 vi.mock("../memory/redis", () => ({ getRedis: () => fake }));
 
 import {
-  createSession, saveSession, loadSession, saveRecap, loadRecap,
-  listSessions, getBuyerSessions,
+  createSession,
+  saveSession,
+  loadSession,
+  saveRecap,
+  loadRecap,
+  listSessions,
+  getBuyerSessions,
 } from "./store";
+import { SESSIONS_INDEX, sessionKey } from "./keys";
 import type { RecapReport, SessionRecord } from "./types";
 
 const record: SessionRecord = {
@@ -96,5 +102,96 @@ describe("sessions store", () => {
 
   it("returns null for an unknown session", async () => {
     expect(await loadSession("nope")).toBeNull();
+  });
+
+  it("returns null when a stored session record is corrupt", async () => {
+    hashes.set("demoless:session:bad", { record: "not-json" });
+
+    expect(await loadSession("bad")).toBeNull();
+  });
+
+  it("keeps identity fields when the stored trace payload is corrupt", async () => {
+    hashes.set("demoless:session:bad-trace", {
+      id: "bad-trace",
+      company: "Acme",
+      status: "ended",
+      buyerEmail: "buyer@acme.com",
+      createdAt: "7",
+      trace: "not-json",
+    });
+
+    expect(await loadSession("bad-trace")).toEqual({
+      id: "bad-trace",
+      company: "Acme",
+      status: "ended",
+      buyerEmail: "buyer@acme.com",
+      buyerName: undefined,
+      role: undefined,
+      createdAt: 7,
+      startedAt: undefined,
+      endedAt: undefined,
+      durationSec: undefined,
+      phaseReached: undefined,
+      browserbaseSessionId: undefined,
+      liveViewUrl: undefined,
+      language: undefined,
+      replayStatus: undefined,
+      replayUrl: undefined,
+      events: [],
+      transcript: [],
+    });
+  });
+
+  it("returns pending when a stored recap is corrupt", async () => {
+    hashes.set("demoless:session:bad:recap", { recap: "not-json" });
+
+    expect(await loadRecap("bad")).toEqual({ status: "pending", recap: null });
+  });
+
+  it("skips stale index ids whose session hash is missing", async () => {
+    await saveSession(record);
+    zsets.set(SESSIONS_INDEX, [
+      { member: "missing", score: 10 },
+      { member: "s1", score: 2 },
+    ]);
+
+    expect(await listSessions()).toEqual([
+      {
+        id: "s1",
+        company: "Acme",
+        status: "ended",
+        buyerEmail: "buyer@acme.com",
+        buyerName: "Bea",
+        createdAt: 1,
+        startedAt: 2,
+        endedAt: 3,
+        durationSec: 1,
+        replayStatus: "pending",
+        label: undefined,
+        summary: undefined,
+      },
+    ]);
+  });
+
+  it("defaults missing summary fields when an indexed hash is partial", async () => {
+    hashes.set(sessionKey("partial"), { id: "partial" });
+    zsets.set(SESSIONS_INDEX, [{ member: "partial", score: 1 }]);
+
+    expect(await listSessions()).toEqual([
+      {
+        id: "partial",
+        company: "",
+        status: "created",
+        buyerEmail: undefined,
+        buyerName: undefined,
+        createdAt: 0,
+        startedAt: undefined,
+        endedAt: undefined,
+        durationSec: undefined,
+        replayStatus: undefined,
+        label: undefined,
+        summary: undefined,
+      },
+    ]);
   });
 });

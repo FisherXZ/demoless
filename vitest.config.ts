@@ -1,5 +1,55 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  test: { include: ["server/**/*.test.ts", "shared/**/*.test.ts", "lib/**/*.test.ts"], environment: "node" },
+  test: {
+    include: [
+      "server/**/*.test.ts",
+      "shared/**/*.test.ts",
+      "lib/**/*.test.ts",
+    ],
+    environment: "node",
+    coverage: {
+      provider: "v8",
+      include: [
+        "server/**/*.ts",
+        "shared/**/*.ts",
+        "lib/**/*.ts",
+        "product/**/*.ts",
+        "pages/api/**/*.ts",
+      ],
+      thresholds: {
+        statements: 100,
+        branches: 100,
+        functions: 100,
+        lines: 100,
+      },
+      exclude: [
+        "**/*.test.ts",
+        "**/types.ts",
+        "**/index.ts",
+        "lib/actions.ts",
+        "lib/browser/**",
+        "lib/data.ts",
+        "lib/harness/**",
+        "lib/knowledge/embed.ts",
+        "lib/knowledge/source.ts",
+        "lib/knowledge/store.ts",
+        "lib/memory/redis.ts",
+        "lib/memory/store.ts",
+        "lib/types.ts",
+        "lib/useDemoState.ts",
+        "lib/voice/audioPlayback.ts",
+        "lib/voice/useAgentName.ts",
+        "lib/voice/useVoiceAgent.ts",
+        "lib/voice/warmBrowser.ts",
+        "server/deepgram/**",
+        "server/index.ts",
+        "server/orchestrator/stub.ts",
+        "server/scripts/**",
+        "server/state.ts",
+        "server/tts/**",
+        "server/util/detectLanguage.ts",
+      ],
+    },
+  },
 });
