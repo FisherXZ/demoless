@@ -585,41 +585,20 @@ export class VoiceSession {
     this.active = { turn, abort };
     if (recordAsUser) this.history.push({ role: "user", text: recordAsUser });
 
-    await this.speakFragment(text, turn, abort.signal);
+    const spoken = await this.pipelineSpeak(
+      (async function* () {
+        yield { text, filler: false };
+      })(),
+      turn,
+      abort.signal
+    );
 
-    if (!abort.signal.aborted) {
-      this.history.push({ role: "agent", text });
+    if (!abort.signal.aborted && spoken.length > 0) {
+      this.history.push({ role: "agent", text: spoken.join(" ") });
       this.send({ t: "tts_end", turn });
       this.endSpeaking();
       this.setState("listening");
       this.active = null;
-    }
-  }
-
-  /** Send caption + synthesize one spoken fragment, streaming PCM to the client. */
-  private async speakFragment(text: string, turn: number, signal: AbortSignal) {
-    if (signal.aborted) return;
-    this.send({ t: "say", text, turn });
-    this.noteAgentWords(text);
-    this.agentSpeaking = true;
-    this.setState("speaking");
-
-    let seq = 0;
-    try {
-      for await (const chunk of this.tts.synthesize(text, this.language, signal)) {
-        if (signal.aborted) return;
-        this.send({
-          t: "tts_chunk",
-          b64: chunk.toString("base64"),
-          sampleRate: AUDIO_SAMPLE_RATE,
-          turn,
-          seq: seq++,
-        });
-      }
-    } catch (err) {
-      if (!signal.aborted) {
-        this.send({ t: "error", message: `TTS: ${(err as Error).message}` });
-      }
     }
   }
 
