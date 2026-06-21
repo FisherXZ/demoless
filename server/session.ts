@@ -33,6 +33,13 @@ import {
   reflectAndStore as defaultReflectAndStore,
 } from "../lib/learnings";
 import { detectLanguage } from "./util/detectLanguage";
+import {
+  SessionRecorder,
+  saveSession as defaultSaveSession,
+  analyzeAndStore as defaultAnalyzeAndStore,
+  replayUrl,
+  type SessionRecord,
+} from "../lib/sessions";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
@@ -47,6 +54,8 @@ export interface VoiceSessionDeps {
     turns: { role: "user" | "agent"; text: string }[];
     phaseReached?: string;
   }) => Promise<void>;
+  saveSession: (record: SessionRecord) => Promise<void>;
+  analyzeAndStore: (record: SessionRecord) => Promise<void>;
 }
 
 /**
@@ -79,6 +88,7 @@ export class VoiceSession {
   private language: Language = DEFAULT_LANGUAGE;
 
   private history: ConversationTurn[] = [];
+  private recorder = new SessionRecorder();
   private buyerNotes: string[] = [];
   private learningsContext = "";
   private company = ""; // set in startListening; "" means a session that never started
@@ -203,6 +213,8 @@ export class VoiceSession {
       stopSession: deps?.stopSession ?? defaultStopSession,
       createOrchestrator: deps?.createOrchestrator ?? defaultCreateOrchestrator,
       reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
+      saveSession: deps?.saveSession ?? defaultSaveSession,
+      analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
     };
 
     ws.on("message", (data, isBinary) => {
@@ -463,6 +475,7 @@ export class VoiceSession {
     this.active = { turn, abort };
 
     this.history.push({ role: "user", text: userText });
+    this.recorder.recordUser(userText, turn);
     this.setState("thinking");
 
     let spoken: string[] = [];
@@ -485,6 +498,7 @@ export class VoiceSession {
     // Never record unspoken / intended text.
     if (spoken.length > 0) {
       this.history.push({ role: "agent", text: spoken.join(" ") });
+      this.recorder.recordAgent(spoken.join(" "), turn);
     }
 
     if (!abort.signal.aborted) {
@@ -531,9 +545,11 @@ export class VoiceSession {
           yield { text: cmd.text, filler: true };
           break;
         case "screen_is_on":
+          this.recorder.recordPage(cmd.page, this.turnCounter);
           this.send({ t: "screen_is_on", page: cmd.page });
           break;
         case "remember":
+          this.recorder.recordRemember(cmd.note, cmd.noteType);
           this.send({ t: "remember", note: cmd.note, noteType: cmd.noteType });
           break;
         case "buyer_loaded":
@@ -546,6 +562,7 @@ export class VoiceSession {
           break;
         case "set_phase":
           this.lastPhase = cmd.phase;
+          this.recorder.recordPhase(cmd.phase);
           this.send({ t: "set_phase", phase: cmd.phase });
           // Also publish to the dashboard SSE channel so the live dashboard
           // panel receives phase transitions (spec §4.2 / §6).
@@ -770,6 +787,20 @@ export class VoiceSession {
       turns: this.history,
       phaseReached: this.lastPhase,
     });
+    // Persist the full session + kick off the evidence-backed recap analysis.
+    // Fire-and-forget; both impls swallow their own errors and never block teardown.
+    {
+      const id = this.browserSessionId ?? "unknown";
+      const record = this.recorder.build({
+        id,
+        company: this.company,
+        role: this.role,
+        phaseReached: this.lastPhase,
+        replayUrl: replayUrl(id),
+      });
+      void this.deps.saveSession(record).catch(() => {});
+      void this.deps.analyzeAndStore(record);
+    }
     this.cancelActive();
     void this.stopStt();
     if (this.browserSessionId) {
