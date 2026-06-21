@@ -146,7 +146,7 @@ export default function DemoRoom({ vals }: { vals: DemoVals }) {
               </div>
               <div className="flex-1 min-w-0 h-7 rounded-md bg-wash2 flex items-center px-3">
                 <span className="text-xs text-muted2 truncate">
-                  {voice.lastScreen ? TARGET : TARGET}
+                  {voice.lastScreen?.page || TARGET}
                 </span>
               </div>
               <span className="text-[11px] text-faint font-mono truncate max-w-[200px]">
