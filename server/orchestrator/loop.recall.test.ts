@@ -51,10 +51,10 @@ describe("LoopOrchestrator recall", () => {
 
   it("omits the English recall line for a non-English session", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
-    const text = orch.greeting("zh", "Maya", returningBuyer);
+    const text = orch.greeting("zh", "Messi", returningBuyer);
     expect(text).not.toContain("Welcome back");
     expect(text).not.toContain("parallel browser sessions");
-    expect(text).toContain("你好，Alice，我是Maya");
+    expect(text).toContain("你好，Alice，我是Messi");
   });
 
   it("greeting for new buyer has no recall fragment", () => {
@@ -120,7 +120,7 @@ describe("LoopOrchestrator recall", () => {
       {
         history: [],
         buyerNotes: [],
-        agentName: "Maya",
+        agentName: "Messi",
         learningsContext: "Reusable demo learning: show security first.",
       },
       new AbortController().signal

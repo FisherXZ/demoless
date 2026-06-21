@@ -20,8 +20,8 @@ describe("LoopOrchestrator", () => {
   it("localizes the greeting for Spanish and Mandarin visitors", () => {
     const orch = new LoopOrchestrator({ executor: executor as any, cfg: cfg as any });
 
-    expect(orch.greeting("es", "Maya")).toContain("Hola, soy Maya");
-    expect(orch.greeting("zh", "Maya")).toContain("你好，我是Maya");
+    expect(orch.greeting("es", "Messi")).toContain("Hola, soy Messi");
+    expect(orch.greeting("zh", "Messi")).toContain("你好，我是Messi");
   });
 
   it("adds the requested language directive to non-English turns", async () => {
@@ -34,7 +34,7 @@ describe("LoopOrchestrator", () => {
 
     for await (const _ of orch.runTurn(
       { text: "hola", language: "es" },
-      { history: [], buyerNotes: [], agentName: "Maya", learningsContext: "" },
+      { history: [], buyerNotes: [], agentName: "Messi", learningsContext: "" },
       new AbortController().signal
     )) {
       // drain
@@ -42,7 +42,7 @@ describe("LoopOrchestrator", () => {
 
     for await (const _ of orch.runTurn(
       { text: "ni hao", language: "zh" },
-      { history: [], buyerNotes: [], agentName: "Maya", learningsContext: "" },
+      { history: [], buyerNotes: [], agentName: "Messi", learningsContext: "" },
       new AbortController().signal
     )) {
       // drain
