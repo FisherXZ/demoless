@@ -295,10 +295,13 @@ export class VoiceSession {
       }
     }
 
+    // Record whatever sentences were actually spoken, even on barge-in abort.
+    // Never record unspoken / intended text.
+    if (spoken.length > 0) {
+      this.history.push({ role: "agent", text: spoken.join(" ") });
+    }
+
     if (!abort.signal.aborted) {
-      if (spoken.length > 0) {
-        this.history.push({ role: "agent", text: spoken.join(" ") });
-      }
       this.send({ t: "tts_end", turn });
       this.endSpeaking();
       this.setState("listening");
