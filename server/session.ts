@@ -65,6 +65,7 @@ export interface VoiceSessionDeps {
   saveSession: (record: SessionRecord) => Promise<void>;
   loadSession: (id: string) => Promise<SessionRecord | null>;
   analyzeAndStore: (record: SessionRecord) => Promise<void>;
+  extractAndStorePacket: (record: SessionRecord) => Promise<void>;
 }
 
 interface VoiceSessionRuntimeDeps {
@@ -220,11 +221,12 @@ export class VoiceSession {
         : defaultDemoSessionStartup);
     const finalizer =
       deps?.finalizer ??
-      (deps?.reflectAndStore || deps?.saveSession || deps?.analyzeAndStore
+      (deps?.reflectAndStore || deps?.saveSession || deps?.analyzeAndStore || deps?.extractAndStorePacket
         ? createDemoSessionFinalizer({
             reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
             saveSession: deps?.saveSession ?? defaultSaveSession,
             analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
+            extractAndStorePacket: deps?.extractAndStorePacket,
           })
         : defaultDemoSessionFinalizer);
 

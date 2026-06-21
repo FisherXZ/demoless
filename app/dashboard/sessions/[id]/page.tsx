@@ -4,6 +4,7 @@ import SessionList from "@/components/dashboard/SessionList";
 import { Group, SignalRow } from "@/components/dashboard/SignalGroup";
 import { getSession, fmtDuration, intentOf, kpis } from "@/lib/dashboard/data";
 import RecapPanel from "@/components/dashboard/RecapPanel";
+import PacketPanel from "@/components/dashboard/PacketPanel";
 import {
   getRecapView,
   resolveDashboardMode,
@@ -342,24 +343,8 @@ function LiveSessionDetail({
             </Link>
           </div>
 
-          {session.recapSummary ? (
-            <div className="mb-4 rounded-[12px] border border-edge bg-slate p-4">
-              <span className="mb-[8px] block font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
-                Recap summary
-              </span>
-              <p className="m-0 text-[14px] leading-[1.6] text-ash">{session.recapSummary}</p>
-            </div>
-          ) : (
-            <div className="mb-4 rounded-[12px] border border-edge bg-slate p-4">
-              <span className="mb-[8px] block font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
-                Recap
-              </span>
-              <p className="m-0 text-[14px] leading-[1.6] text-ash">
-                No recap generated yet. This view shows raw captured evidence only —
-                transcript, trace, and replay metadata.
-              </p>
-            </div>
-          )}
+          {/* Issue #21: evidence-backed post-demo packet (supersedes the recap summary). */}
+          <PacketPanel status={session.packetStatus} packet={session.packet} />
 
           {/* replay status — real Browserbase link only when available */}
           <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-[12px] border border-edge bg-[#0E1116]">
