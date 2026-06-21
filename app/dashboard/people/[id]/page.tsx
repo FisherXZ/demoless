@@ -8,7 +8,7 @@ function scoreClass(n: number) {
 }
 function intentHex(n: number) {
   const i = intentOf(n);
-  return i === "High" ? "#34d399" : i === "Medium" ? "#fbbf24" : "#aba79e";
+  return i === "High" ? "#16A34A" : i === "Medium" ? "#C2710C" : "#8A94A2";
 }
 
 export default async function PersonDetail({
@@ -52,7 +52,7 @@ export default async function PersonDetail({
         </div>
         <Link
           href={`/dashboard/sessions/${s.id}`}
-          className="ml-auto rounded-[9px] border border-edge px-3.5 py-2 text-[13px] font-semibold text-brandlit2 transition-colors hover:border-coal2 hover:text-chalk"
+          className="ml-auto rounded-[9px] border border-edge px-3.5 py-2 text-[13px] font-semibold text-brandlit2 transition-colors hover:border-ember hover:text-chalk"
         >
           View session →
         </Link>
@@ -116,7 +116,7 @@ export default async function PersonDetail({
             </div>
           </div>
 
-          <div className="rounded-[14px] border border-brandlit/40 bg-gradient-to-b from-[#171830] to-slate p-[18px]">
+          <div className="rounded-[14px] border border-brandlit/40 bg-gradient-to-b from-[#E7E8FB] to-slate p-[18px]">
             <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.1em] text-brandlit2">
               Recommended follow-up
             </span>

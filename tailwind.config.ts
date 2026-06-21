@@ -26,26 +26,31 @@ const config: Config = {
         coal2: "#4b4b48",
         coalline: "#34332f",
 
-        // ── Dark instrument layer (the dashboard "command center") ──────────
-        // Layered warm-black surfaces. Use as: obsidian = app base,
-        // slate = raised panel/card, slate2 = nested/hover, with edge hairlines.
-        obsidian: "#0c0c0b", // app base (deepest)
-        slate: "#161614", // raised panel / card
-        slate2: "#1d1d1a", // nested fill / row hover
-        slate3: "#242420", // input / control fill
-        edge: "#2b2a27", // dark hairline border
-        edge2: "#201f1d", // subtler divider
-        // Text ramp on dark (warm, never pure white)
-        chalk: "#f3f1ec", // primary text on dark
-        ash: "#aba79e", // secondary text on dark
-        ember: "#75716a", // tertiary / mono labels on dark
-        // Accents retuned to glow on near-black (the light brand is invisible here)
-        brandlit: "#7c82ff", // indigo accent on dark — actions, active, AI presence
-        brandlit2: "#9aa0ff", // hover / brighter
-        goodlit: "#34d399", // qualified / positive on dark
-        warnlit: "#fbbf24", // objection / caution on dark
-        dangerlit: "#f87171", // needs-a-human on dark
-        livelit: "#34d399", // active / streaming / speaking-now on dark
+        // ── Instrument layer — COMMITTED LIGHT system (cobalt) ──────────────
+        // Light tiered base (Stripe-style) + cobalt accent. Names kept from the
+        // earlier dark build; values are now the user-approved light palette.
+        // (Dashboard-only tokens — the landing still uses paper/ink/brand above.)
+        obsidian: "#F6F7F9", // canvas — app ground (tinted off-white, not pure white)
+        slate: "#FFFFFF", // panel — raised card
+        slate2: "#EDF0F4", // sunk — nested fill / row hover / rails
+        slate3: "#F1F4F7", // field — input / control fill
+        edge: "#E3E7EC", // hairline border
+        edge2: "#ECEFF3", // subtler divider
+        // Text ramp on light (cool near-black, never pure #000)
+        chalk: "#0E1116", // primary text — ink
+        ash: "#525B68", // secondary text
+        ember: "#8A94A2", // tertiary / mono labels
+        // Cobalt accent
+        brandlit: "#3A41D6", // accent — actions, active, AI presence, one series
+        brandlit2: "#2A2FA8", // accent-deep — hover / links on light
+        accentsoft: "#E7E8FB", // accent tint — selected row, featured-card wash, chips
+        accentink: "#1B1D66", // deep accent text on tint
+        goodlit: "#16A34A", // qualified / positive
+        goodsofter: "#E6F4EA", // good tint (badge bg)
+        warnlit: "#C2710C", // objection / caution
+        warnsofter: "#FBF1E3", // warn tint (glyph bg)
+        dangerlit: "#DC2626", // needs-a-human
+        livelit: "#16A34A", // active / streaming / speaking-now
 
         muted: "#57534e",
         muted2: "#78716c",
@@ -82,6 +87,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-hanken)", "system-ui", "sans-serif"],
         mono: ["var(--font-jetbrains)", "monospace"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
       },
     },
   },

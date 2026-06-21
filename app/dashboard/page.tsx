@@ -147,8 +147,8 @@ function Timeline() {
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none">
         <defs>
           <linearGradient id="qualFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7c82ff" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#7c82ff" stopOpacity="0" />
+            <stop offset="0%" stopColor="#3A41D6" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="#3A41D6" stopOpacity="0" />
           </linearGradient>
           <filter id="lineGlow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="2.2" result="b" />
@@ -162,7 +162,7 @@ function Timeline() {
         {/* gridlines + y ticks */}
         {ticks.map((t) => (
           <g key={t}>
-            <line x1={PAD_L} y1={y(t)} x2={W} y2={y(t)} stroke="#2b2a27" strokeWidth="1" />
+            <line x1={PAD_L} y1={y(t)} x2={W} y2={y(t)} stroke="#E3E7EC" strokeWidth="1" />
             <text
               x={PAD_L - 8}
               y={y(t) + 3}
@@ -183,7 +183,7 @@ function Timeline() {
         <path
           d={smoothPath(allPts)}
           fill="none"
-          stroke="#aba79e"
+          stroke="#8A94A2"
           strokeWidth="1.6"
           strokeOpacity="0.65"
           strokeLinecap="round"
@@ -191,13 +191,13 @@ function Timeline() {
         <path
           d={smoothPath(qualPts)}
           fill="none"
-          stroke="#7c82ff"
+          stroke="#3A41D6"
           strokeWidth="2.4"
           strokeLinecap="round"
           filter="url(#lineGlow)"
         />
         {qualPts.map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r="2.4" fill="#0c0c0b" stroke="#7c82ff" strokeWidth="1.6" />
+          <circle key={i} cx={cx} cy={cy} r="2.4" fill="#FFFFFF" stroke="#3A41D6" strokeWidth="1.6" />
         ))}
 
         {/* x axis ticks */}
@@ -220,8 +220,8 @@ function Timeline() {
 
 // ── page ──────────────────────────────────────────────────────────────────
 
-const DEVICE_COLORS = ["#7c82ff", "#2b2a27"]; // brandlit, edge
-const SOURCE_COLORS = ["#34d399", "#1d6b4f", "#2b2a27"]; // goodlit, deep green, edge
+const DEVICE_COLORS = ["#3A41D6", "#E3E7EC"]; // brandlit, edge
+const SOURCE_COLORS = ["#16A34A", "#15803D", "#E3E7EC"]; // goodlit, deep green, edge
 
 export default function OverviewPage() {
   const k = kpis();
@@ -241,7 +241,7 @@ export default function OverviewPage() {
       {/* header */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-[25px] font-extrabold tracking-[-0.025em] text-chalk">
+          <h1 className="font-serif text-[28px] font-medium tracking-[-0.015em] text-chalk">
             Good evening, Alex
           </h1>
           <p className="mt-[3px] text-[13px] text-ash">
@@ -259,12 +259,12 @@ export default function OverviewPage() {
       {/* latest session — live is the hero */}
       <Link
         href={`/dashboard/sessions/${latest.id}`}
-        className="group mt-[18px] flex items-center gap-4 rounded-[12px] border border-edge bg-slate px-4 py-[13px] transition-colors hover:border-coal2"
+        className="group mt-[18px] flex items-center gap-4 rounded-[12px] border border-edge bg-slate px-4 py-[13px] transition-colors hover:border-ember"
       >
         <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ember">Latest</span>
         <span
           className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px] font-mono text-[11px] font-bold"
-          style={{ background: "#1d1d1a", color: "#9aa0ff" }}
+          style={{ background: "#EDF0F4", color: "#2A2FA8" }}
         >
           {latest.buyer.initials}
         </span>
@@ -272,7 +272,7 @@ export default function OverviewPage() {
           <div className="flex items-center gap-2">
             <span className="text-[13.5px] font-semibold text-chalk">{latest.buyer.company}</span>
             {latest.qualified && (
-              <span className="rounded-[5px] bg-[#0f2a1d] px-[6px] py-px font-mono text-[9px] font-semibold uppercase tracking-[0.05em] text-goodlit">
+              <span className="rounded-[5px] bg-[#E6F4EA] px-[6px] py-px font-mono text-[9px] font-semibold uppercase tracking-[0.05em] text-goodlit">
                 Qualified
               </span>
             )}
@@ -298,7 +298,7 @@ export default function OverviewPage() {
       {/* KPI row — featured Qualified card + secondary metrics */}
       <div className="my-5 grid grid-cols-1 gap-[12px] md:grid-cols-2 lg:grid-cols-4">
         {/* hero metric */}
-        <div className="relative overflow-hidden rounded-[14px] border border-brandlit/40 bg-gradient-to-b from-[#171830] to-slate p-[18px] lg:row-span-1">
+        <div className="relative overflow-hidden rounded-[14px] border border-brandlit/40 bg-gradient-to-b from-[#E7E8FB] to-slate p-[18px] lg:row-span-1">
           <div className="absolute right-0 top-0 h-[60px] w-[60px] rounded-bl-[40px] bg-brandlit/10 blur-2xl" />
           <div className="flex items-center justify-between">
             <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-brandlit2">
@@ -325,7 +325,7 @@ export default function OverviewPage() {
         {cards.map((c) => (
           <div
             key={c.label}
-            className="flex flex-col rounded-[14px] border border-edge bg-slate p-[18px] transition-colors hover:border-coal2"
+            className="flex flex-col rounded-[14px] border border-edge bg-slate p-[18px] transition-colors hover:border-ember"
           >
             <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
               {c.label}
@@ -334,7 +334,7 @@ export default function OverviewPage() {
               <span className="dl-num font-mono text-[30px] font-semibold leading-none tracking-[-0.02em] text-chalk">
                 {c.value}
               </span>
-              {c.spark && <Sparkline data={c.spark} color="#7c82ff" />}
+              {c.spark && <Sparkline data={c.spark} color="#3A41D6" />}
             </div>
             <div className="mt-auto flex items-center gap-[7px] pt-[14px]">
               <span

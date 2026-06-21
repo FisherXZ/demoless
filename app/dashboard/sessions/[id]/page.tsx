@@ -25,7 +25,7 @@ export default async function SessionDetail({
   return (
     <div className="flex h-screen flex-col text-chalk">
       <header className="flex flex-none items-center gap-[10px] border-b border-edge px-5 py-[14px]">
-        <span className="text-[15px] font-extrabold tracking-[-0.01em]">Sessions</span>
+        <span className="font-serif text-[17px] font-medium tracking-[-0.01em]">Sessions</span>
         <span className="dl-num ml-auto font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
           {k.total} total · {k.qualified} qualified
         </span>
@@ -33,12 +33,12 @@ export default async function SessionDetail({
 
       <div className="grid min-h-0 flex-1 grid-cols-[240px_1fr_252px]">
         {/* left — sessions list */}
-        <div className="dl-scroll-dark min-w-0 overflow-y-auto border-r border-edge">
+        <div className="dl-scroll min-w-0 overflow-y-auto border-r border-edge">
           <SessionList selectedId={s.id} />
         </div>
 
         {/* center — the call */}
-        <div className="dl-scroll-dark min-w-0 overflow-y-auto px-6 py-[22px]">
+        <div className="dl-scroll min-w-0 overflow-y-auto px-6 py-[22px]">
           <div className="mb-[16px] flex items-center gap-[11px]">
             <span className="flex h-[38px] w-[38px] items-center justify-center rounded-[9px] bg-slate2 font-mono text-[13px] font-bold text-brandlit2">
               {s.buyer.initials}
@@ -53,7 +53,7 @@ export default async function SessionDetail({
             </div>
             <Link
               href={`/dashboard/people/${s.buyer.id}`}
-              className="ml-auto flex-none rounded-[8px] border border-edge px-3 py-1.5 text-[12px] font-semibold text-brandlit2 transition-colors hover:border-coal2 hover:text-chalk"
+              className="ml-auto flex-none rounded-[8px] border border-edge px-3 py-1.5 text-[12px] font-semibold text-brandlit2 transition-colors hover:border-ember hover:text-chalk"
             >
               View buyer →
             </Link>
@@ -67,22 +67,22 @@ export default async function SessionDetail({
           </div>
 
           {/* replay player */}
-          <div className="relative aspect-video overflow-hidden rounded-[12px] border border-edge bg-[#0a0a09]">
+          <div className="relative aspect-video overflow-hidden rounded-[12px] border border-edge bg-[#0E1116]">
             <div className="dl-grid absolute inset-0 flex items-center justify-center font-mono text-[11px] text-ember">
               ▶ Browserbase session replay · {fmtDuration(s.durationSec)}
             </div>
-            <div className="absolute left-[14px] top-3 flex items-center gap-1.5 font-mono text-[10px] text-chalk">
+            <div className="absolute left-[14px] top-3 flex items-center gap-1.5 font-mono text-[10px] text-white">
               <span className="h-[7px] w-[7px] rounded-full bg-dangerlit" style={{ animation: "dlBlink 1.4s ease infinite" }} />
               REC {fmtDuration(s.durationSec)}
             </div>
             <div className="absolute inset-x-0 bottom-0 flex items-center gap-[11px] bg-gradient-to-t from-black/80 to-transparent px-[14px] py-[12px]">
-              <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full bg-chalk text-[12px] text-obsidian">
+              <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full bg-white text-[12px] text-[#0E1116]">
                 ▶
               </span>
               <div className="relative h-[3px] flex-1 rounded bg-white/20">
                 <span className="absolute inset-y-0 left-0 w-[42%] rounded bg-brandlit" />
               </div>
-              <span className="dl-num font-mono text-[11px] text-chalk">
+              <span className="dl-num font-mono text-[11px] text-white">
                 01:46 / {fmtDuration(s.durationSec)}
               </span>
             </div>
@@ -94,7 +94,7 @@ export default async function SessionDetail({
         </div>
 
         {/* right — signals */}
-        <div className="dl-scroll-dark min-w-0 overflow-y-auto border-l border-edge bg-[#101010] px-4 py-[18px]">
+        <div className="dl-scroll min-w-0 overflow-y-auto border-l border-edge bg-[#EDF0F4] px-4 py-[18px]">
           <Group label="Snapshot">
             <div className="mb-2 flex items-center text-[13px]">
               <span className="text-ash">Lead score</span>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 
@@ -17,6 +17,15 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+// Editorial display serif (Tiempos-adjacent) for hero + page titles.
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Demoless",
   description: "The AI AE that sells your SaaS while your team sleeps.",
@@ -28,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${hanken.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${hanken.variable} ${jetbrains.variable} ${newsreader.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>

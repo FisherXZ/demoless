@@ -2,8 +2,8 @@ import type { Signal } from "@/lib/dashboard/data";
 import { SIGNAL_GLYPH } from "@/lib/dashboard/data";
 
 const GLYPH_CLS: Record<string, string> = {
-  int: "bg-[#0f2a1d] text-goodlit",
-  obj: "bg-[#2e2110] text-warnlit",
+  int: "bg-[#E6F4EA] text-goodlit",
+  obj: "bg-[#FBF1E3] text-warnlit",
   neu: "bg-slate2 text-ash",
 };
 

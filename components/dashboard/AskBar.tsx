@@ -121,7 +121,7 @@ export default function AskBar() {
           <button
             key={s}
             onClick={() => ask(s)}
-            className="cursor-pointer rounded-[8px] border border-edge bg-slate px-[11px] py-1.5 text-[12px] text-ash transition-colors hover:border-coal2 hover:text-chalk"
+            className="cursor-pointer rounded-[8px] border border-edge bg-slate px-[11px] py-1.5 text-[12px] text-ash transition-colors hover:border-ember hover:text-chalk"
           >
             {s}
           </button>

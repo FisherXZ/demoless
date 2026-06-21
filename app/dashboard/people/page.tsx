@@ -9,14 +9,14 @@ export default function PeoplePage() {
   return (
     <div className="flex h-screen flex-col text-chalk">
       <header className="flex flex-none items-center gap-[10px] border-b border-edge px-[34px] py-[14px]">
-        <span className="text-[15px] font-extrabold tracking-[-0.01em]">People</span>
+        <span className="font-serif text-[17px] font-medium tracking-[-0.01em]">People</span>
         <span className="dl-num ml-auto font-mono text-[11px] uppercase tracking-[0.1em] text-ember">
           {SESSIONS.length} buyers
         </span>
       </header>
-      <div className="dl-scroll-dark min-h-0 flex-1 overflow-y-auto px-[34px] py-5">
+      <div className="dl-scroll min-h-0 flex-1 overflow-y-auto px-[34px] py-5">
         <div className="overflow-hidden rounded-[14px] border border-edge bg-slate">
-          <div className="grid grid-cols-[1.6fr_1fr_1fr_0.6fr_0.6fr] bg-[#101010] px-4 py-[11px] font-mono text-[10px] uppercase tracking-[0.1em] text-ember">
+          <div className="grid grid-cols-[1.6fr_1fr_1fr_0.6fr_0.6fr] bg-[#EDF0F4] px-4 py-[11px] font-mono text-[10px] uppercase tracking-[0.1em] text-ember">
             <span>Buyer</span>
             <span>Company</span>
             <span>Role</span>

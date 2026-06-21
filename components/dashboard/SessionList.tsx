@@ -27,7 +27,7 @@ export default function SessionList({ selectedId }: { selectedId?: string }) {
             <div className="mt-1 flex items-center gap-2">
               <span className="text-[12px] text-ember">{s.buyer.company}</span>
               {s.qualified && (
-                <span className="rounded-[5px] bg-[#0f2a1d] px-1.5 py-px font-mono text-[9px] font-semibold uppercase tracking-[0.05em] text-goodlit">
+                <span className="rounded-[5px] bg-[#E6F4EA] px-1.5 py-px font-mono text-[9px] font-semibold uppercase tracking-[0.05em] text-goodlit">
                   Qualified
                 </span>
               )}

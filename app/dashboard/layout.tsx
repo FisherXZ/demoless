@@ -17,10 +17,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-obsidian text-chalk">
-      <aside className="sticky top-0 flex h-screen w-[224px] flex-none flex-col border-r border-edge bg-[#101010] px-[13px] py-[16px]">
+      <aside className="sticky top-0 flex h-screen w-[224px] flex-none flex-col border-r border-edge bg-[#EDF0F4] px-[13px] py-[16px]">
         <Link href="/" className="group flex items-center gap-[9px] px-2 pb-[18px] pt-1">
-          <span className="flex h-[27px] w-[27px] items-center justify-center rounded-[8px] bg-chalk transition-transform group-hover:scale-105">
-            <span className="h-[10px] w-[10px] rounded-full bg-brand" />
+          <span className="flex h-[27px] w-[27px] items-center justify-center rounded-[8px] bg-brandlit transition-transform group-hover:scale-105">
+            <span className="h-[10px] w-[10px] rounded-full bg-white" />
           </span>
           <span className="text-[15.5px] font-extrabold tracking-[-0.02em] text-chalk">
             Demoless
@@ -84,7 +84,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="dl-grid dl-scroll-dark min-w-0 flex-1 bg-obsidian">{children}</main>
+      <main className="dl-grid dl-scroll min-w-0 flex-1 bg-obsidian">{children}</main>
     </div>
   );
 }
