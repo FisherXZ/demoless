@@ -102,12 +102,12 @@ const FEATURES: [string, string, string][] = [
   [
     "Available 24/7",
     "Always on",
-    "Visitors jump into a live, narrated call straight from your landing page, in-app, or an outbound email — no scheduling, ever.",
+    "Visitors jump into a live, narrated call straight from your landing page, in-app, or an outbound email. No scheduling, ever.",
   ],
   [
     "Hyper-personalized",
     "Adaptive",
-    "Each demo adapts to the visitor's role and context, and stays current with your real product — not a recorded walkthrough.",
+    "Each demo adapts to the visitor's role and context, and stays current with your real product, not a recorded walkthrough.",
   ],
   [
     "Speaks their language",
@@ -117,7 +117,7 @@ const FEATURES: [string, string, string][] = [
   [
     "Insights backed by the transcript",
     "Signal",
-    "After every call your dashboard gets why they came, their pain points, buying signals, and objections — each one backed by a real quote from the demo.",
+    "After every call your dashboard gets why they came, their pain points, buying signals, and objections, each one backed by a real quote from the demo.",
   ],
 ];
 
@@ -153,13 +153,12 @@ export default function Landing({ vals }: { vals: DemoVals }) {
       <section className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-14 px-10 pb-14 pt-12 lg:grid-cols-[1.05fr_1fr]">
         <div>
           <h1 className="m-0 max-w-[600px] font-serif text-[clamp(40px,5.2vw,60px)] font-medium leading-[1.04] tracking-[-0.02em] text-chalk">
-            Don't make your prospects{" "}
-            <em className="italic text-brandlit2">wait — ever again.</em>
+            An AI sales agent that sells while you sleep.
           </h1>
-          <p className="mb-9 mt-6 max-w-[470px] text-[18px] leading-[1.55] text-ash">
-            An AI sales agent walks each visitor through your real product on a live call, answers
-            out loud, and hands your team a scored read on what they cared about — the moment the
-            call ends.
+          <p className="mb-9 mt-6 max-w-[520px] text-[18px] leading-[1.55] text-ash">
+            Convert buyers the moment they show intent. Demoless gives each prospect a live,
+            voice-led product walkthrough in their own language, then sends your team a scored
+            summary of what they cared about before the lead goes cold.
           </p>
           <div className="flex items-center gap-3">
             <LaunchButton onClick={vals.goForm} large />
@@ -227,7 +226,7 @@ export default function Landing({ vals }: { vals: DemoVals }) {
       <section className="border-y border-edge bg-slate2/40 py-16">
         <div className="mx-auto w-full max-w-[1180px] px-10">
           <h2 className="m-0 max-w-[680px] font-serif text-[clamp(26px,3.4vw,36px)] font-medium leading-[1.12] tracking-[-0.015em] text-chalk">
-            Close leads when intent is highest — with demos running around the clock.
+            Close leads when intent is highest, with demos running around the clock.
           </h2>
         </div>
         <div className="mt-9 flex flex-col gap-3 overflow-hidden">
