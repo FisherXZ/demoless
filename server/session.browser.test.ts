@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, type Mock } from "vitest";
+import { getDemoConfig } from "./config/demoConfig";
 
 // We test VoiceSession with fake deps injected via the optional ctor param.
 // Import after mocking the real modules it would otherwise load at module-init time.
@@ -67,7 +68,7 @@ describe("VoiceSession — browser session ownership", () => {
     // Give async startSession time to resolve
     await new Promise((r) => setTimeout(r, 10));
 
-    expect(fakeStartSession).toHaveBeenCalledWith("https://www.browserbase.com");
+    expect(fakeStartSession).toHaveBeenCalledWith(getDemoConfig().browseTargetUrl);
 
     const events = ws.sent.map((s) => JSON.parse(s) as { t: string; url?: string });
     const liveView = events.find((e) => e.t === "live_view");
