@@ -98,7 +98,7 @@ export async function analyzeSession(
   chat: ChatFn = defaultChat,
   now: number = Date.now()
 ): Promise<RecapReport | null> {
-  if (!record.transcript.some((t) => t.role === "user")) return null;
+  if (!record.events.some((e) => e.kind === "user_said")) return null;
   const raw = await chat(SYSTEM, buildUserPrompt(record));
   const parsed = parseRecap(raw, record.id, now);
   if (!parsed) return null;
