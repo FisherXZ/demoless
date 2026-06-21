@@ -15,6 +15,8 @@ import type {
   TraceEvent,
   TranscriptTurn,
 } from "../sessions";
+import { loadPacket } from "../sessions/packet";
+import type { ExtractionStatus, SessionPacket } from "../sessions/packet";
 
 export interface RecapView {
   record: SessionRecord;
@@ -71,6 +73,9 @@ export interface LiveSessionView {
   /** Present only when a real recap exists. */
   recapLabel?: SessionSummary["label"];
   recapSummary?: string;
+  /** The evidence-backed post-demo packet (issue #21), present on detail views. */
+  packet?: SessionPacket | null;
+  packetStatus?: ExtractionStatus;
 }
 
 export interface LiveBuyer {
@@ -205,6 +210,10 @@ export async function getLiveSession(id: string): Promise<LiveSessionView | null
     view.recapLabel = recap.label;
     view.recapSummary = recap.summary;
   }
+  // Issue #21: the evidence-backed packet powers the rich detail panel.
+  const { status: packetStatus, packet } = await loadPacket(id);
+  view.packet = packet;
+  view.packetStatus = packetStatus;
   return view;
 }
 

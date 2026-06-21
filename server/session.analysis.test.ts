@@ -47,6 +47,7 @@ async function startedSession() {
   const ws = fakeWs();
   const saveSession = vi.fn(async () => {});
   const analyzeAndStore = vi.fn(async () => {});
+  const extractAndStorePacket = vi.fn(async () => {});
   new VoiceSession(ws, "dg-key", {
     startSession: vi.fn().mockResolvedValue({
       liveViewUrl: "https://live.example.com", sessionId: "bb-1",
@@ -60,27 +61,33 @@ async function startedSession() {
     saveSession,
     loadSession: vi.fn().mockResolvedValue(null),
     analyzeAndStore,
+    extractAndStorePacket,
   });
   ws.emit("message", JSON.stringify({ t: "audio_start", language: "en", buyer: BUYER }), false);
   await new Promise((r) => setTimeout(r, 10)); // let startListening settle
-  return { ws, saveSession, analyzeAndStore };
+  return { ws, saveSession, analyzeAndStore, extractAndStorePacket };
 }
 
 describe("VoiceSession analysis", () => {
   it("persists and analyzes the identified session once on socket close", async () => {
-    const { ws, saveSession, analyzeAndStore } = await startedSession();
+    const { ws, saveSession, analyzeAndStore, extractAndStorePacket } = await startedSession();
     saveSession.mockClear(); // ignore the live snapshots taken while running
 
     ws.emit("close");
 
-    // analyze runs exactly once, at teardown; the final save is the ended record.
+    // analyze + packet extraction each run exactly once, at teardown; the final
+    // save is the ended record.
     expect(analyzeAndStore).toHaveBeenCalledTimes(1);
+    expect(extractAndStorePacket).toHaveBeenCalledTimes(1);
     expect(saveSession).toHaveBeenCalledTimes(1);
     const ended = (saveSession.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
     expect(ended).toMatchObject({ id: "demo-1", status: "ended", buyerEmail: "buyer@example.com" });
     expect(ended).toHaveProperty("transcript");
     const analyzed = (analyzeAndStore.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
     expect(analyzed).toHaveProperty("events");
+    // The packet extractor receives the same ended record.
+    const packeted = (extractAndStorePacket.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
+    expect(packeted).toMatchObject({ id: "demo-1", status: "ended" });
   });
 
   it("does not analyze twice when error then close both fire", async () => {

@@ -11,11 +11,13 @@ describe("demo session finalizer", () => {
     const reflectAndStore = vi.fn(async () => {});
     const saveSession = vi.fn(async (_record: SessionRecord) => {});
     const analyzeAndStore = vi.fn(async (_record: SessionRecord) => {});
+    const extractAndStorePacket = vi.fn(async (_record: SessionRecord) => {});
 
     const finalizer = createDemoSessionFinalizer({
       reflectAndStore,
       saveSession,
       analyzeAndStore,
+      extractAndStorePacket,
       replayUrl: (id) => `https://replay.example.com/${id}`,
     });
 
@@ -43,8 +45,10 @@ describe("demo session finalizer", () => {
 
     expect(saveSession).toHaveBeenCalledTimes(1);
     expect(analyzeAndStore).toHaveBeenCalledTimes(1);
+    expect(extractAndStorePacket).toHaveBeenCalledTimes(1);
     const record = saveSession.mock.calls[0][0];
     expect(record).toBe(analyzeAndStore.mock.calls[0][0]);
+    expect(record).toBe(extractAndStorePacket.mock.calls[0][0]);
     expect(record).toMatchObject({
       id: "demo-789",
       company: "browserbase",
@@ -100,6 +104,7 @@ describe("demo session finalizer", () => {
       reflectAndStore: vi.fn(async () => {}),
       saveSession,
       analyzeAndStore,
+      extractAndStorePacket: vi.fn(async () => {}),
       replayUrl: (id) => `https://replay.example.com/${id}`,
     });
 
