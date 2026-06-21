@@ -544,6 +544,9 @@ export class VoiceSession {
         case "filler":
           yield { text: cmd.text, filler: true };
           break;
+        case "navigate":
+          this.recorder.recordAction("navigate", cmd.url, this.turnCounter);
+          break;
         case "screen_is_on":
           this.recorder.recordPage(cmd.page, this.turnCounter);
           this.send({ t: "screen_is_on", page: cmd.page });
