@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const DEFAULT_TARGET =
-  process.env.DEMO_TARGET_URL || "https://worldcuparena.live/";
+  process.env.DEMO_TARGET_URL || "https://www.browserbase.com/";
 
 interface Body {
   action?: "start" | "navigate" | "click" | "stop";

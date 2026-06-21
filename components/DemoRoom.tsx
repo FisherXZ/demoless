@@ -6,7 +6,7 @@ import { useVoiceAgent } from "@/lib/voice/useVoiceAgent";
 import { useAgentName } from "@/lib/voice/useAgentName";
 import { LANGUAGES, type Language } from "@/lib/voice/messages";
 
-const TARGET = process.env.NEXT_PUBLIC_DEMO_TARGET_URL || "https://worldcuparena.live/";
+const TARGET = process.env.NEXT_PUBLIC_DEMO_TARGET_URL || "https://www.browserbase.com/";
 
 const SUGGESTIONS = [
   "Show me my sessions",
