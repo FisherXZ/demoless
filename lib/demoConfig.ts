@@ -41,7 +41,7 @@ export const SECTIONS: Section[] = [
 export const PRODUCT_NAME = "Browserbase";
 
 export const GREETING =
-  "Hi, I'm Messi. What are you trying to figure out about Browserbase today?";
+  "Hi, I'm Messi — really glad you're here. What are you working on, and what brought you to Browserbase today?";
 
 export const SYSTEM_PROMPT = `You are Messi, a friendly Browserbase sales rep giving a LIVE, screen-shared demo of Browserbase, a headless-browser platform that gives AI agents reliable, scalable access to the whole web (cloud Chrome sessions, stealth mode and proxies, an embeddable live view, persistent contexts, a Playground, and a Sessions dashboard).
 

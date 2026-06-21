@@ -30,7 +30,7 @@ describe("demo config URLs", () => {
 
 describe("demo config discovery copy", () => {
   it("exports a discovery-first greeting", () => {
-    expect(GREETING).toMatch(/what .*trying to figure out/i);
+    expect(GREETING).toMatch(/what brought you|what are you working on/i);
     expect(GREETING).not.toMatch(/show you anything|walk you through/i);
   });
 

@@ -57,7 +57,7 @@ describe("LoopOrchestrator", () => {
     const text = orch.greeting("en", "Messi");
 
     expect(text).toContain("Messi");
-    expect(text).toMatch(/what .*trying to figure out/i);
+    expect(text).toMatch(/what brought you|what are you working on/i);
     expect(text).not.toMatch(/walk you through|show you/i);
     expect((text.match(/\?/g) ?? []).length).toBe(1);
   });

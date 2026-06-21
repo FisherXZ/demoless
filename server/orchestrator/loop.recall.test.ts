@@ -45,7 +45,7 @@ describe("LoopOrchestrator recall", () => {
 
     expect(text).toContain("parallel browser sessions");
     expect(text).toMatch(/today/i);
-    expect(text).toMatch(/trying to figure out/i);
+    expect(text).toMatch(/what brought you|what are you working on/i);
     expect(text).not.toMatch(/pick up there|walk you through/i);
   });
 

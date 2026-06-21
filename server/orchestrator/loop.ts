@@ -41,10 +41,10 @@ export class LoopOrchestrator implements Orchestrator {
     const first = firstName(buyer?.profile.name);
     const base =
       lang === "zh"
-        ? `你好${first ? `，${first}` : ""}，我是${agentName}。你今天想了解${product}的哪件事？`
+        ? `你好${first ? `，${first}` : ""}，我是${agentName}。很高兴见到你。你最近在忙些什么、今天想了解${product}的哪方面呢？`
         : lang === "es"
-          ? `Hola${first ? `, ${first}` : ""}, soy ${agentName}. ¿Qué estás tratando de entender sobre ${product} hoy?`
-          : `Hi${first ? ` ${first}` : ""}, I'm ${agentName}. What are you trying to figure out about ${product} today?`;
+          ? `Hola${first ? `, ${first}` : ""}, soy ${agentName}. Me alegra mucho que estés aquí. ¿En qué estás trabajando y qué te trae a ${product} hoy?`
+          : `Hi${first ? ` ${first}` : ""}, I'm ${agentName} — really glad you're here. What are you working on, and what brought you to ${product} today?`;
     // The recall line is composed in English from stored notes. Speaking it in a
     // non-English session mixes scripts in one TTS utterance (the Mandarin voice
     // muffling English) and reads wrong, so only prepend it for English. The
