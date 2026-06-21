@@ -50,14 +50,6 @@ textarea:focus {
     width: 100%;
   }
 }
-@keyframes dlRing {
-  0% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.35);
-  }
-  100% {
-    box-shadow: 0 0 0 14px rgba(79, 70, 229, 0);
-  }
-}
 @keyframes dlFade {
   from {
     opacity: 0;
@@ -96,4 +88,60 @@ textarea:focus {
 .dl-scroll::-webkit-scrollbar-thumb {
   background: #d6d3d1;
   border-radius: 8px;
+}
+
+/* ── Dark instrument (dashboard command center) ─────────────────────────── */
+
+/* Faint engineering grid on the app base — texture, not decoration. */
+.dl-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Dark scrollbar for the command-center surfaces. */
+.dl-scroll-dark::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+.dl-scroll-dark::-webkit-scrollbar-thumb {
+  background: #2b2a27;
+  border-radius: 9px;
+}
+.dl-scroll-dark::-webkit-scrollbar-thumb:hover {
+  background: #3a3934;
+}
+
+/* Live presence — a slow breathing glow on the active/latest signal. */
+@keyframes dlGlow {
+  0%,
+  100% {
+    opacity: 0.9;
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.45);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 5px rgba(52, 211, 153, 0);
+  }
+}
+.dl-live-dot {
+  animation: dlGlow 2.4s ease-in-out infinite;
+}
+
+/* Instrument numerals: tabular figures so columns of data align. */
+.dl-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+/* Reduced motion: kill every looping/entrance animation, keep state instant. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
