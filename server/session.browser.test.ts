@@ -88,17 +88,31 @@ describe("VoiceSession — browser session ownership", () => {
       startSession: fakeStartSession,
       stopSession: fakeStopSession,
       createOrchestrator: fakeCreateOrchestrator,
+      saveSession: vi.fn().mockResolvedValue(undefined),
+      loadSession: vi.fn().mockResolvedValue(null),
+      analyzeAndStore: vi.fn().mockResolvedValue(undefined),
     });
 
     // Simulate audio_start control message
     const [[, handler]] = (ws.on as Mock).mock.calls.filter(
       (args: unknown[]) => args[0] === "message"
     );
-    await handler(JSON.stringify({ t: "audio_start", language: "en" }), false);
+    await handler(
+      JSON.stringify({
+        t: "audio_start",
+        language: "en",
+        buyer: { demoSessionId: "demo-1", buyerEmail: "buyer@example.com" },
+      }),
+      false
+    );
 
     await waitForEvent(ws, "ready");
 
-    expect(fakeStartSession).toHaveBeenCalledWith(getDemoConfig().browseTargetUrl);
+    // Cold-start path passes the target URL plus an early live-view callback.
+    expect(fakeStartSession).toHaveBeenCalledWith(
+      getDemoConfig().browseTargetUrl,
+      expect.any(Function)
+    );
 
     const events = ws.sent.map((s) => JSON.parse(s) as { t: string; url?: string });
     const liveView = events.find((e) => e.t === "live_view");
@@ -129,14 +143,24 @@ describe("VoiceSession — browser session ownership", () => {
       startSession: fakeStartSession,
       stopSession: fakeStopSession,
       createOrchestrator: fakeCreateOrchestrator,
+      saveSession: vi.fn().mockResolvedValue(undefined),
+      loadSession: vi.fn().mockResolvedValue(null),
+      analyzeAndStore: vi.fn().mockResolvedValue(undefined),
     });
 
     // Trigger audio_start so sessionId gets set
     const [[, msgHandler]] = (ws.on as Mock).mock.calls.filter(
       (args: unknown[]) => args[0] === "message"
     );
-    await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
-    await waitForEvent(ws, "ready");
+    await msgHandler(
+      JSON.stringify({
+        t: "audio_start",
+        language: "en",
+        buyer: { demoSessionId: "demo-1", buyerEmail: "buyer@example.com" },
+      }),
+      false
+    );
+    await new Promise((r) => setTimeout(r, 10));
 
     // Trigger close
     const closeHandlerCall = (ws.on as Mock).mock.calls.find(

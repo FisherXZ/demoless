@@ -5,6 +5,7 @@ import { base64ToInt16, PcmPlayer } from "./audioPlayback";
 import {
   AUDIO_SAMPLE_RATE,
   DEFAULT_LANGUAGE,
+  type BuyerIdentity,
   type Language,
   parseServerEvent,
 } from "./messages";
@@ -44,11 +45,9 @@ const WS_URL = process.env.NEXT_PUBLIC_VOICE_WS_URL ?? "ws://localhost:3001";
 
 /** Options for {@link useVoiceAgent}. */
 export interface VoiceAgentOptions {
-  /**
-   * Visitor's self-reported role (from the pre-call form). Sent to the gateway
-   * so it can pick an audience persona (technical vs non-technical).
-   */
-  role?: string;
+  /** Verified identity for this demo session; gates connection and records the
+   *  session under the right buyer. */
+  buyer?: BuyerIdentity;
 }
 
 export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
@@ -69,10 +68,10 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const stream = useRef<MediaStream | null>(null);
   const player = useRef<PcmPlayer | null>(null);
   const languageRef = useRef<Language>(language);
-  const roleRef = useRef<string | undefined>(options.role);
+  const buyerRef = useRef<BuyerIdentity | undefined>(options.buyer);
 
   languageRef.current = language;
-  roleRef.current = options.role;
+  buyerRef.current = options.buyer;
 
   const teardown = useCallback(() => {
     node.current?.port.close();
@@ -154,7 +153,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
   const sendText = useCallback((text: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
-        JSON.stringify({ t: "text_input", text, role: roleRef.current })
+        JSON.stringify({ t: "text_input", text, buyer: buyerRef.current })
       );
     }
   }, []);
@@ -163,6 +162,11 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
     if (active) return;
     setError(null);
     setStatus("connecting");
+    if (!buyerRef.current) {
+      setError("Missing demo session identity");
+      setStatus("error");
+      return;
+    }
     try {
       const media = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -201,7 +205,7 @@ export function useVoiceAgent(options: VoiceAgentOptions = {}): VoiceAgent {
             t: "audio_start",
             sampleRate: AUDIO_SAMPLE_RATE,
             language: languageRef.current,
-            role: roleRef.current,
+            buyer: buyerRef.current,
           })
         );
       };

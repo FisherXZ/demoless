@@ -2,6 +2,7 @@ import type { WebSocket } from "ws";
 import {
   AUDIO_SAMPLE_RATE,
   DEFAULT_LANGUAGE,
+  type BuyerIdentity,
   type Language,
   type ServerEvent,
   parseClientMessage,
@@ -36,9 +37,11 @@ import { detectLanguage } from "./util/detectLanguage";
 import {
   SessionRecorder,
   saveSession as defaultSaveSession,
+  loadSession as defaultLoadSession,
   analyzeAndStore as defaultAnalyzeAndStore,
   replayUrl,
   type SessionRecord,
+  type SessionStatus,
 } from "../lib/sessions";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
@@ -55,6 +58,7 @@ export interface VoiceSessionDeps {
     phaseReached?: string;
   }) => Promise<void>;
   saveSession: (record: SessionRecord) => Promise<void>;
+  loadSession: (id: string) => Promise<SessionRecord | null>;
   analyzeAndStore: (record: SessionRecord) => Promise<void>;
 }
 
@@ -95,8 +99,12 @@ export class VoiceSession {
   private lastPhase: string | undefined;
   private disposed = false; // dispose() is bound to both ws "close" and "error"
 
-  /** Visitor's self-reported role from the pre-call form; picks the persona. */
-  private role: string | undefined;
+  /** Verified buyer identity for this session (demo id + email/name). */
+  private buyer: BuyerIdentity | null = null;
+  /** createdAt of the up-front session record, cached so live snapshots
+   *  (which don't know it) never clobber it. 0 = unknown. */
+  private sessionCreatedAt = 0;
+  private liveViewUrl: string | undefined;
 
   /** Finalized transcript segments for the in-progress user utterance. */
   private finals: string[] = [];
@@ -214,6 +222,7 @@ export class VoiceSession {
       createOrchestrator: deps?.createOrchestrator ?? defaultCreateOrchestrator,
       reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
       saveSession: deps?.saveSession ?? defaultSaveSession,
+      loadSession: deps?.loadSession ?? defaultLoadSession,
       analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
     };
 
@@ -249,7 +258,7 @@ export class VoiceSession {
     if (!msg) return;
     switch (msg.t) {
       case "audio_start":
-        if (msg.role) this.role = msg.role;
+        if (!this.acceptBuyer(msg.buyer)) return;
         void this.ensureStarted(msg.language);
         break;
       case "audio_stop":
@@ -268,10 +277,69 @@ export class VoiceSession {
         // A text-only visitor may type before enabling the mic; make sure the
         // browser session + orchestrator are started before running a turn
         // (otherwise this.orchestrator is null and runTurn crashes).
-        if (msg.role) this.role = msg.role;
+        if (!this.acceptBuyer(msg.buyer)) return;
         this.send({ t: "user_said", text: msg.text, final: true });
         void this.ensureStarted(this.language).then(() => this.runTurn(msg.text));
         break;
+    }
+  }
+
+  /** Adopt the buyer identity from a client message (once), normalizing the
+   *  email. Returns false (and tells the client) if we still have no identity —
+   *  a live session must be recorded under a real buyer, never "anonymous". */
+  private acceptBuyer(buyer?: BuyerIdentity): boolean {
+    if (buyer?.demoSessionId && buyer.buyerEmail) {
+      this.buyer = {
+        demoSessionId: buyer.demoSessionId,
+        buyerEmail: buyer.buyerEmail.trim().toLowerCase(),
+        buyerName: buyer.buyerName,
+      };
+    }
+    if (!this.buyer) {
+      this.send({ t: "error", message: "Missing buyer identity for live demo session." });
+      return false;
+    }
+    return true;
+  }
+
+  private get buyerEmail(): string {
+    return this.buyer?.buyerEmail ?? "";
+  }
+
+  private get demoSessionId(): string | null {
+    return this.buyer?.demoSessionId ?? null;
+  }
+
+  /** Snapshot the current session (identity + lifecycle + the recorder's event
+   *  log) to Redis, keyed by the app-owned demo session id. Fire-and-forget at
+   *  the call sites; this never throws. */
+  private async snapshot(
+    status: SessionStatus,
+    extra?: { endedAt?: number; durationSec?: number },
+  ): Promise<void> {
+    const id = this.demoSessionId;
+    if (!id) return;
+    const bb = this.browserSessionId ?? undefined;
+    const record = this.recorder.build({
+      id,
+      company: this.company,
+      status,
+      buyerEmail: this.buyerEmail || undefined,
+      buyerName: this.buyer?.buyerName,
+      createdAt: this.sessionCreatedAt,
+      endedAt: extra?.endedAt,
+      durationSec: extra?.durationSec,
+      phaseReached: this.lastPhase,
+      browserbaseSessionId: bb,
+      liveViewUrl: this.liveViewUrl,
+      language: this.language,
+      replayStatus: bb ? "pending" : "unavailable",
+      replayUrl: bb ? replayUrl(bb) : undefined,
+    });
+    try {
+      await this.deps.saveSession(record);
+    } catch (err) {
+      console.warn("[sessions] snapshot failed (continuing):", err);
     }
   }
 
@@ -297,10 +365,23 @@ export class VoiceSession {
   }
 
   private async startListening(language: Language) {
+    if (!this.demoSessionId) {
+      this.send({ t: "error", message: "Missing buyer identity for live demo session." });
+      return;
+    }
     this.language = language ?? DEFAULT_LANGUAGE;
 
     // Start the cloud browser and wire the orchestrator to its session.
     const cfg = getDemoConfig();
+    this.company = cfg.company;
+    // Recover createdAt from the up-front record so live snapshots don't clobber
+    // it; if the record is missing (Redis was down at enterDemo) we leave it 0.
+    try {
+      const existing = await this.deps.loadSession(this.demoSessionId);
+      this.sessionCreatedAt = existing?.createdAt ?? 0;
+    } catch {
+      this.sessionCreatedAt = 0;
+    }
     let sessionId: string;
     let liveViewUrl: string;
     const warm = takeWarmSession();
@@ -322,11 +403,15 @@ export class VoiceSession {
       liveViewUrl = started.liveViewUrl;
     }
     this.browserSessionId = sessionId;
+    this.liveViewUrl = liveViewUrl;
     this.send({ t: "live_view", url: liveViewUrl });
+    // The session is now live with a real cloud browser — mark it so the
+    // dashboard Live mode can show it in progress (with replay pending).
+    void this.snapshot("live");
 
     this.orchestrator = this.deps.createOrchestrator({
       sessionId,
-      buyerId: "anonymous",
+      buyerId: this.buyerEmail,
       company: cfg.company,
     });
 
@@ -334,7 +419,7 @@ export class VoiceSession {
     // so a Redis outage never blocks the session from starting.
     let buyer;
     try {
-      buyer = await loadBuyer("anonymous");
+      buyer = await loadBuyer(this.buyerEmail);
       this.buyerNotes = buyer.notes.map((n) => n.text);
     } catch {
       // Degrade gracefully: no notes injected.
@@ -342,7 +427,6 @@ export class VoiceSession {
 
     // Load cross-session demo learnings into the per-session prompt context.
     // Same degrade-on-failure contract as buyer memory above.
-    this.company = cfg.company;
     try {
       const learnings = await getLearnings(cfg.company);
       this.learningsContext = buildLearningsContext(learnings);
@@ -501,6 +585,10 @@ export class VoiceSession {
       this.recorder.recordAgent(spoken.join(" "), turn);
     }
 
+    // Snapshot the in-progress session so the dashboard Live view reflects the
+    // latest transcript/events. Fire-and-forget; never blocks the turn.
+    void this.snapshot("live");
+
     if (!abort.signal.aborted) {
       this.send({ t: "tts_end", turn });
       this.endSpeaking();
@@ -532,7 +620,6 @@ export class VoiceSession {
         buyerNotes: this.buyerNotes,
         agentName: this.agentName,
         learningsContext: this.learningsContext,
-        role: this.role,
       },
       signal
     )) {
@@ -569,7 +656,7 @@ export class VoiceSession {
           this.send({ t: "set_phase", phase: cmd.phase });
           // Also publish to the dashboard SSE channel so the live dashboard
           // panel receives phase transitions (spec §4.2 / §6).
-          void publishPhase("anonymous", cmd.phase);
+          void publishPhase(this.buyerEmail, cmd.phase);
           break;
         default:
           break;
@@ -790,16 +877,30 @@ export class VoiceSession {
       turns: this.history,
       phaseReached: this.lastPhase,
     });
-    // Persist the full session + kick off the evidence-backed recap analysis.
-    // Fire-and-forget; both impls swallow their own errors and never block teardown.
-    {
-      const id = this.browserSessionId ?? "unknown";
+    // Persist the final session (status ended) + kick off the evidence-backed
+    // recap analysis. Keyed by the app-owned demo id; the Browserbase id is an
+    // attached field. Fire-and-forget; impls swallow errors and never block.
+    if (this.demoSessionId) {
+      const bb = this.browserSessionId ?? undefined;
+      const endedAt = Date.now();
+      const durationSec = this.sessionCreatedAt
+        ? Math.max(0, Math.round((endedAt - this.sessionCreatedAt) / 1000))
+        : undefined;
       const record = this.recorder.build({
-        id,
+        id: this.demoSessionId,
         company: this.company,
-        role: this.role,
+        status: "ended",
+        buyerEmail: this.buyerEmail || undefined,
+        buyerName: this.buyer?.buyerName,
+        createdAt: this.sessionCreatedAt,
+        endedAt,
+        durationSec,
         phaseReached: this.lastPhase,
-        replayUrl: replayUrl(id),
+        browserbaseSessionId: bb,
+        liveViewUrl: this.liveViewUrl,
+        language: this.language,
+        replayStatus: bb ? "pending" : "unavailable",
+        replayUrl: bb ? replayUrl(bb) : undefined,
       });
       void this.deps.saveSession(record).catch(() => {});
       void this.deps.analyzeAndStore(record).catch(() => {});

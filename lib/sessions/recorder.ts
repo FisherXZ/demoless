@@ -1,6 +1,12 @@
 // Pure, in-memory accumulator of trace events for one live session. No Redis,
 // no network — VoiceSession feeds it events; build() snapshots a SessionRecord.
-import type { TraceEvent, TranscriptTurn, SessionRecord } from "./types";
+import type {
+  TraceEvent,
+  TranscriptTurn,
+  SessionRecord,
+  SessionStatus,
+  ReplayStatus,
+} from "./types";
 
 export class SessionRecorder {
   private _events: TraceEvent[] = [];
@@ -45,18 +51,37 @@ export class SessionRecorder {
   build(args: {
     id: string;
     company: string;
+    status: SessionStatus;
+    buyerEmail?: string;
+    buyerName?: string;
     role?: string;
-    phaseReached?: string;
-    replayUrl?: string;
+    createdAt: number;
+    startedAt?: number;
     endedAt?: number;
+    durationSec?: number;
+    phaseReached?: string;
+    browserbaseSessionId?: string;
+    liveViewUrl?: string;
+    language?: string;
+    replayStatus?: ReplayStatus;
+    replayUrl?: string;
   }): SessionRecord {
     return {
       id: args.id,
       company: args.company,
+      status: args.status,
+      buyerEmail: args.buyerEmail,
+      buyerName: args.buyerName,
       role: args.role,
-      startedAt: this.startedAt,
-      endedAt: args.endedAt ?? Date.now(),
+      createdAt: args.createdAt,
+      startedAt: args.startedAt ?? this.startedAt,
+      endedAt: args.endedAt,
+      durationSec: args.durationSec,
       phaseReached: args.phaseReached,
+      browserbaseSessionId: args.browserbaseSessionId,
+      liveViewUrl: args.liveViewUrl,
+      language: args.language,
+      replayStatus: args.replayStatus,
       replayUrl: args.replayUrl,
       events: this.events(),
       transcript: this.transcript(),

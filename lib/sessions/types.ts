@@ -4,6 +4,11 @@
 export type RecapLabel = "hot" | "follow_up_needed" | "nurture";
 export type RecapStatus = "pending" | "ready";
 
+/** Lifecycle of a demo session, from up-front creation through teardown. */
+export type SessionStatus = "created" | "live" | "ended";
+/** Whether a Browserbase replay is expected (pending) or won't exist. */
+export type ReplayStatus = "pending" | "unavailable";
+
 /** An ordered, timestamped record of what happened during a live demo. */
 export type TraceEvent =
   | { kind: "user_said"; text: string; ts: number; turn: number }
@@ -21,15 +26,31 @@ export interface TranscriptTurn {
   ts: number;
 }
 
-/** Everything persisted about one finished session — the source of truth. */
+/**
+ * Everything persisted about one demo session — the single source of truth for
+ * both the live dashboard (status === "live") and the post-session recap
+ * (status === "ended"). The id is app-owned and created up-front (at enterDemo),
+ * so a session exists before the cloud browser does; the Browserbase id is an
+ * attached field, not the key. The event log is append-only; transcript and
+ * recap are projections of it.
+ */
 export interface SessionRecord {
-  id: string;          // Browserbase session id
+  id: string;                       // app-owned demo session id (created up-front)
   company: string;
-  role?: string;       // visitor's self-reported role
-  startedAt: number;
-  endedAt: number;
+  status: SessionStatus;
+  buyerEmail?: string;              // verified identity from the pre-call form
+  buyerName?: string;
+  role?: string;                    // discovery-derived audience hint (no longer form-fed)
+  createdAt: number;                // when the session was created (pre-browser)
+  startedAt?: number;               // when the live browser phase began
+  endedAt?: number;                 // when the session ended
+  durationSec?: number;
   phaseReached?: string;
-  replayUrl?: string;
+  browserbaseSessionId?: string;    // the vendor session id, attached when live
+  liveViewUrl?: string;
+  language?: string;
+  replayStatus?: ReplayStatus;
+  replayUrl?: string;               // derived from browserbaseSessionId
   events: TraceEvent[];
   transcript: TranscriptTurn[];
 }
