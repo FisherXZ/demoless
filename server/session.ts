@@ -308,6 +308,9 @@ export class VoiceSession {
             notes: cmd.notes,
           });
           break;
+        case "set_phase":
+          this.send({ t: "set_phase", phase: cmd.phase });
+          break;
         default:
           break;
       }

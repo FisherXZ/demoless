@@ -70,6 +70,7 @@ export type Command =
   | { type: "screen_is_on"; page: string }
   | { type: "remember"; note: string; noteType?: string }
   | { type: "buyer_loaded"; buyerId: string; notes?: string[] }
+  | { type: "set_phase"; phase: string }
   | { type: "done" };
 
 /* ----------------------------------------------------------------------- *
@@ -181,6 +182,16 @@ export interface RememberEvent {
   noteType?: string;
 }
 
+export interface SetPhaseEvent {
+  t: "set_phase";
+  phase: string;
+}
+
+export interface LiveViewEvent {
+  t: "live_view";
+  url: string;
+}
+
 export interface ErrorEvent {
   t: "error";
   message: string;
@@ -197,6 +208,8 @@ export type ServerEvent =
   | ScreenIsOnEvent
   | BuyerLoadedEvent
   | RememberEvent
+  | SetPhaseEvent
+  | LiveViewEvent
   | ErrorEvent;
 
 /* ----------------------------------------------------------------------- *
