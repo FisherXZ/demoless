@@ -17,7 +17,7 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
-// Editorial display serif (Tiempos-adjacent) for hero + page titles.
+// Editorial display serif for hero + dashboard page titles.
 const newsreader = Newsreader({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
