@@ -31,7 +31,6 @@ import {
   SessionRecorder,
   saveSession as defaultSaveSession,
   analyzeAndStore as defaultAnalyzeAndStore,
-  replayUrl,
   type SessionRecord,
 } from "../lib/sessions";
 import {
@@ -41,10 +40,16 @@ import {
   type DemoSessionStartup,
   type StartBrowserSession,
 } from "./demoSession/startup";
+import {
+  createDemoSessionFinalizer,
+  defaultDemoSessionFinalizer,
+  type DemoSessionFinalizer,
+} from "./demoSession/finalize";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
   startup: DemoSessionStartup;
+  finalizer: DemoSessionFinalizer;
   startSession: StartBrowserSession;
   stopSession: (sessionId: string) => Promise<void>;
   createOrchestrator: CreateOrchestrator;
@@ -200,6 +205,15 @@ export class VoiceSession {
 
     this.deps = {
       startup,
+      finalizer:
+        deps?.finalizer ??
+        (deps?.reflectAndStore || deps?.saveSession || deps?.analyzeAndStore
+          ? createDemoSessionFinalizer({
+              reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
+              saveSession: deps?.saveSession ?? defaultSaveSession,
+              analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
+            })
+          : defaultDemoSessionFinalizer),
       startSession,
       stopSession: deps?.stopSession ?? defaultStopSession,
       createOrchestrator,
@@ -721,27 +735,14 @@ export class VoiceSession {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
-    // Fire-and-forget: distill this demo into cross-session learnings. Must not
-    // block teardown; reflectAndStore never throws and no-ops on empty history.
-    void this.deps.reflectAndStore({
+    this.deps.finalizer.finalize({
+      browserSessionId: this.browserSessionId,
       company: this.company,
-      turns: this.history,
+      role: this.role,
       phaseReached: this.lastPhase,
+      recorder: this.recorder,
+      turns: this.history,
     });
-    // Persist the full session + kick off the evidence-backed recap analysis.
-    // Fire-and-forget; both impls swallow their own errors and never block teardown.
-    {
-      const id = this.browserSessionId ?? "unknown";
-      const record = this.recorder.build({
-        id,
-        company: this.company,
-        role: this.role,
-        phaseReached: this.lastPhase,
-        replayUrl: replayUrl(id),
-      });
-      void this.deps.saveSession(record).catch(() => {});
-      void this.deps.analyzeAndStore(record).catch(() => {});
-    }
     this.cancelActive();
     void this.stopStt();
     if (this.browserSessionId) {
