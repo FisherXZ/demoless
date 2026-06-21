@@ -27,12 +27,22 @@ import {
 } from "../lib/browser/session";
 import { loadBuyer } from "../lib/memory/store";
 import { publishPhase } from "../lib/memory/pubsub";
+import {
+  getLearnings,
+  buildLearningsContext,
+  reflectAndStore as defaultReflectAndStore,
+} from "../lib/learnings";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
   startSession: (url: string) => Promise<{ liveViewUrl: string; sessionId: string; url: string; title: string }>;
   stopSession: (sessionId: string) => Promise<void>;
   createOrchestrator: (args: { sessionId: string; buyerId: string; company: string }) => Orchestrator;
+  reflectAndStore: (args: {
+    company: string;
+    turns: { role: "user" | "agent"; text: string }[];
+    phaseReached?: string;
+  }) => Promise<void>;
 }
 
 /**
@@ -47,6 +57,10 @@ export class VoiceSession {
 
   private history: ConversationTurn[] = [];
   private buyerNotes: string[] = [];
+  private learningsContext = "";
+  private company = ""; // set in startListening; "" means a session that never started
+  private lastPhase: string | undefined;
+  private disposed = false; // dispose() is bound to both ws "close" and "error"
 
   /** Finalized transcript segments for the in-progress user utterance. */
   private finals: string[] = [];
@@ -147,6 +161,7 @@ export class VoiceSession {
       startSession: deps?.startSession ?? defaultStartSession,
       stopSession: deps?.stopSession ?? defaultStopSession,
       createOrchestrator: deps?.createOrchestrator ?? defaultCreateOrchestrator,
+      reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
     };
 
     ws.on("message", (data, isBinary) => {
@@ -219,6 +234,16 @@ export class VoiceSession {
       this.buyerNotes = buyer.notes.map((n) => n.text);
     } catch {
       // Degrade gracefully: no notes injected.
+    }
+
+    // Load cross-session demo learnings into the per-session prompt context.
+    // Same degrade-on-failure contract as buyer memory above.
+    this.company = cfg.company;
+    try {
+      const learnings = await getLearnings(cfg.company);
+      this.learningsContext = buildLearningsContext(learnings);
+    } catch {
+      // Degrade gracefully: no learnings injected.
     }
 
     await this.openStt();
@@ -358,6 +383,7 @@ export class VoiceSession {
         history: recentHistory,
         buyerNotes: this.buyerNotes,
         agentName: this.agentName,
+        learningsContext: this.learningsContext,
       },
       signal
     )) {
@@ -384,6 +410,7 @@ export class VoiceSession {
           });
           break;
         case "set_phase":
+          this.lastPhase = cmd.phase;
           this.send({ t: "set_phase", phase: cmd.phase });
           // Also publish to the dashboard SSE channel so the live dashboard
           // panel receives phase transitions (spec §4.2 / §6).
@@ -598,6 +625,15 @@ export class VoiceSession {
   }
 
   dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    // Fire-and-forget: distill this demo into cross-session learnings. Must not
+    // block teardown; reflectAndStore never throws and no-ops on empty history.
+    void this.deps.reflectAndStore({
+      company: this.company,
+      turns: this.history,
+      phaseReached: this.lastPhase,
+    });
     this.cancelActive();
     void this.stopStt();
     if (this.browserSessionId) {
