@@ -20,18 +20,12 @@ import {
 import type { ConversationTurn } from "./orchestrator/types";
 import { createTts, type TtsProvider } from "./tts";
 import { ChunkChannel } from "./util/chunkChannel";
-import { getDemoConfig } from "./config/demoConfig";
 import {
   startSession as defaultStartSession,
   stopSession as defaultStopSession,
 } from "../lib/browser/session";
-import { loadBuyer } from "../lib/memory/store";
 import { publishPhase } from "../lib/memory/pubsub";
-import {
-  getLearnings,
-  buildLearningsContext,
-  reflectAndStore as defaultReflectAndStore,
-} from "../lib/learnings";
+import { reflectAndStore as defaultReflectAndStore } from "../lib/learnings";
 import { detectLanguage } from "./util/detectLanguage";
 import {
   SessionRecorder,
@@ -40,15 +34,20 @@ import {
   replayUrl,
   type SessionRecord,
 } from "../lib/sessions";
+import {
+  createDemoSessionStartup,
+  defaultDemoSessionStartup,
+  type CreateOrchestrator,
+  type DemoSessionStartup,
+  type StartBrowserSession,
+} from "./demoSession/startup";
 
 /** Injectable dependencies — real impls used in production; fakes in tests. */
 export interface VoiceSessionDeps {
-  startSession: (
-    url: string,
-    onLiveView?: (liveViewUrl: string, sessionId: string) => void
-  ) => Promise<{ liveViewUrl: string; sessionId: string; url: string; title: string }>;
+  startup: DemoSessionStartup;
+  startSession: StartBrowserSession;
   stopSession: (sessionId: string) => Promise<void>;
-  createOrchestrator: (args: { sessionId: string; buyerId: string; company: string }) => Orchestrator;
+  createOrchestrator: CreateOrchestrator;
   reflectAndStore: (args: {
     company: string;
     turns: { role: "user" | "agent"; text: string }[];
@@ -56,25 +55,6 @@ export interface VoiceSessionDeps {
   }) => Promise<void>;
   saveSession: (record: SessionRecord) => Promise<void>;
   analyzeAndStore: (record: SessionRecord) => Promise<void>;
-}
-
-/**
- * A browser pre-created by a `prewarm` message, kept briefly so the next real
- * session can adopt it (skipping the ~6s create+connect). Held at MODULE scope —
- * not on a VoiceSession — so the short-lived prewarm connection closing doesn't
- * release it. Opt-in: only populated when a client sends `prewarm`.
- */
-let warmSession: { sessionId: string; liveViewUrl: string; at: number } | null = null;
-const WARM_TTL_MS = 120_000;
-
-function takeWarmSession(): { sessionId: string; liveViewUrl: string } | null {
-  if (warmSession && Date.now() - warmSession.at < WARM_TTL_MS) {
-    const { sessionId, liveViewUrl } = warmSession;
-    warmSession = null;
-    return { sessionId, liveViewUrl };
-  }
-  warmSession = null; // expired
-  return null;
 }
 
 /**
@@ -91,6 +71,7 @@ export class VoiceSession {
   private recorder = new SessionRecorder();
   private buyerNotes: string[] = [];
   private learningsContext = "";
+  private buyerId = "anonymous";
   private company = ""; // set in startListening; "" means a session that never started
   private lastPhase: string | undefined;
   private disposed = false; // dispose() is bound to both ws "close" and "error"
@@ -208,10 +189,20 @@ export class VoiceSession {
     // Set a placeholder so the field is never uninitialized.
     this.orchestrator = null as unknown as Orchestrator;
 
+    const startSession = deps?.startSession ?? defaultStartSession;
+    const createOrchestrator =
+      deps?.createOrchestrator ?? defaultCreateOrchestrator;
+    const startup =
+      deps?.startup ??
+      (deps?.startSession || deps?.createOrchestrator
+        ? createDemoSessionStartup({ startSession, createOrchestrator })
+        : defaultDemoSessionStartup);
+
     this.deps = {
-      startSession: deps?.startSession ?? defaultStartSession,
+      startup,
+      startSession,
       stopSession: deps?.stopSession ?? defaultStopSession,
-      createOrchestrator: deps?.createOrchestrator ?? defaultCreateOrchestrator,
+      createOrchestrator,
       reflectAndStore: deps?.reflectAndStore ?? defaultReflectAndStore,
       saveSession: deps?.saveSession ?? defaultSaveSession,
       analyzeAndStore: deps?.analyzeAndStore ?? defaultAnalyzeAndStore,
@@ -282,79 +273,26 @@ export class VoiceSession {
     return this.startPromise;
   }
 
-  /** Pre-create the cloud browser so the next real session adopts it. Does NOT
-   *  set this.browserSessionId, so this (short-lived) connection closing won't
-   *  release the warmed browser. Best-effort. */
   private async prewarm() {
-    if (warmSession && Date.now() - warmSession.at < WARM_TTL_MS) return;
-    try {
-      const cfg = getDemoConfig();
-      const r = await this.deps.startSession(cfg.browseTargetUrl);
-      warmSession = { sessionId: r.sessionId, liveViewUrl: r.liveViewUrl, at: Date.now() };
-    } catch {
-      /* best-effort — warm-up never blocks anything */
-    }
+    await this.deps.startup.prewarm();
   }
 
   private async startListening(language: Language) {
     this.language = language ?? DEFAULT_LANGUAGE;
 
-    // Start the cloud browser and wire the orchestrator to its session.
-    const cfg = getDemoConfig();
-    let sessionId: string;
-    let liveViewUrl: string;
-    const warm = takeWarmSession();
-    if (warm) {
-      // Adopt a pre-warmed browser — instant, no create+connect+load wait.
-      sessionId = warm.sessionId;
-      liveViewUrl = warm.liveViewUrl;
-    } else {
-      // Show the live browser as soon as it's connectable (before the page
-      // finishes loading) so the visitor watches it navigate instead of waiting.
-      const started = await this.deps.startSession(
-        cfg.browseTargetUrl,
-        (url, sid) => {
-          this.browserSessionId = sid;
-          this.send({ t: "live_view", url });
-        }
-      );
-      sessionId = started.sessionId;
-      liveViewUrl = started.liveViewUrl;
-    }
-    this.browserSessionId = sessionId;
-    this.send({ t: "live_view", url: liveViewUrl });
-
-    this.orchestrator = this.deps.createOrchestrator({
-      sessionId,
-      buyerId: "anonymous",
-      company: cfg.company,
+    const prepared = await this.deps.startup.prepare({
+      buyerId: this.buyerId,
+      onLiveView: (url, sessionId) => {
+        this.browserSessionId = sessionId;
+        this.send({ t: "live_view", url });
+      },
     });
-
-    // Load buyer memory; populate buyerNotes for turn context; ignore errors
-    // so a Redis outage never blocks the session from starting.
-    let buyer;
-    try {
-      buyer = await loadBuyer("anonymous");
-      this.buyerNotes = buyer.notes.map((n) => n.text);
-    } catch {
-      // Degrade gracefully: no notes injected.
-    }
-
-    // Load cross-session demo learnings into the per-session prompt context.
-    // Same degrade-on-failure contract as buyer memory above.
-    this.company = cfg.company;
-    try {
-      const learnings = await getLearnings(cfg.company);
-      this.learningsContext = buildLearningsContext(learnings);
-      if (this.learningsContext) {
-        const n = this.learningsContext.split("\n").length - 1;
-        console.log(
-          `[learnings] loaded ${n} past-demo learning(s) for ${cfg.company} into this session's prompt`
-        );
-      }
-    } catch {
-      // Degrade gracefully: no learnings injected.
-    }
+    this.browserSessionId = prepared.sessionId;
+    this.send({ t: "live_view", url: prepared.liveViewUrl });
+    this.orchestrator = prepared.orchestrator;
+    this.buyerNotes = prepared.buyerNotes;
+    this.learningsContext = prepared.learningsContext;
+    this.company = prepared.company;
 
     await this.openStt();
     this.send({ t: "ready", language: this.language, agentName: this.agentName });
@@ -363,7 +301,7 @@ export class VoiceSession {
     const greeting = await this.orchestrator.greeting?.(
       this.language,
       this.agentName,
-      buyer
+      prepared.buyer
     );
     if (greeting) {
       await this.speakTurn(greeting, /* recordAsUser */ null);
@@ -569,7 +507,7 @@ export class VoiceSession {
           this.send({ t: "set_phase", phase: cmd.phase });
           // Also publish to the dashboard SSE channel so the live dashboard
           // panel receives phase transitions (spec §4.2 / §6).
-          void publishPhase("anonymous", cmd.phase);
+          void publishPhase(this.buyerId, cmd.phase);
           break;
         default:
           break;

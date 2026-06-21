@@ -22,6 +22,22 @@ vi.mock("./bargeIn", () => ({
   novelWordCount: vi.fn().mockReturnValue(0),
   tokenize: vi.fn().mockReturnValue([]),
 }));
+vi.mock("../lib/memory/store", () => ({
+  loadBuyer: vi.fn().mockResolvedValue({
+    profile: { email: "anonymous" },
+    notes: [],
+    isReturning: false,
+    recall: { line: "", topInterests: [], painPoints: [], objections: [] },
+  }),
+}));
+vi.mock("../lib/memory/pubsub", () => ({
+  publishPhase: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock("../lib/learnings", () => ({
+  getLearnings: vi.fn().mockResolvedValue([]),
+  buildLearningsContext: vi.fn().mockReturnValue(""),
+  reflectAndStore: vi.fn().mockResolvedValue(undefined),
+}));
 
 import { VoiceSession } from "./session";
 
@@ -65,10 +81,15 @@ describe("VoiceSession — browser session ownership", () => {
     );
     await handler(JSON.stringify({ t: "audio_start", language: "en" }), false);
 
-    // Give async startSession time to resolve
-    await new Promise((r) => setTimeout(r, 10));
+    await vi.waitFor(() => {
+      const events = ws.sent.map((s) => JSON.parse(s) as { t: string });
+      expect(events.some((e) => e.t === "ready")).toBe(true);
+    });
 
-    expect(fakeStartSession).toHaveBeenCalledWith(getDemoConfig().browseTargetUrl);
+    expect(fakeStartSession).toHaveBeenCalledWith(
+      getDemoConfig().browseTargetUrl,
+      expect.any(Function)
+    );
 
     const events = ws.sent.map((s) => JSON.parse(s) as { t: string; url?: string });
     const liveView = events.find((e) => e.t === "live_view");
@@ -106,7 +127,10 @@ describe("VoiceSession — browser session ownership", () => {
       (args: unknown[]) => args[0] === "message"
     );
     await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
-    await new Promise((r) => setTimeout(r, 10));
+    await vi.waitFor(() => {
+      const events = ws.sent.map((s) => JSON.parse(s) as { t: string });
+      expect(events.some((e) => e.t === "ready")).toBe(true);
+    });
 
     // Trigger close
     const closeHandlerCall = (ws.on as Mock).mock.calls.find(
@@ -115,5 +139,42 @@ describe("VoiceSession — browser session ownership", () => {
     await closeHandlerCall?.[1]?.();
 
     expect(fakeStopSession).toHaveBeenCalledWith("bb-session-456");
+  });
+
+  it("can stop the browser if the socket closes after early live_view but before startup resolves", async () => {
+    const ws = makeWs();
+
+    const fakeStartSession = vi.fn(
+      (_url: string, onLiveView?: (liveViewUrl: string, sessionId: string) => void) =>
+        new Promise<{
+          liveViewUrl: string;
+          sessionId: string;
+          url: string;
+          title: string;
+        }>(() => {
+          onLiveView?.("https://live.example.com/early", "bb-session-early");
+        })
+    );
+    const fakeStopSession = vi.fn().mockResolvedValue(undefined);
+    const fakeCreateOrchestrator = vi.fn();
+
+    new VoiceSession(ws as unknown as import("ws").WebSocket, "dg-key", {
+      startSession: fakeStartSession,
+      stopSession: fakeStopSession,
+      createOrchestrator: fakeCreateOrchestrator,
+    });
+
+    const [[, msgHandler]] = (ws.on as Mock).mock.calls.filter(
+      (args: unknown[]) => args[0] === "message"
+    );
+    await msgHandler(JSON.stringify({ t: "audio_start", language: "en" }), false);
+
+    const closeHandlerCall = (ws.on as Mock).mock.calls.find(
+      (args: unknown[]) => args[0] === "close"
+    );
+    await closeHandlerCall?.[1]?.();
+
+    expect(fakeStopSession).toHaveBeenCalledWith("bb-session-early");
+    expect(fakeCreateOrchestrator).not.toHaveBeenCalled();
   });
 });
