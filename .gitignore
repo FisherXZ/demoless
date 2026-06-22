@@ -23,3 +23,6 @@ next-env.d.ts
 # Clay docs crawl (48MB raw HTML) — regenerable via scripts/fetch-clay-docs-browser.mjs
 research/clay-kb/
 .worktrees/
+
+# Playwright MCP scratch (transient)
+.playwright-mcp/

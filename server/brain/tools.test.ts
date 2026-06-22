@@ -11,4 +11,10 @@ describe("tool catalog", () => {
   it("every tool has an input_schema with a type object", () => {
     for (const t of TOOLS) expect(t.input_schema.type).toBe("object");
   });
+  it("look accepts an optional visual flag and is not required", () => {
+    const look = TOOLS.find((t) => t.name === "look")!;
+    const props = look.input_schema.properties as Record<string, any>;
+    expect(props.visual).toMatchObject({ type: "boolean" });
+    expect(look.input_schema.required ?? []).not.toContain("visual");
+  });
 });
