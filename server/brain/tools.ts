@@ -4,7 +4,13 @@ export type ToolName =
   | "navigate" | "click" | "type" | "press" | "scroll" | "wait"
   | "look" | "remember" | "search_knowledge" | "set_phase";
 
-export interface ToolResult { ok: boolean; content: string }
+// content is usually text; the vision path (explicit look(visual) or a failed
+// click/type) returns a [text, image] block array — the exact subset Anthropic
+// allows inside a tool_result.
+export interface ToolResult {
+  ok: boolean;
+  content: string | Array<Anthropic.TextBlockParam | Anthropic.ImageBlockParam>;
+}
 
 export const TOOLS: Anthropic.Tool[] = [
   { name: "navigate", description: "Drive the live browser to a full URL on the demo site.",
@@ -25,8 +31,8 @@ export const TOOLS: Anthropic.Tool[] = [
     input_schema: { type: "object", properties: {
       until: { type: "string" }, seconds: { type: "number" }
     }, required: [] } },
-  { name: "look", description: "Read the current page (title, links, text) without navigating.",
-    input_schema: { type: "object", properties: {}, required: [] } },
+  { name: "look", description: "Read the current page (title, elements, text) without navigating. Pass visual:true to ALSO attach a screenshot when text isn't enough (a chart, an icon-only control, an ambiguous layout) — use sparingly.",
+    input_schema: { type: "object", properties: { visual: { type: "boolean" } }, required: [] } },
   { name: "remember", description: "Save a durable note about the buyer.",
     input_schema: { type: "object", properties: {
       note: { type: "string" },

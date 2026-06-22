@@ -1,0 +1,31 @@
+# VERBATIM excerpt of a real Playwright locator.ariaSnapshot() capture
+# (W3C ARIA APG 'checkbox mixed' example, captured 2026-06-21). Do not edit
+# the role/name/state grammar — this exists to test parseAriaElements against
+# REAL output (multiple bracket groups, [ref=]/[cursor=] noise, [checked=mixed]).
+                - link "Checkbox (Two State)" [ref=e77] [cursor=pointer]:
+                  - /url: ../checkbox/
+                - text: ": Simple two state checkbox."
+          - generic [ref=e78]:
+            - heading "Example" [level=2] [ref=e80]
+            - separator "Start of Example"
+            - group "Sandwich Condiments" [ref=e82]:
+              - generic [ref=e83]: Sandwich Condiments
+              - checkbox "All condiments" [checked=mixed] [ref=e84] [cursor=pointer]
+              - list [ref=e85]:
+                - listitem [ref=e86]:
+                  - generic [ref=e87]:
+                    - checkbox "Lettuce" [ref=e88]
+                    - text: Lettuce
+                - listitem [ref=e89]:
+                  - generic [ref=e90]:
+                    - checkbox "Tomato" [checked] [ref=e91]
+                    - text: Tomato
+                - listitem [ref=e92]:
+                  - generic [ref=e93]:
+                    - checkbox "Mustard" [ref=e94]
+                    - text: Mustard
+                - listitem [ref=e95]:
+                  - generic [ref=e96]:
+                    - checkbox "Sprouts" [ref=e97]
+                    - text: Sprouts
+            - separator "End of Example"

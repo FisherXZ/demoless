@@ -5,6 +5,7 @@ vi.mock("../../lib/browser/session", () => ({
   navigate: vi.fn(),
   clickText: vi.fn(),
   pageContext: vi.fn(),
+  screenshot: vi.fn(),
   startSession: vi.fn(),
   stopSession: vi.fn(),
 }));

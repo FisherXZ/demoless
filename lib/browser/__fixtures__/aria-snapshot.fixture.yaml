@@ -1,0 +1,35 @@
+# Representative Playwright `locator.ariaSnapshot()` output (default mode).
+# Mirrors the documented aria-snapshot grammar and exercises every shape the
+# parser must handle: nested containers, an unnamed (icon-only) button, a
+# textbox/combobox with a folded-in value, [checked]/[checked=mixed]/[pressed]/
+# [expanded]/[selected]/[level=N] state tokens, and a [ref=] token (ai-mode) the
+# parser must NOT treat as a state. Non-interactive roles must be filtered out.
+# NOTE: ideally replace with a verbatim captured snapshot (Playwright MCP) when
+# the headless browser is available — see PR notes.
+- banner:
+  - link "Skip to content"
+  - button "Open menu" [expanded]
+  - button
+- navigation "Main":
+  - list:
+    - listitem:
+      - link "Home"
+    - listitem:
+      - link "Docs"
+- main:
+  - heading "Welcome back" [level=1]
+  - searchbox "Search"
+  - textbox "Email": jane@example.com
+  - checkbox "Remember me" [checked]
+  - checkbox "Select all rows" [checked=mixed]
+  - button "Submit"
+  - button "Bold" [pressed]
+  - tablist:
+    - tab "Overview" [selected]
+    - tab "Pricing"
+  - switch "Dark mode" [checked]
+  - slider "Volume"
+  - combobox "Country": United States
+  - img "Company logo"
+  - paragraph: Some descriptive copy that is not actionable.
+  - link "AI Mode Link" [ref=e42]

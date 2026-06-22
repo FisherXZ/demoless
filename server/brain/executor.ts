@@ -1,7 +1,9 @@
+import type Anthropic from "@anthropic-ai/sdk";
 import type { ToolName, ToolResult } from "./tools";
 
 export interface ScreenState { sessionId: string; url: string; title: string }
-export interface PageContext { url: string; title: string; links: string[]; text: string }
+export interface PageContext { url: string; title: string; elements: string[]; text: string }
+export interface Shot { base64: string; mediaType: "image/jpeg" }
 export interface BrowserLane {
   navigate(sessionId: string, url: string): Promise<ScreenState>;
   clickText(sessionId: string, text: string): Promise<ScreenState>;
@@ -10,6 +12,7 @@ export interface BrowserLane {
   scroll(sessionId: string, direction: "down" | "up"): Promise<ScreenState>;
   waitFor(sessionId: string, until?: string, seconds?: number): Promise<ScreenState>;
   pageContext(sessionId: string): Promise<PageContext>;
+  screenshot(sessionId: string): Promise<Shot>;
 }
 export interface MemoryLane { remember(buyerId: string, n: { text: string; type: string }): Promise<unknown> }
 export interface KnowledgeLane {
@@ -23,7 +26,18 @@ export interface ExecutorDeps {
 export interface ToolExecutor { run(name: ToolName, input: any, signal?: AbortSignal): Promise<ToolResult>; phase: string }
 
 const pageToText = (p: PageContext) =>
-  `URL: ${p.url}\nTitle: ${p.title}\nLinks: ${p.links.join(", ")}\n\n${p.text}`.slice(0, 4000);
+  `URL: ${p.url}\nTitle: ${p.title}\nElements:\n${p.elements.join("\n")}\n\n${p.text}`.slice(0, 4000);
+
+/** Bundle a text label with a screenshot into the [text, image] block array
+ *  Anthropic accepts inside a tool_result — the shared shape for look(visual)
+ *  and the click/type failure-recovery path. */
+const withShot = (
+  text: string,
+  shot: Shot
+): Array<Anthropic.TextBlockParam | Anthropic.ImageBlockParam> => [
+  { type: "text", text },
+  { type: "image", source: { type: "base64", media_type: shot.mediaType, data: shot.base64 } },
+];
 
 export function makeExecutor(d: ExecutorDeps): ToolExecutor {
   let phase = "HOOK";
@@ -51,8 +65,14 @@ export function makeExecutor(d: ExecutorDeps): ToolExecutor {
           case "wait":
             await d.browser.waitFor(d.sessionId, input.until, input.seconds);
             return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };
-          case "look":
-            return { ok: true, content: pageToText(await d.browser.pageContext(d.sessionId)) };
+          case "look": {
+            const text = pageToText(await d.browser.pageContext(d.sessionId));
+            if (input?.visual) {
+              const shot = await d.browser.screenshot(d.sessionId).catch(() => null);
+              if (shot) return { ok: true, content: withShot(text, shot) };
+            }
+            return { ok: true, content: text };
+          }
           case "remember":
             await d.memory.remember(d.buyerId, { text: input.note, type: input.type });
             return { ok: true, content: "noted" };
@@ -70,7 +90,15 @@ export function makeExecutor(d: ExecutorDeps): ToolExecutor {
           case "set_phase": phase = input.phase; return { ok: true, content: `phase=${phase}` };
         }
       } catch (e) {
-        return { ok: false, content: `tool ${name} failed: ${(e as Error).message}` };
+        const msg = `tool ${name} failed: ${(e as Error).message}`;
+        // Vision recovery: when a click/type couldn't find its target, attach the
+        // current screen so the model can self-correct. Skip on barge-in (aborted)
+        // — no point paying screenshot latency for a turn that's being cut off.
+        if ((name === "click" || name === "type") && !signal?.aborted) {
+          const shot = await d.browser.screenshot(d.sessionId).catch(() => null);
+          if (shot) return { ok: false, content: withShot(`${msg} — current screen attached`, shot) };
+        }
+        return { ok: false, content: msg };
       }
     },
   };

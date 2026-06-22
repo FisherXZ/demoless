@@ -11,7 +11,8 @@ const fakes = () => ({
     pressKey: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
     scroll: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
     waitFor: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
-    pageContext: vi.fn(async () => ({ url: "/x", title: "X", links: ["/a"], text: "hello world" })),
+    pageContext: vi.fn(async () => ({ url: "/x", title: "X", elements: ['link "Home"'], text: "hello world" })),
+    screenshot: vi.fn(async () => ({ base64: "AAAA", mediaType: "image/jpeg" as const })),
   },
   memory: { remember: vi.fn(async () => ({ id: "n1" })) },
   knowledge: { searchKnowledge: vi.fn(async () => [{ title: "Pricing", text: "$$", score: 0.9 }]),
@@ -33,7 +34,8 @@ describe("ToolExecutor", () => {
     expect(f.browser.clickText).toHaveBeenCalledWith("s1", "Pricing");
     expect(f.browser.pageContext).toHaveBeenCalledWith("s1");
     expect(r.ok).toBe(true);
-    expect(r.content).toContain("Links: /a");
+    expect(r.content).toContain('link "Home"');
+    expect(r.content).toContain("Elements:");
   });
   it("type fills a field THEN reads pageContext for text", async () => {
     const f = fakes(); const ex = makeExecutor(f as any);
@@ -107,5 +109,58 @@ describe("ToolExecutor", () => {
     const r = await ex.run("navigate", { url: "/x" }, ac.signal);
     expect(f.browser.navigate).not.toHaveBeenCalled();
     expect(r.ok).toBe(false);
+  });
+
+  it("look(visual:true) attaches a screenshot as an image block", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("look", { visual: true });
+    expect(f.browser.screenshot).toHaveBeenCalledWith("s1");
+    expect(Array.isArray(r.content)).toBe(true);
+    const blocks = r.content as any[];
+    expect(blocks[0]).toMatchObject({ type: "text" });
+    expect(blocks[0].text).toContain("Title: X");
+    expect(blocks[1]).toMatchObject({
+      type: "image",
+      source: { type: "base64", media_type: "image/jpeg", data: "AAAA" },
+    });
+  });
+
+  it("look without visual stays text-only (no screenshot)", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const r = await ex.run("look", {});
+    expect(f.browser.screenshot).not.toHaveBeenCalled();
+    expect(typeof r.content).toBe("string");
+  });
+
+  it("a failed click attaches the current screen so the model can self-correct", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    f.browser.clickText.mockRejectedValueOnce(new Error("element not found"));
+    const r = await ex.run("click", { text: "Ghost button" });
+    expect(r.ok).toBe(false);
+    expect(Array.isArray(r.content)).toBe(true);
+    const blocks = r.content as any[];
+    expect(blocks[0].text).toContain("tool click failed");
+    expect(blocks[1]).toMatchObject({ type: "image" });
+  });
+
+  it("a failed click degrades to text-only when the screenshot also fails", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    f.browser.clickText.mockRejectedValueOnce(new Error("element not found"));
+    f.browser.screenshot.mockRejectedValueOnce(new Error("no session"));
+    const r = await ex.run("click", { text: "Ghost button" });
+    expect(r.ok).toBe(false);
+    expect(typeof r.content).toBe("string");
+    expect(r.content).toContain("tool click failed");
+  });
+
+  it("a click failed by barge-in (aborted) skips the screenshot latency", async () => {
+    const f = fakes(); const ex = makeExecutor(f as any);
+    const ac = new AbortController();
+    // abort mid-flight, after the entry guard, so we reach the catch block aborted
+    f.browser.clickText.mockImplementationOnce(async () => { ac.abort(); throw new Error("boom"); });
+    const r = await ex.run("click", { text: "X" }, ac.signal);
+    expect(r.ok).toBe(false);
+    expect(f.browser.screenshot).not.toHaveBeenCalled();
+    expect(typeof r.content).toBe("string");
   });
 });

@@ -6,6 +6,7 @@ import type { ToolExecutor } from "./executor";
 import { SentenceChunker } from "../util/sentenceChunker";   // REVIEW FIX improvement 2
 import type { Command } from "../../lib/voice/messages";      // REVIEW FIX B1: the ONE shared union
 import { sanitizeSpokenText } from "./spokenText";
+import { toText } from "../util/contentText";
 
 function say(text: string): Command | null {
   const clean = sanitizeSpokenText(text);
@@ -65,8 +66,10 @@ export async function* runTurn(args: TurnArgs): AsyncIterable<Command> {
       if (t.name === "navigate" || t.name === "click" || t.name === "look") {
         // Emit a concise page label (Title line from pageToText output), not a
         // raw 200-char text dump. Falls back to the navigate target URL.
-        const titleMatch = r.content.match(/^Title: (.+)$/m);
-        const urlMatch = r.content.match(/^URL: (.+)$/m);
+        // toText: tool content may be a [text, image] array on the vision path.
+        const label = toText(r.content);
+        const titleMatch = label.match(/^Title: (.+)$/m);
+        const urlMatch = label.match(/^URL: (.+)$/m);
         const page = titleMatch?.[1]?.trim() || urlMatch?.[1]?.trim() || t.input?.url || "";
         yield { type: "screen_is_on", page };
       }

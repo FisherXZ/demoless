@@ -9,7 +9,8 @@ const fakeWithRagError = () => ({
   browser: {
     navigate: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
     clickText: vi.fn(async () => ({ sessionId: "s1", url: "/x", title: "" })),
-    pageContext: vi.fn(async () => ({ url: "/x", title: "X", links: [], text: "" })),
+    pageContext: vi.fn(async () => ({ url: "/x", title: "X", elements: [], text: "" })),
+    screenshot: vi.fn(async () => ({ base64: "AAAA", mediaType: "image/jpeg" as const })),
   },
   memory: { remember: vi.fn(async () => ({ id: "n1" })) },
   knowledge: {

@@ -157,4 +157,55 @@ describe("runTurn", () => {
 
     expect(out).toContainEqual({ type: "screen_is_on", page: "" });
   });
+
+  // Vision path: tool content may be a [text, image] block array. The label
+  // extraction must read through it (via toText) and the array must round-trip.
+  const imageBlock = { type: "image", source: { type: "base64", media_type: "image/jpeg", data: "AAAA" } };
+
+  it("extracts the page label from a [text, image] success result", async () => {
+    const stream = (() => {
+      let i = 0;
+      const scripts = [
+        [{ kind: "tool_use", id: "0", name: "navigate", input: { url: "/p" } }, { kind: "end" }],
+        [{ kind: "end" }],
+      ];
+      return async function* () { yield* scripts[i++]; } as any;
+    })();
+    const executor = {
+      phase: "HOOK",
+      run: vi.fn(async () => ({
+        ok: true,
+        content: [{ type: "text", text: "URL: /p\nTitle: Pricing\n\ntext" }, imageBlock],
+      })),
+    };
+    const out: any[] = [];
+    for await (const c of runTurn({ system: "s", messages: [], executor: executor as any,
+      signal: new AbortController().signal, stream })) out.push(c);
+    expect(out).toContainEqual({ type: "screen_is_on", page: "Pricing" });
+    expect(out.at(-1)).toEqual({ type: "done" });
+  });
+
+  it("round-trips an is_error [text, image] failure result without crashing", async () => {
+    const stream = (() => {
+      let i = 0;
+      const scripts = [
+        [{ kind: "tool_use", id: "0", name: "click", input: { text: "Ghost" } }, { kind: "end" }],
+        [{ kind: "text", delta: "Not seeing that one." }, { kind: "end" }],
+      ];
+      return async function* () { yield* scripts[i++]; } as any;
+    })();
+    const executor = {
+      phase: "HOOK",
+      run: vi.fn(async () => ({
+        ok: false,
+        content: [{ type: "text", text: "tool click failed: element not found — current screen attached" }, imageBlock],
+      })),
+    };
+    const out: any[] = [];
+    for await (const c of runTurn({ system: "s", messages: [], executor: executor as any,
+      signal: new AbortController().signal, stream })) out.push(c);
+    // The model still gets to recover and speak; the loop completes cleanly.
+    expect(out.filter((c) => c.type === "say").map((c) => c.text).join(" ")).toContain("Not seeing that one.");
+    expect(out.at(-1)).toEqual({ type: "done" });
+  });
 });
